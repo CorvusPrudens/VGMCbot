@@ -33,7 +33,7 @@ peasantCommands = """
 ✿ hmc -- "How Many Coins;" this'll tell you how many you've got!
 """
 
-leader = 'CAW CAW CAW'
+leader = 'Leader'
 
 bank = {}
 
