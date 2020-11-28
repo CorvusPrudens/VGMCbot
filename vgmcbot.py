@@ -107,8 +107,9 @@ def loadBank(dict, path):
     try:
         with open(path, 'r') as file:
             for line in file:
-                tokens = line.split(',')
-                dict[int(tokens[0])] = float(tokens[1])
+                tokens = line.replace('\n', '').split(',')
+                if len(line.replace('\n', '')) > 0:
+                    dict[int(tokens[0])] = float(tokens[1])
     except FileNotFoundError:
         pass
 
