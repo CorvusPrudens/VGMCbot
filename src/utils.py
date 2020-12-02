@@ -105,18 +105,19 @@ async def reactionRemove(reaction, user):
         except KeyError:
             bank[reaction.message.author.id] = 0
 
-        # if bank[reaction.message.author.id] >= 1:
+        # This is a bit troll since people can be put into debt if someone
+        # removes a coin while the debtor has less than one coin
         bank[reaction.message.author.id] -= 1
         bank[user.id] += 1
         storeBank(bank, cachePath)
-        # else:
-        #     pass
 
 ################################################################################
 ########################## on_message functions ################################
 ################################################################################
 
-async def noMention(message):
+async def preMention(message):
+    # this global crap is messy and needs to be cleaned up
+    global prevChoice
     if honkRegex.search(message.content.lower()) != None:
         currentChoice = randrange(5)
         while currentChoice == prevChoice:
@@ -174,7 +175,7 @@ async def fList(message, tokens):
         if len(fetched.name) > longest:
             longest = len(fetched.name)
     for pair in templist:
-        if pair[1] > 0:
+        if pair[1] != 0:
             tempstr += responses['listItem'].format(pair[0], pair[1])
     await message.channel.send(tempstr)
 

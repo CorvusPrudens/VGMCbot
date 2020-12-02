@@ -12,23 +12,18 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    # this global crap is messy and needs to be cleaned up
-    global prevChoice
     if message.author == client.user:
         return
 
     # Just so the bot doesn't feel neurotic
     sleep(0.5)
 
-    await noMention(message)
+    await preMention(message)
 
     # Proper parsing would be best here, but this
     # will work for now
     if client.user.mentioned_in(message):
         tokens = message.content.split(' ')
-        lowertokens = message.content.lower().split(' ')
-        name = '{0.user}'.format(client)[:-5]
-        # server = message.guild
 
         # This means that the first command left-to-right is
         # the one that is executed. I think this is fine.
