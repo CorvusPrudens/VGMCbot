@@ -1,75 +1,7 @@
 import random as rand
 import re
-import aiohttp
 from data import *
-
-################################################################################
-########################## general functions ###################################
-################################################################################
-
-async def getHour():
-    response = {'datetime': ''}
-    async with aiohttp.ClientSession() as session:
-        async with session.get(timeUrl) as r:
-            if r.status == 200:
-                response = await r.json()
-    hour = timeRegex.search(response['datetime'])
-    if hour == None:
-        return None
-    else:
-        return int(hour.group(0))
-
-def getUserFromMention(mention):
-    try:
-        return int(mentionRegex.search(mention).group(0))
-    except AttributeError:
-        return None
-
-def extractValue(tokens, keyword):
-    for i in range(len(tokens)):
-        if keyword in tokens[i]:
-            if i >= len(tokens) - 2:
-                return None
-            try:
-                value = float(tokens[i + 2])
-                return {'value': value, 'name': tokens[i + 1]}
-            except ValueError:
-                return None
-    return None
-
-def hasPermission(user, role):
-    for ro in user.roles:
-        if ro.name == role:
-            return True
-    return False
-
-def helpMessage(message):
-    tempstr = commandsHeader.format(rand.choice(cute))
-    if hasPermission(message.author, leader):
-        tempstr += leaderCommands
-    return tempstr + peasantCommands
-
-def loadBank(dict, path):
-    try:
-        with open(path, 'r') as file:
-            for line in file:
-                tokens = line.replace('\n', '').split(',')
-                if len(line.replace('\n', '')) > 0:
-                    dict[int(tokens[0])] = float(tokens[1])
-    except FileNotFoundError:
-        pass
-
-def storeBank(dict, path):
-    with open(path, 'w') as file:
-        for key in dict:
-            file.write(f'{key},{dict[key]}\n')
-
-def getReactionName(reactStr):
-    match = reactRegex.search(reactStr)
-    if match != None:
-        return match.group(0)
-    else:
-        return None
+from utils import *
 
 ################################################################################
 ########################## on_reaction functions ###############################
@@ -118,7 +50,7 @@ async def reactionRemove(reaction, user):
 ########################## on_message functions ################################
 ################################################################################
 
-async def preMention(message):
+async def preMention(message, client):
     # this global crap is messy and needs to be cleaned up
     global prevChoice
     if honkRegex.search(message.content.lower()) != None:
@@ -131,7 +63,7 @@ async def preMention(message):
     elif hankRegex.search(message.content.lower()) != None:
         await message.channel.send(hankUrl1 + hankUrl2 + hankUrl3)
 
-async def fGive(message):
+async def fGive(message, client):
     if hasPermission(message.author, leader):
         # bit ugly but...
         sanitized = message.content.replace('<', ' <').replace('>', '> ')
@@ -156,10 +88,14 @@ async def fGive(message):
         mess = responses['permission'].format(message.author.mention, rand.choice(sad))
         await message.channel.send(mess)
 
-async def fHelp(message):
-    await message.channel.send(helpMessage(message))
+async def fHelp(message, client):
+    # await message.channel.send(helpMessage(message))
+    tempstr = commandsHeader.format(rand.choice(cute))
+    if hasPermission(message.author, leader):
+        tempstr += leaderCommands
+    await message.channel.send(tempstr + client.peasantCommands)
 
-async def fHmc(message):
+async def fHmc(message, client):
     try:
         value = bank[message.author.id]
     except KeyError:
@@ -169,7 +105,7 @@ async def fHmc(message):
         mess = mess.replace('VGMCoins', 'VGMCoin')
     await message.channel.send(mess)
 
-async def fList(message):
+async def fList(message, client):
     await message.channel.send(responses['list'].format(rand.choice(cute)))
     tempstr = ''
     templist = []
@@ -187,10 +123,10 @@ async def fList(message):
             tempstr += responses['listItem'].format(pair[0], pair[1])
     await message.channel.send(tempstr)
 
-async def fUwu(message):
+async def fUwu(message, client):
     await message.channel.send(responses['uwu'].format(rand.choice(cute)))
 
-async def fTime(message):
+async def fTime(message, client):
     time = timePartRegex.search(message.content.lower())
     if time != None:
         period = time.group(0)
@@ -210,7 +146,7 @@ async def fTime(message):
                 mess = responses['nottime'].format('night', rand.choice(sad))
                 await message.channel.send(mess)
 
-async def fCount(message):
+async def fCount(message, client):
     await message.channel.send(str(client.counter))
 
 # this dictionary allows us to cleanly call the defined
@@ -232,8 +168,10 @@ funcDict = {
     'count': fCount
 }
 
+
+
 # here we construct the regex string so it's not a pain in the ass to update
-commRegexString = '\\b'
+commRegexString = '\\b('
 for key in funcDict:
     commRegexString += '({})|'.format(key)
-commRegex = re.compile(commRegexString[:-1] + '\\b')
+commRegex = re.compile(commRegexString[:-1] + ')\\b')

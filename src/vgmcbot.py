@@ -2,13 +2,15 @@ import asyncio
 import sys
 import random as rand
 from data import *
-from funcs import *
+from utils import *
+from commands import *
 
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
     loadBank(bank, cachePath)
+    client.addCommands()
 
 @client.event
 async def on_message(message):
@@ -27,7 +29,7 @@ async def on_message(message):
         # the one that is executed. I think this is fine.
         command = commRegex.search(message.content.lower())
         if command != None:
-            await funcDict[command.group(0)](message)
+            await funcDict[command.group(0)](message, client)
         else:
             mess = 'what\'s up gamer {}'.format(rand.choice(cute))
             await message.channel.send(mess)

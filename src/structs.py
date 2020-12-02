@@ -1,11 +1,20 @@
 import discord
 import asyncio
+import games
+from commands import *
+from data import *
 
 class extClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # create the background task and run it in the background
+        self.funcDict = funcDict
+        self.peasantCommands = peasantCommands
+
+        self.games = games.Games()
+
+        self.commands.update(games.funcDict)
+        self.peasantCommands += games.commandString
         self.bg_task = self.loop.create_task(self.printing())
         self.counter = 0
 
