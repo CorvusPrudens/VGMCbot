@@ -2,7 +2,7 @@ from random import choice, randrange
 from time import sleep
 from sys import argv
 from data import *
-from utils import *
+from funcs import *
 
 
 @client.event

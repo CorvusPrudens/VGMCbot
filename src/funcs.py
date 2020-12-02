@@ -1,8 +1,8 @@
 import json
 from random import choice
 from re import compile
-from data import *
 from requests import get
+from data import *
 
 ################################################################################
 ########################## general functions ###################################
