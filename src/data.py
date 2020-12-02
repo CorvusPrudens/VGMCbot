@@ -1,5 +1,6 @@
 import discord
-from re import compile
+import re
+from structs import *
 
 ################################################################################
 ########################## main globals ########################################
@@ -8,7 +9,7 @@ from re import compile
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = discord.Client(intents=intents)
+client = extClient(intents=intents)
 botID = '782113493797044224'
 cachePath = 'bank.csv'
 prevChoice = 0
@@ -23,6 +24,8 @@ timeBound = {
 ########################## text data ###########################################
 ################################################################################
 
+timeUrl = 'https://worldtimeapi.org/api/timezone/America/New_York'
+
 imgur = 'https://i.imgur.com/'
 end = '.jpg'
 honks = [
@@ -34,7 +37,8 @@ honks = [
 ]
 
 hankUrl1 = "https://static.wikia.nocookie.net/kingofthehill/images/c/c4/"
-hankUrl2 = "Hank_Hill.png/revision/latest/top-crop/width/360/height/450?cb=20140504043948"
+hankUrl2 = "Hank_Hill.png/revision/latest/top-crop/width/360/height/"
+hankUrl3 = "450?cb=20140504043948"
 commandsHeader = "When you mention me, I'll do a command for you! {}"
 leaderCommands = """
 ✿ give @<username> <value> coins -- this will give <username> the <value> of coins!
@@ -91,10 +95,9 @@ sad = [
 ########################## regex ###############################################
 ################################################################################
 
-timeRegex = compile('(?<=T)[0-9]{1,2}')
-timePartRegex = compile('\\b(morning)|(night)\\b')
-honkRegex = compile('\\b(honk)s*\\b')
-hankRegex = compile('\\b(hank)\\b')
-mentionRegex = compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
-reactRegex = compile('(?<=<:)[A-Za-z_0-9]+')
-commRegex = compile('\\b(give)|(help)|(hmc)|(list)|(uwu)|(night)|(morning)\\b')
+timeRegex = re.compile('(?<=T)[0-9]{1,2}')
+timePartRegex = re.compile('\\b(morning)|(night)\\b')
+honkRegex = re.compile('\\b(honk)s*\\b')
+hankRegex = re.compile('\\b(hank)\\b')
+mentionRegex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
+reactRegex = re.compile('(?<=<:)[A-Za-z_0-9]+')

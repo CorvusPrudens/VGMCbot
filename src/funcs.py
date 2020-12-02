@@ -1,16 +1,19 @@
-import json
-from random import choice
-from re import compile
-from requests import get
+import random as rand
+import re
+import aiohttp
 from data import *
 
 ################################################################################
 ########################## general functions ###################################
 ################################################################################
 
-def getHour():
-    response = get('https://worldtimeapi.org/api/timezone/America/New_York')
-    hour = timeRegex.search(response.json()['datetime'])
+async def getHour():
+    response = {'datetime': ''}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(timeUrl) as r:
+            if r.status == 200:
+                response = await r.json()
+    hour = timeRegex.search(response['datetime'])
     if hour == None:
         return None
     else:
@@ -41,7 +44,7 @@ def hasPermission(user, role):
     return False
 
 def helpMessage(message):
-    tempstr = commandsHeader.format(choice(cute))
+    tempstr = commandsHeader.format(rand.choice(cute))
     if hasPermission(message.author, leader):
         tempstr += leaderCommands
     return tempstr + peasantCommands
@@ -119,21 +122,25 @@ async def preMention(message):
     # this global crap is messy and needs to be cleaned up
     global prevChoice
     if honkRegex.search(message.content.lower()) != None:
-        currentChoice = randrange(5)
+        currentChoice = rand.randrange(5)
         while currentChoice == prevChoice:
-            currentChoice = randrange(5)
+            currentChoice = rand.randrange(5)
         prevChoice = currentChoice
         url = imgur + honks[currentChoice] + end
         await message.channel.send(url)
     elif hankRegex.search(message.content.lower()) != None:
-        await message.channel.send(hankUrl1 + hankUrl2)
+        await message.channel.send(hankUrl1 + hankUrl2 + hankUrl3)
 
-async def fGive(message, tokens):
+async def fGive(message):
     if hasPermission(message.author, leader):
+        # bit ugly but...
+        sanitized = message.content.replace('<', ' <').replace('>', '> ')
+        sanitized = sanitized.replace('  ', ' ')
+        tokens = sanitized.split(' ')
         data = extractValue(tokens, 'give')
         user = getUserFromMention(data['name'])
         if data['value'] == None or user == None:
-            mess = responses['giveErr'].format(message.author.mention, choice(sad))
+            mess = responses['giveErr'].format(message.author.mention, rand.choice(sad))
             await message.channel.send(mess)
         else:
             try:
@@ -141,33 +148,34 @@ async def fGive(message, tokens):
             except KeyError:
                 bank[user] = data['value']
             storeBank(bank, cachePath)
-            mess = responses['give'].format(data['name'], bank[user], choice(cute))
+            mess = responses['give'].format(data['name'], bank[user], rand.choice(cute))
             if bank[user] == 1:
                 mess = mess.replace('VGMCoins', 'VGMCoin')
             await message.channel.send(mess)
     else:
-        mess = responses['permission'].format(message.author.mention, choice(sad))
+        mess = responses['permission'].format(message.author.mention, rand.choice(sad))
         await message.channel.send(mess)
 
-async def fHelp(message, tokens):
+async def fHelp(message):
     await message.channel.send(helpMessage(message))
 
-async def fHmc(message, tokens):
+async def fHmc(message):
     try:
         value = bank[message.author.id]
     except KeyError:
         value = 0
-    mess = responses['hmc'].format(message.author.mention, value, choice(cute))
+    mess = responses['hmc'].format(message.author.mention, value, rand.choice(cute))
     if value == 1:
         mess = mess.replace('VGMCoins', 'VGMCoin')
     await message.channel.send(mess)
 
-async def fList(message, tokens):
-    await message.channel.send(responses['list'].format(choice(cute)))
+async def fList(message):
+    await message.channel.send(responses['list'].format(rand.choice(cute)))
     tempstr = ''
     templist = []
     longest = 0
-    sortedBank = dict(sorted(bank.items(), key=lambda item: item[1], reverse=True))
+    sortedBank = sorted(bank.items(), key=lambda item: item[1], reverse=True)
+    sortedBank = dict(sortedBank)
     # can't really use longest yet, but maybe we'll find a use eventually
     for key in sortedBank:
         fetched = await client.fetch_user(key)
@@ -179,28 +187,31 @@ async def fList(message, tokens):
             tempstr += responses['listItem'].format(pair[0], pair[1])
     await message.channel.send(tempstr)
 
-async def fUwu(message, tokens):
-    await message.channel.send(responses['uwu'].format(choice(cute)))
+async def fUwu(message):
+    await message.channel.send(responses['uwu'].format(rand.choice(cute)))
 
-async def fTime(message, tokens):
+async def fTime(message):
     time = timePartRegex.search(message.content.lower())
     if time != None:
         period = time.group(0)
-        hour = getHour()
+        hour = await getHour()
         if period == 'morning':
-            if hour > timeBound['morning'][0] and hour < timeBound['morning'][1]:
-                mess = responses['time'].format('morning', choice(cute))
+            if hour>timeBound['morning'][0] and hour < timeBound['morning'][1]:
+                mess = responses['time'].format('morning', rand.choice(cute))
                 await message.channel.send(mess)
             else:
-                mess = responses['nottime'].format('morning', choice(sad))
+                mess = responses['nottime'].format('morning', rand.choice(sad))
                 await message.channel.send(mess)
         elif period == 'night':
             if hour > timeBound['night'][0] or hour < timeBound['night'][1]:
-                mess = responses['time'].format('night', choice(cute))
+                mess = responses['time'].format('night', rand.choice(cute))
                 await message.channel.send(mess)
             else:
-                mess = responses['nottime'].format('night', choice(sad))
+                mess = responses['nottime'].format('night', rand.choice(sad))
                 await message.channel.send(mess)
+
+async def fCount(message):
+    await message.channel.send(str(client.counter))
 
 # this dictionary allows us to cleanly call the defined
 # functions without explicitly checking for the
@@ -218,4 +229,11 @@ funcDict = {
     'uwu': fUwu,
     'morning': fTime,
     'night': fTime,
+    'count': fCount
 }
+
+# here we construct the regex string so it's not a pain in the ass to update
+commRegexString = '\\b'
+for key in funcDict:
+    commRegexString += '({})|'.format(key)
+commRegex = re.compile(commRegexString[:-1] + '\\b')

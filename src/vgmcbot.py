@@ -1,6 +1,6 @@
-from random import choice, randrange
-from time import sleep
-from sys import argv
+import asyncio
+import sys
+import random as rand
 from data import *
 from funcs import *
 
@@ -16,22 +16,20 @@ async def on_message(message):
         return
 
     # Just so the bot doesn't feel neurotic
-    sleep(0.5)
+    await asyncio.sleep(0.5)
 
     await preMention(message)
 
     # Proper parsing would be best here, but this
     # will work for now
     if client.user.mentioned_in(message):
-        tokens = message.content.split(' ')
-
         # This means that the first command left-to-right is
         # the one that is executed. I think this is fine.
         command = commRegex.search(message.content.lower())
         if command != None:
-            await funcDict[command.group(0)](message, tokens)
+            await funcDict[command.group(0)](message)
         else:
-            mess = 'what\'s up gamer {}'.format(choice(cute))
+            mess = 'what\'s up gamer {}'.format(rand.choice(cute))
             await message.channel.send(mess)
 
 @client.event
@@ -50,8 +48,8 @@ async def on_reaction_remove(reaction, user):
 
 
 if __name__ == '__main__':
-    if len(argv) != 2:
+    if len(sys.argv) != 2:
         print('Please provide the bot token as a command line argument!')
         exit(1)
 
-    client.run(argv[1])
+    client.run(sys.argv[1])
