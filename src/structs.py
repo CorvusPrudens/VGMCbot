@@ -1,3 +1,4 @@
+import aiohttp
 import discord
 import asyncio
 import re
@@ -7,7 +8,7 @@ import utils
 import random as rand
 
 class extClient(discord.Client):
-    def __init__(self, funcDict, peasantCommands, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # self.funcDict = funcDict
@@ -21,11 +22,6 @@ class extClient(discord.Client):
         self.counter = 0
 
         self.data = data.Data()
-
-        commRegexString = '\\b('
-        for key in self.data.funDict:
-            commRegexString += '({})|'.format(key)
-        self.commRegex = re.compile(commRegexString[:-1] + ')\\b')
 
         # this dictionary allows us to cleanly call the defined
         # functions without explicitly checking for the
@@ -43,8 +39,16 @@ class extClient(discord.Client):
             'uwu': self.fUwu,
             'morning': self.fTime,
             'night': self.fTime,
-            'count': self.fCount
+            'count': self.fCount,
+            'addimg': self.fAddimg,
+            'mgmvote': self.fMgmvote,
+            'mgmwin': self.fMgmwin,
         }
+
+        commRegexString = '\\b('
+        for key in self.funcDict:
+            commRegexString += '({})|'.format(key)
+        self.commRegex = re.compile(commRegexString[:-1] + ')\\b')
 
     async def gameLoop(self):
         await self.wait_until_ready()
@@ -68,12 +72,30 @@ class extClient(discord.Client):
             for key in self.data.bank:
                 file.write(f'{key},{self.data.bank[key]}\n')
 
-    async def execComm(self, message):
+    async def execComm(self, command, message):
         await self.funcDict[command](message)
+
+    async def getHour(self):
+        response = {'datetime': ''}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.data.timeUrl) as r:
+                if r.status == 200:
+                    response = await r.json()
+        hour = self.data.timeRegex.search(response['datetime'])
+        if hour == None:
+            return None
+        else:
+            return int(hour.group(0))
 
     ################################################################################
     ########################## on_reaction functions ###############################
     ################################################################################
+
+    def checkVoteAdd(self, reaction):
+        for i in range(len(self.data.mgm)):
+            if reaction.message.id == self.data.mgm[i]['id']:
+                self.data.mgm[i]['votes'] += 1
+                break
 
     async def reactionAdd(self, reaction, user):
         name = utils.getReactionName(str(reaction), self.data.reactRegex)
@@ -92,8 +114,19 @@ class extClient(discord.Client):
                 self.data.bank[user.id] -= 1
                 self.data.bank[reaction.message.author.id] += 1
                 self.storeBank()
+                self.checkVoteAdd(reaction)
             else:
+                self.data.bank[user.id] -= 1
+                self.data.bank[reaction.message.author.id] += 1
+                # this then triggers the reactionRemove event
+                self.checkVoteAdd(reaction)
                 await reaction.message.remove_reaction(reaction.emoji, user)
+
+    def checkVoteRemove(self, reaction):
+        for i in range(len(self.data.mgm)):
+            if reaction.message.id == self.data.mgm[i]['id']:
+                self.data.mgm[i]['votes'] -= 1
+                break
 
     async def reactionRemove(self, reaction, user):
         name = utils.getReactionName(str(reaction), self.data.reactRegex)
@@ -113,26 +146,25 @@ class extClient(discord.Client):
             self.data.bank[reaction.message.author.id] -= 1
             self.data.bank[user.id] += 1
             self.storeBank()
+            self.checkVoteRemove(reaction)
 
     ################################################################################
     ########################## on_message functions ################################
     ################################################################################
 
     async def preMention(self, message):
-        # this global crap is messy and needs to be cleaned up
-        global prevChoice
         if self.data.honkRegex.search(message.content.lower()) != None:
             currentChoice = rand.randrange(5)
-            while currentChoice == prevChoice:
+            while currentChoice == self.data.prevChoice:
                 currentChoice = rand.randrange(5)
-            prevChoice = currentChoice
-            url = imgur + honks[currentChoice] + end
+            self.data.prevChoice = currentChoice
+            url = self.data.imgur + self.data.honks[currentChoice] + self.data.end
             await message.channel.send(url)
         elif self.data.hankRegex.search(message.content.lower()) != None:
-            await message.channel.send(hankUrl1 + hankUrl2 + hankUrl3)
+            await message.channel.send(self.data.hankUrl1 + self.data.hankUrl2 + self.data.hankUrl3)
 
     async def fGive(self, message):
-        if utils.hasPermission(message.author, leader):
+        if utils.hasPermission(message.author, self.data.leader):
             # bit ugly but...
             sanitized = message.content.replace('<', ' <').replace('>', '> ')
             sanitized = sanitized.replace('  ', ' ')
@@ -140,7 +172,7 @@ class extClient(discord.Client):
             data = utils.extractValue(tokens, 'give')
             user = utils.getUserFromMention(data['name'], self.data.mentionRegex)
             if data['value'] == None or user == None:
-                mess = responses['giveErr'].format(message.author.mention, rand.choice(sad))
+                mess = self.data.responses['giveErr'].format(message.author.mention, rand.choice(self.data.sad))
                 await message.channel.send(mess)
             else:
                 try:
@@ -148,32 +180,32 @@ class extClient(discord.Client):
                 except KeyError:
                     self.data.bank[user] = data['value']
                 self.storeBank()
-                mess = responses['give'].format(data['name'], self.data.bank[user], rand.choice(cute))
+                mess = self.data.responses['give'].format(data['name'], self.data.bank[user], rand.choice(self.data.cute))
                 if self.data.bank[user] == 1:
                     mess = mess.replace('VGMCoins', 'VGMCoin')
                 await message.channel.send(mess)
         else:
-            mess = responses['permission'].format(message.author.mention, rand.choice(sad))
+            mess = self.data.responses['permission'].format(message.author.mention, rand.choice(self.data.sad))
             await message.channel.send(mess)
 
     async def fHelp(self, message):
-        tempstr = commandsHeader.format(rand.choice(cute))
-        if utils.hasPermission(message.author, leader):
-            tempstr += leaderCommands
-        await message.channel.send(tempstr + self.peasantCommands)
+        tempstr = self.data.commandsHeader.format(rand.choice(self.data.cute))
+        if utils.hasPermission(message.author, self.data.leader):
+            tempstr += self.data.leaderCommands
+        await message.channel.send(tempstr + self.data.peasantCommands)
 
     async def fHmc(self, message):
         try:
             value = self.data.bank[message.author.id]
         except KeyError:
             value = 0
-        mess = responses['hmc'].format(message.author.mention, value, rand.choice(cute))
+        mess = self.data.responses['hmc'].format(message.author.mention, value, rand.choice(self.data.cute))
         if value == 1:
             mess = mess.replace('VGMCoins', 'VGMCoin')
         await message.channel.send(mess)
 
     async def fList(self, message):
-        await message.channel.send(responses['list'].format(rand.choice(cute)))
+        await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
         tempstr = ''
         templist = []
         longest = 0
@@ -187,31 +219,92 @@ class extClient(discord.Client):
                 longest = len(fetched.name)
         for pair in templist:
             if pair[1] != 0:
-                tempstr += responses['listItem'].format(pair[0], pair[1])
+                tempstr += self.data.responses['listItem'].format(pair[0], pair[1])
         await message.channel.send(tempstr)
 
     async def fUwu(self, message):
-        await message.channel.send(responses['uwu'].format(rand.choice(cute)))
+        await message.channel.send(self.data.responses['uwu'].format(rand.choice(self.data.cute)))
 
     async def fTime(self, message):
         time = self.data.timePartRegex.search(message.content.lower())
         if time != None:
             period = time.group(0)
-            hour = await utils.getHour(self.data.timeRegex)
+            hour = await self.getHour()
             if period == 'morning':
-                if hour>timeBound['morning'][0] and hour < timeBound['morning'][1]:
-                    mess = responses['time'].format('morning', rand.choice(cute))
+                if hour != None and hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]:
+                    mess = self.data.responses['time'].format('morning', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
-                    mess = responses['nottime'].format('morning', rand.choice(sad))
+                    mess = self.data.responses['nottime'].format('morning', rand.choice(self.data.sad))
                     await message.channel.send(mess)
             elif period == 'night':
-                if hour > timeBound['night'][0] or hour < timeBound['night'][1]:
-                    mess = responses['time'].format('night', rand.choice(cute))
+                if hour != None and (hour > self.data.timeBound['night'][0] or hour < self.data.timeBound['night'][1]):
+                    mess = self.data.responses['time'].format('night', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
-                    mess = responses['nottime'].format('night', rand.choice(sad))
+                    mess = self.data.responses['nottime'].format('night', rand.choice(self.data.sad))
                     await message.channel.send(mess)
 
     async def fCount(self, message):
         await message.channel.send(str(self.counter))
+
+    async def fAddimg(self, message):
+        # print(message.content)
+        if utils.hasPermission(message.author, self.data.leader):
+            tokens = utils.sanitizedTokens(message.content)
+            for i in range(len(tokens)):
+                if tokens[i] == 'addimg':
+                    if i < len(tokens) - 1:
+                        self.data.mgm.append({'url': tokens[i + 1], 'votes': 0, 'id': -1})
+                        mess = self.data.responses['addimg'].format(rand.choice(self.data.cute))
+                        await message.channel.send(mess)
+                    else:
+                        mess = self.data.responses['addimgErr'].format(rand.choice(self.data.sad))
+                        await message.channel.send(mess)
+        else:
+            mess = self.data.responses['addimgPerm'].format(message.author.mention, rand.choice(self.data.sad))
+            await message.channel.send(mess)
+
+    async def fMgmvote(self, message):
+        if utils.hasPermission(message.author, self.data.leader):
+            if len(self.data.mgm) == 0:
+                mess = self.data.responses['mgmvoteErr'].format(rand.choice(self.data.sad))
+                await message.channel.send(mess)
+            else:
+                deats = '(make sure you react to the images, not the text above)'
+                mess = 'Ok everyone, vote with your coins! {} {}'.format(rand.choice(self.data.cute), deats)
+                await message.channel.send(mess)
+                for i in range(len(self.data.mgm)):
+                    string = 'Image {}'.format(i + 1)
+                    await message.channel.send(string)
+                    newMess = await message.channel.send(self.data.mgm[i]['url'])
+                    self.data.mgm[i]['id'] = newMess.id
+                await message.channel.send('have fun! {}'.format(rand.choice(self.data.cute)))
+        else:
+            mess = self.data.responses['mgmvotePerm'].format(message.author.mention, rand.choice(self.data.sad))
+            await message.channel.send(mess)
+
+    def mgmkey(self, dict):
+        return dict['votes']
+
+    async def fMgmwin(self, message):
+        if utils.hasPermission(message.author, self.data.leader):
+            self.data.mgm.sort(key=self.mgmkey, reverse=True)
+            if len(self.data.mgm) > 4:
+                self.data.mgm = self.data.mgm[:4]
+
+            mess = 'And the winners are....'
+            await message.channel.send(mess)
+            await asyncio.sleep(1)
+            for img in self.data.mgm:
+                ess = 's'
+                if img['votes'] == 1:
+                    ess = ''
+                mess = '{} vote{}:'.format(img['votes'], ess)
+                await message.channel.send(mess)
+                await message.channel.send(img['url'])
+            await message.channel.send('Thanks for voting everyone! {}'.format(rand.choice(self.data.cute)))
+            self.data.mgm = []
+        else:
+            mess = self.data.responses['mgmwinPerm'].format(message.author.mention, rand.choice(self.data.sad))
+            await message.channel.send(mess)

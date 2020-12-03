@@ -2,11 +2,12 @@ import asyncio
 import sys
 import discord
 import structs
+import random as rand
 
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = structs.extClient(funcDict, peasantCommands, intents=intents)
+client = structs.extClient(intents=intents)
 # regex = Regex()
 
 @client.event
@@ -33,7 +34,7 @@ async def on_message(message):
         # the one that is executed. I think this is fine.
         command = client.commRegex.search(message.content.lower())
         if command != None:
-            await client.execComm(command, message)
+            await client.execComm(command.group(0), message)
             # await client.funcDict[command.group(0)](message, client)
         else:
             mess = 'what\'s up gamer {}'.format(rand.choice(client.data.cute))

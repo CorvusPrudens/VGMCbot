@@ -6,18 +6,6 @@ from data import *
 ########################## general functions ###################################
 ################################################################################
 
-async def getHour(regex):
-    response = {'datetime': ''}
-    async with aiohttp.ClientSession() as session:
-        async with session.get(timeUrl) as r:
-            if r.status == 200:
-                response = await r.json()
-    hour = regex.search(response['datetime'])
-    if hour == None:
-        return None
-    else:
-        return int(hour.group(0))
-
 def getUserFromMention(mention, regex):
     try:
         return int(regex.search(mention).group(0))
@@ -66,8 +54,13 @@ def storej(dict, path):
         json.dump(dict, path)
 
 def getReactionName(reactStr, regex):
-    match = regex.react.search(reactStr)
+    match = regex.search(reactStr)
     if match != None:
         return match.group(0)
     else:
         return None
+
+def sanitizedTokens(string):
+    sanitized = string.replace('<', ' <').replace('>', '> ')
+    sanitized = sanitized.replace('  ', ' ')
+    return sanitized.split(' ')

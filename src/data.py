@@ -33,29 +33,39 @@ class Data:
         self.hankUrl3 = "450?cb=20140504043948"
         self.commandsHeader = "When you mention me, I'll do a command for you! {}"
         self.leaderCommands = """
-        ✿ give @<username> <value> coins -- this will give <username> the <value> of coins!
-        """
+Leader commands:
+✿ give @<username> <value> coins -- this will give <username> the <value> of coins!
+✿ addimg <image url> -- this will add the given image to the current mgm raffle!
+✿ mgmvote -- this will kick off mgm voting!
+✿ mgmwin -- this will end mgm voting and announce the winning images!
+"""
 
         self.peasantCommands = """
-        ✿ help -- I'll list out all these commands for you!
-        ✿ hmc -- "How Many Coins;" this'll tell you how many you've got!
-        ✿ list -- List out all the VGMConnoisseurs!
-        ✿ uwu -- UwU
-        ✿ morning -- I'll saw good morning!
-        ✿ night -- I'll say goodnight!
-        """
+✿ help -- I'll list out all these commands for you!
+✿ hmc -- "How Many Coins;" this'll tell you how many you've got!
+✿ list -- List out all the VGMConnoisseurs!
+✿ uwu -- UwU
+✿ morning -- I'll saw good morning!
+✿ night -- I'll say goodnight!
+"""
 
         self.responses = {
             'give': "Ok! {} now has {:,.2f} VGMCoins {}",
             'giveErr': """I'm sorry {}, I didn't quite catch that.
-        The \"give\" syntax is \"give @<username> <number> coins\" {}""",
+The \"give\" syntax is \"give @<username> <number> coins\" {}""",
             'permission': "sorry {}, you don't have permission to give coins {}",
             'hmc': 'hey {}, looks like you have {} VGMCoins {}',
             'list': 'get ready {}\n',
             'listItem': '✿ {}\n  -- {:,.2f} VGMCoins\n',
             'uwu': 'UwU {}',
             'time': '✧ good {} gamer {} ✧',
-            'nottime': 'b-but... it\'s not {} {}'
+            'nottime': 'b-but... it\'s not {} {}',
+            'addimg': 'Ok! I\'ve added that to the list {}',
+            'addimgErr': 'I\'m sorry, I didn\'t catch that {}\nMake sure the image is given as a link!',
+            'addimgPerm': "sorry {}, you don't have permission to add images {}",
+            'mgmvotePerm': "sorry {}, you don't have permission to start the vote {}",
+            'mgmvoteErr': "there's no images!! {}",
+            'mgmwinPerm': "sorry {}, you don't have permission to end the vote {}",
         }
 
         self.cute = [
@@ -89,3 +99,5 @@ class Data:
         self.hankRegex = re.compile('\\b(hank)\\b')
         self.mentionRegex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
         self.reactRegex = re.compile('(?<=<:)[A-Za-z_0-9]+')
+
+        self.mgm = []
