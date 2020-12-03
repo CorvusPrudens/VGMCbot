@@ -1,16 +1,20 @@
 import asyncio
 import sys
-import random as rand
-from data import *
-from utils import *
-from commands import *
+import discord
+import structs
 
+intents = discord.Intents.default()
+intents.reactions = True
+intents.members = True
+client = structs.extClient(funcDict, peasantCommands, intents=intents)
+# regex = Regex()
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    loadBank(bank, cachePath)
-    client.addCommands()
+    client.loadBank()
+    # loadBank(bank, cachePath)
+    # client.addCommands()
 
 @client.event
 async def on_message(message):
@@ -20,25 +24,26 @@ async def on_message(message):
     # Just so the bot doesn't feel neurotic
     await asyncio.sleep(0.5)
 
-    await preMention(message)
+    await client.preMention(message)
 
     # Proper parsing would be best here, but this
     # will work for now
     if client.user.mentioned_in(message):
         # This means that the first command left-to-right is
         # the one that is executed. I think this is fine.
-        command = commRegex.search(message.content.lower())
+        command = client.commRegex.search(message.content.lower())
         if command != None:
-            await funcDict[command.group(0)](message, client)
+            await client.execComm(command, message)
+            # await client.funcDict[command.group(0)](message, client)
         else:
-            mess = 'what\'s up gamer {}'.format(rand.choice(cute))
+            mess = 'what\'s up gamer {}'.format(rand.choice(client.data.cute))
             await message.channel.send(mess)
 
 @client.event
 async def on_reaction_add(reaction, user):
     if user == client.user or not reaction.custom_emoji:
         return
-    await reactionAdd(reaction, user)
+    await client.reactionAdd(reaction, user)
 
 # this event explicitly needs the members privileged intent
 # worth?
@@ -46,7 +51,7 @@ async def on_reaction_add(reaction, user):
 async def on_reaction_remove(reaction, user):
     if user == client.user or not reaction.custom_emoji:
         return
-    await reactionRemove(reaction, user)
+    await client.reactionRemove(reaction, user)
 
 
 if __name__ == '__main__':

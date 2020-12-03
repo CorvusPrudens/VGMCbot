@@ -19,11 +19,11 @@ fishCommands = """
 """
 
 fishCatalog = {}
-with open('fish.json') as file:
+with open('games/fish.json') as file:
     fishCatalog = json.load(file)
 
 fishLocations = {}
-with open('locations.json') as file:
+with open('games/locations.json') as file:
     fishLocations = json.load(file)
 
 def detectAn(string):
@@ -100,7 +100,7 @@ def newLure(name='broken can', efficacy=-0.8, durability=5, damage=0):
     return {'name': name, 'efficacy': efficacy, 'durability': durability, 'damage': damage}
 
 def newRecord(name='trout', size='20', location='lagoon'):
-    return {'name': name, 'size': size, 'location'=location}
+    return {'name': name, 'size': size, 'location': location}
 
 # for each game, well have an init and a loop to be
 # run inside the games class

@@ -1,13 +1,12 @@
-import time
-import requests
-import fishing
+# relative to the calling file ugh
+from games.fishing import *
 
 class Games:
 
     def __init__(self):
         self.players = {}
-        self.commands = fishing.funcDict
-        self.commandString = fishing.fishCommands
+        self.commands = funcDict
+        self.commandString = fishCommands
 
     def gameLoop(self):
         pass

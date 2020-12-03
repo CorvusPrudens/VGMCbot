@@ -50,20 +50,20 @@ async def reactionRemove(reaction, user):
 ########################## on_message functions ################################
 ################################################################################
 
-async def preMention(message, client):
+async def preMention(message, client, regex):
     # this global crap is messy and needs to be cleaned up
     global prevChoice
-    if honkRegex.search(message.content.lower()) != None:
+    if regex.honk.search(message.content.lower()) != None:
         currentChoice = rand.randrange(5)
         while currentChoice == prevChoice:
             currentChoice = rand.randrange(5)
         prevChoice = currentChoice
         url = imgur + honks[currentChoice] + end
         await message.channel.send(url)
-    elif hankRegex.search(message.content.lower()) != None:
+    elif regex.hank.search(message.content.lower()) != None:
         await message.channel.send(hankUrl1 + hankUrl2 + hankUrl3)
 
-async def fGive(message, client):
+async def fGive(message, client, regex):
     if hasPermission(message.author, leader):
         # bit ugly but...
         sanitized = message.content.replace('<', ' <').replace('>', '> ')
@@ -88,14 +88,14 @@ async def fGive(message, client):
         mess = responses['permission'].format(message.author.mention, rand.choice(sad))
         await message.channel.send(mess)
 
-async def fHelp(message, client):
+async def fHelp(message, client, regex):
     # await message.channel.send(helpMessage(message))
     tempstr = commandsHeader.format(rand.choice(cute))
     if hasPermission(message.author, leader):
         tempstr += leaderCommands
     await message.channel.send(tempstr + client.peasantCommands)
 
-async def fHmc(message, client):
+async def fHmc(message, client, regex):
     try:
         value = bank[message.author.id]
     except KeyError:
@@ -105,7 +105,7 @@ async def fHmc(message, client):
         mess = mess.replace('VGMCoins', 'VGMCoin')
     await message.channel.send(mess)
 
-async def fList(message, client):
+async def fList(message, client, regex):
     await message.channel.send(responses['list'].format(rand.choice(cute)))
     tempstr = ''
     templist = []
@@ -126,8 +126,8 @@ async def fList(message, client):
 async def fUwu(message, client):
     await message.channel.send(responses['uwu'].format(rand.choice(cute)))
 
-async def fTime(message, client):
-    time = timePartRegex.search(message.content.lower())
+async def fTime(message, client, regex):
+    time = regex.timePart.search(message.content.lower())
     if time != None:
         period = time.group(0)
         hour = await getHour()
@@ -146,7 +146,7 @@ async def fTime(message, client):
                 mess = responses['nottime'].format('night', rand.choice(sad))
                 await message.channel.send(mess)
 
-async def fCount(message, client):
+async def fCount(message, client, regex):
     await message.channel.send(str(client.counter))
 
 # this dictionary allows us to cleanly call the defined

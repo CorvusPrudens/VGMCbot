@@ -6,21 +6,21 @@ from data import *
 ########################## general functions ###################################
 ################################################################################
 
-async def getHour():
+async def getHour(regex):
     response = {'datetime': ''}
     async with aiohttp.ClientSession() as session:
         async with session.get(timeUrl) as r:
             if r.status == 200:
                 response = await r.json()
-    hour = timeRegex.search(response['datetime'])
+    hour = regex.search(response['datetime'])
     if hour == None:
         return None
     else:
         return int(hour.group(0))
 
-def getUserFromMention(mention):
+def getUserFromMention(mention, regex):
     try:
-        return int(mentionRegex.search(mention).group(0))
+        return int(regex.search(mention).group(0))
     except AttributeError:
         return None
 
@@ -42,26 +42,20 @@ def hasPermission(user, role):
             return True
     return False
 
-def helpMessage(message):
-    tempstr = commandsHeader.format(rand.choice(cute))
-    if hasPermission(message.author, leader):
-        tempstr += leaderCommands
-    return tempstr + peasantCommands
-
-def loadBank(dict, path):
-    try:
-        with open(path, 'r') as file:
-            for line in file:
-                tokens = line.replace('\n', '').split(',')
-                if len(line.replace('\n', '')) > 0:
-                    dict[int(tokens[0])] = float(tokens[1])
-    except FileNotFoundError:
-        pass
-
-def storeBank(dict, path):
-    with open(path, 'w') as file:
-        for key in dict:
-            file.write(f'{key},{dict[key]}\n')
+# def loadBank(dict, path):
+#     try:
+#         with open(path, 'r') as file:
+#             for line in file:
+#                 tokens = line.replace('\n', '').split(',')
+#                 if len(line.replace('\n', '')) > 0:
+#                     dict[int(tokens[0])] = float(tokens[1])
+#     except FileNotFoundError:
+#         pass
+#
+# def storeBank(dict, path):
+#     with open(path, 'w') as file:
+#         for key in dict:
+#             file.write(f'{key},{dict[key]}\n')
 
 def loadj(dict, path):
     with open(path, 'r') as file:
@@ -71,8 +65,8 @@ def storej(dict, path):
     with open(path, 'w') as file:
         json.dump(dict, path)
 
-def getReactionName(reactStr):
-    match = reactRegex.search(reactStr)
+def getReactionName(reactStr, regex):
+    match = regex.react.search(reactStr)
     if match != None:
         return match.group(0)
     else:
