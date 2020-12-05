@@ -1,14 +1,9 @@
 import json
 import asyncio
-from matplotlib import pyplot
-import numpy as np
-import math
 import random as rand
-import sys
-sys.path.append('../')
-from data import *
 
-fishCommands = """
+commandString = """
+Fishing Commands:
 ✿ forage -- scrounge around for a rod and lure if you're desparate!
 ✿ shop -- Take a look at the rods and lures for sale!
 ✿ buy <item> -- Buy something from the shop (where item = number on the left)
@@ -130,6 +125,7 @@ async def initFishing(message, client):
         'poles': [newPole()],
         'lures': [newLure()],
         'records': {},
+        'lastChannel': -1,
     }
     client.games.players[message.author.id]['fishing'] = templateDict
 
@@ -141,12 +137,27 @@ async def initFishing(message, client):
     await message.channel.send(string1 + string2 + string3)
 
 
-def fCast(players, currentPlayer):
+async def fCast(message, client):
+    currentPlayer = message.author.id
     try:
-        players[currentPlayer]['fishing']['state']['state'] = 'cast'
+        len1 = len(client.games.players[currentPlayer]['fishing']['poles'])
+        len2 = len(client.games.players[currentPlayer]['fishing']['lures'])
+        if len1 > 0 and len2 > 0:
+            client.games.players[currentPlayer]['fishing']['state']['state'] = 'cast'
+            client.games.players[currentPlayer]['fishing']['lastChannel'] = message.channel
+        else:
+            string = 'You don\'t have any {}{} {}'
+            if len1 == 0 and len2 == 0:
+                string.format('poles', ' _or_ lures', rand.choice(client.data.sad))
+            elif len1 == 0:
+                string.format('poles', '', rand.choice(client.data.sad))
+            else:
+                string.format('lures', '', rand.choice(client.data.sad))
+            await message.channel.send(string)
     except KeyError:
-        initFishing(players, currentPlayer)
-        players[currentPlayer]['fishing']['state']['state'] = 'cast'
+        initFishing(message, client)
+        client.games.players[currentPlayer]['fishing']['state']['state'] = 'cast'
+        client.games.players[currentPlayer]['fishing']['lastChannel'] = message.channel
 
 
 async def fShop(message, client):
@@ -167,6 +178,7 @@ async def fShop(message, client):
 
     string += 'If you\'d like to buy something, mention me and say buy <left number>'
     await message.channel.send(string)
+    client.games.players[currentPlayer]['fishing']['lastChannel'] = message.channel
 
 async def fGoto(message, client):
     sanitized = message.content.replace('<', ' <').replace('>', '> ')
@@ -188,13 +200,35 @@ async def fGoto(message, client):
             await message.channel.send(mess)
             try:
                 client.games.players[message.author.id]['fishing']['state']['location'] = targ
+
             except KeyError:
                 await initFishing(message, client)
                 client.games.players[message.author.id]['fishing']['state']['location'] = targ
+        try:
+            client.games.players[currentPlayer]['fishing']['lastChannel'] = message.channel
+        except KeyError:
+            await initFishing(message, client)
+            client.games.players[currentPlayer]['fishing']['lastChannel'] = message.channel
 
-fishingFuncs = {
+async def lCast(playerKey, players, client):
+    # probability of catch related to efficacy
+    totalEff = players[playerKey]['fishing']['poles'][0]['efficacy']
+    totalEff += players[playerKey]['fishing']['lures'][0]['efficacy']
+    if rand.random() > 0.8 - 0.1*totalEff:
+        # 50 50 chance of catching
+        if rand.random() > 0.5 - 0.2*totalEff:
+            #caught
+            pass
+        else:
+            pass
+
+commands = {
     'goto': fGoto,
     'shop': fShop,
+}
+
+loopCommands = {
+    'cast':
 }
 
 if __name__ == '__main__':

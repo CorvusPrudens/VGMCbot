@@ -2,7 +2,7 @@ import aiohttp
 import discord
 import asyncio
 import re
-import games.games as games
+from games import games
 import data
 import utils
 import random as rand
@@ -10,18 +10,6 @@ import random as rand
 class extClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # self.funcDict = funcDict
-        # self.peasantCommands = peasantCommands
-
-        # self.games = games.Games()
-        #
-        # self.commands.update(games.funcDict)
-        # self.peasantCommands += games.commandString
-        self.bg_task = self.loop.create_task(self.gameLoop())
-        self.counter = 0
-
-        self.data = data.Data()
 
         # this dictionary allows us to cleanly call the defined
         # functions without explicitly checking for the
@@ -45,8 +33,20 @@ class extClient(discord.Client):
             'mgmwin': self.fMgmwin,
         }
 
+        self.data = data.Data()
+
+        self.games = games.Games('games/players.csv')
+        #
+        # self.funcDict.update(self.games.commands)
+        # print(self.funcDict)
+        self.data.peasantCommands += self.games.commandString
+        self.bg_task = self.loop.create_task(self.gameLoop())
+        self.counter = 0
+
         commRegexString = '\\b('
         for key in self.funcDict:
+            commRegexString += '({})|'.format(key)
+        for key in self.games.commands:
             commRegexString += '({})|'.format(key)
         self.commRegex = re.compile(commRegexString[:-1] + ')\\b')
 
@@ -54,7 +54,7 @@ class extClient(discord.Client):
         await self.wait_until_ready()
         while not self.is_closed():
             self.counter += 1
-            # print(self.counter)
+            await self.games.gameLoop(self)
             await asyncio.sleep(1) # task runs every 60 seconds
 
     def loadBank(self):
@@ -73,7 +73,10 @@ class extClient(discord.Client):
                 file.write(f'{key},{self.data.bank[key]}\n')
 
     async def execComm(self, command, message):
-        await self.funcDict[command](message)
+        try:
+            await self.funcDict[command](message)
+        except KeyError:
+            await self.games.execComm(command, message, self)
 
     async def getHour(self):
         response = {'datetime': ''}
@@ -231,14 +234,14 @@ class extClient(discord.Client):
             period = time.group(0)
             hour = await self.getHour()
             if period == 'morning':
-                if hour != None and hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]:
+                if  hour == None or (hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]):
                     mess = self.data.responses['time'].format('morning', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
                     mess = self.data.responses['nottime'].format('morning', rand.choice(self.data.sad))
                     await message.channel.send(mess)
             elif period == 'night':
-                if hour != None and (hour > self.data.timeBound['night'][0] or hour < self.data.timeBound['night'][1]):
+                if hour == None or (hour > self.data.timeBound['night'][0] or hour < self.data.timeBound['night'][1]):
                     mess = self.data.responses['time'].format('night', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
