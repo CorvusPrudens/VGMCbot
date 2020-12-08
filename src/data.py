@@ -31,22 +31,22 @@ class Data:
         self.hankUrl1 = "https://static.wikia.nocookie.net/kingofthehill/images/c/c4/"
         self.hankUrl2 = "Hank_Hill.png/revision/latest/top-crop/width/360/height/"
         self.hankUrl3 = "450?cb=20140504043948"
-        self.commandsHeader = "When you mention me, I'll do a command for you! {}"
+        self.commandsHeader = "if you prefix something with a dot, I'll do a command for you! {}"
         self.leaderCommands = """
 Leader commands:
-✿ give @<username> <value> coins -- this will give <username> the <value> of coins!
-✿ addimg <image url> -- this will add the given image to the current mgm raffle!
-✿ mgmvote -- this will kick off mgm voting!
-✿ mgmwin -- this will end mgm voting and announce the winning images!
+✿ .give @<username> <value> coins -- this will give <username> the <value> of coins!
+✿ .addimg <image url> -- this will add the given image to the current mgm raffle!
+✿ .mgmvote -- this will kick off mgm voting!
+✿ .mgmwin -- this will end mgm voting and announce the winning images!
 """
 
         self.peasantCommands = """
-✿ help -- I'll list out all these commands for you!
-✿ hmc -- "How Many Coins;" this'll tell you how many you've got!
-✿ list -- List out all the VGMConnoisseurs!
-✿ uwu -- UwU
-✿ morning -- I'll saw good morning!
-✿ night -- I'll say goodnight!
+✿ .help <option> -- I'll list out all these commands for you! (options: {})
+✿ .hmc -- "How Many Coins;" this'll tell you how many you've got!
+✿ .list -- List out all the VGMConnoisseurs!
+✿ .uwu -- UwU
+✿ .morning -- I'll saw good morning!
+✿ .night -- I'll say goodnight!
 """
 
         self.responses = {
@@ -54,7 +54,7 @@ Leader commands:
             'giveErr': """I'm sorry {}, I didn't quite catch that.
 The \"give\" syntax is \"give @<username> <number> coins\" {}""",
             'permission': "sorry {}, you don't have permission to give coins {}",
-            'hmc': 'hey {}, looks like you have {} VGMCoins {}',
+            'hmc': 'hey {}, looks like you have {:,.2f} VGMCoins {}',
             'list': 'get ready {}\n',
             'listItem': '✿ {}\n  -- {:,.2f} VGMCoins\n',
             'uwu': 'UwU {}',
@@ -94,10 +94,12 @@ The \"give\" syntax is \"give @<username> <number> coins\" {}""",
         ]
 
         self.timeRegex = re.compile('(?<=T)[0-9]{1,2}')
-        self.timePartRegex = re.compile('\\b(morning)|(night)\\b')
+        self.timePartRegex = re.compile('(?<=\\.)((morning)|(night))\\b')
         self.honkRegex = re.compile('\\b(honk)s*\\b')
         self.hankRegex = re.compile('\\b(hank)\\b')
         self.mentionRegex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
         self.reactRegex = re.compile('(?<=<:)[A-Za-z_0-9]+')
 
         self.mgm = []
+
+        self.prefix = '.'

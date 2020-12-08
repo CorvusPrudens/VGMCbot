@@ -29,16 +29,16 @@ async def on_message(message):
 
     # Proper parsing would be best here, but this
     # will work for now
-    if client.user.mentioned_in(message):
+    # if client.mentioned(message):
         # This means that the first command left-to-right is
         # the one that is executed. I think this is fine.
-        command = client.commRegex.search(message.content.lower())
-        if command != None:
-            await client.execComm(command.group(0), message)
-            # await client.funcDict[command.group(0)](message, client)
-        else:
-            mess = 'what\'s up gamer {}'.format(rand.choice(client.data.cute))
-            await message.channel.send(mess)
+    command = client.commRegex.search(message.content.lower())
+    if command != None:
+        await client.execComm(command.group(0), message)
+        # await client.funcDict[command.group(0)](message, client)
+    # else:
+    #     mess = 'what\'s up gamer {}'.format(rand.choice(client.data.cute))
+    #     await message.channel.send(mess)
 
 @client.event
 async def on_reaction_add(reaction, user):

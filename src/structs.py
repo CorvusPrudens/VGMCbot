@@ -20,35 +20,47 @@ class extClient(discord.Client):
         # properly defined before passing them to the dict
 
         self.funcDict = {
-            'give': self.fGive,
-            'help': self.fHelp,
-            'hmc': self.fHmc,
-            'list': self.fList,
-            'uwu': self.fUwu,
-            'morning': self.fTime,
-            'night': self.fTime,
-            'count': self.fCount,
-            'addimg': self.fAddimg,
-            'mgmvote': self.fMgmvote,
-            'mgmwin': self.fMgmwin,
+            '.give': self.fGive,
+            '.help': self.fHelp,
+            '.hmc': self.fHmc,
+            '.list': self.fList,
+            '.uwu': self.fUwu,
+            '.morning': self.fTime,
+            '.night': self.fTime,
+            '.count': self.fCount,
+            '.addimg': self.fAddimg,
+            '.mgmvote': self.fMgmvote,
+            '.mgmwin': self.fMgmwin,
         }
 
         self.data = data.Data()
 
-        self.games = games.Games('games/players.csv')
+        self.helpDict = {'normal': self.data.peasantCommands,
+                         'leader': self.data.leaderCommands}
+
+        self.games = games.Games('games/players.json', 'games/misc.json')
         #
         # self.funcDict.update(self.games.commands)
         # print(self.funcDict)
-        self.data.peasantCommands += self.games.commandString
+        self.helpDict.update(self.games.helpDict)
+
+        helpOptions = ''
+        for key in self.helpDict:
+            helpOptions += key + ', '
+        helpOptions = helpOptions[:-2]
+        self.helpDict['normal'] = self.helpDict['normal'].format(helpOptions)
         self.bg_task = self.loop.create_task(self.gameLoop())
         self.counter = 0
 
-        commRegexString = '\\b('
+        commRegexString = '('
         for key in self.funcDict:
-            commRegexString += '({})|'.format(key)
+            commRegexString += '(\\{})|'.format(key)
         for key in self.games.commands:
-            commRegexString += '({})|'.format(key)
+            commRegexString += '(\\{})|'.format(key)
         self.commRegex = re.compile(commRegexString[:-1] + ')\\b')
+
+        #WARNING: HARDCODED
+        self.nameRegex = re.compile('\\b@(({})|({}))\\b'.format('VGMCbot', 'VGMCtest'))
 
     async def gameLoop(self):
         await self.wait_until_ready()
@@ -89,6 +101,14 @@ class extClient(discord.Client):
             return None
         else:
             return int(hour.group(0))
+
+    def mentioned(self, message):
+        men = False
+        if self.user.mentioned_in(message):
+            men = True
+        elif self.nameRegex.search(message.content) != None:
+            men = True
+        return men
 
     ################################################################################
     ########################## on_reaction functions ###############################
@@ -172,7 +192,7 @@ class extClient(discord.Client):
             sanitized = message.content.replace('<', ' <').replace('>', '> ')
             sanitized = sanitized.replace('  ', ' ')
             tokens = sanitized.split(' ')
-            data = utils.extractValue(tokens, 'give')
+            data = utils.extractValue(tokens, '.give')
             user = utils.getUserFromMention(data['name'], self.data.mentionRegex)
             if data['value'] == None or user == None:
                 mess = self.data.responses['giveErr'].format(message.author.mention, rand.choice(self.data.sad))
@@ -193,9 +213,20 @@ class extClient(discord.Client):
 
     async def fHelp(self, message):
         tempstr = self.data.commandsHeader.format(rand.choice(self.data.cute))
-        if utils.hasPermission(message.author, self.data.leader):
-            tempstr += self.data.leaderCommands
-        await message.channel.send(tempstr + self.data.peasantCommands)
+        tokens = message.content.lower().split(' ')
+        type = 'normal'
+        for i in range(len(tokens)):
+            if tokens[i] == '.help':
+                if i != len(tokens) - 1:
+                    type = tokens[i + 1]
+                    break
+        try:
+            tempstr += self.helpDict[type]
+            await message.channel.send(tempstr)
+        except KeyError:
+            mess = 'I\'m sorry, I don\'t think we have any commands like that {}'
+            mess = mess.format(rand.choice(self.data.sad))
+            await message.channel.send(mess)
 
     async def fHmc(self, message):
         try:
@@ -256,7 +287,7 @@ class extClient(discord.Client):
         if utils.hasPermission(message.author, self.data.leader):
             tokens = utils.sanitizedTokens(message.content)
             for i in range(len(tokens)):
-                if tokens[i] == 'addimg':
+                if tokens[i] == '.addimg':
                     if i < len(tokens) - 1:
                         self.data.mgm.append({'url': tokens[i + 1], 'votes': 0, 'id': -1})
                         mess = self.data.responses['addimg'].format(rand.choice(self.data.cute))
