@@ -23,6 +23,7 @@ class extClient(discord.Client):
             '.give': self.fGive,
             '.help': self.fHelp,
             '.hmc': self.fHmc,
+            '.coins': self.fHmc,
             '.list': self.fList,
             '.uwu': self.fUwu,
             '.morning': self.fTime,

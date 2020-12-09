@@ -42,7 +42,8 @@ Leader commands:
 
         self.peasantCommands = """
 ✿ .help <option> -- I'll list out all these commands for you! (options: {})
-✿ .hmc -- "How Many Coins;" this'll tell you how many you've got!
+✿ .coins -- I'll tell you how many you've got!
+✿ .hmc -- "How Many Coins;" legacy command, equivalent to .coins
 ✿ .list -- List out all the VGMConnoisseurs!
 ✿ .uwu -- UwU
 ✿ .morning -- I'll saw good morning!

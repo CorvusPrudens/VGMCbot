@@ -155,9 +155,9 @@
     ],
     "fishing": {
       "state": {
-        "location": "lagoon",
+        "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.3000000000000007,
+        "timeCast": -0.6799999999999997,
         "prevnibs": 0
       },
       "rods": [
@@ -165,7 +165,15 @@
           "name": "bamboo rod",
           "efficacy": -0.1,
           "durability": 35,
-          "damage": 4.180000000000001,
+          "damage": 23.735,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "old pine rod",
+          "efficacy": -0.5,
+          "durability": 10,
+          "damage": 5.14,
           "type": "rods",
           "multi": true
         },
@@ -186,7 +194,16 @@
           "multi": true
         }
       ],
-      "lures": [],
+      "lures": [
+        {
+          "name": "spinner",
+          "efficacy": 0.1,
+          "durability": 40,
+          "damage": 24.695,
+          "type": "lures",
+          "multi": true
+        }
+      ],
       "records": {
         "White Mullet": {
           "name": "White Mullet",
@@ -219,9 +236,76 @@
           "name": "Sand Perch",
           "size": 186.6,
           "location": "lagoon"
+        },
+        "Gray Triggerfish": {
+          "name": "Gray Triggerfish",
+          "size": 280.9,
+          "location": "cliffside"
+        },
+        "Ladyfish": {
+          "name": "Ladyfish",
+          "size": 323.6,
+          "location": "cliffside"
+        },
+        "Southern Kingfish": {
+          "name": "Southern Kingfish",
+          "size": 307.8,
+          "location": "cliffside"
+        },
+        "Atlantic Croaker": {
+          "name": "Atlantic Croaker",
+          "size": 378.0,
+          "location": "cliffside"
+        },
+        "Hogfish": {
+          "name": "Hogfish",
+          "size": 424.9,
+          "location": "cliffside"
+        },
+        "Largemouth Bass": {
+          "name": "Largemouth Bass",
+          "size": 398.8,
+          "location": "cliffside"
+        },
+        "Summer Flounder": {
+          "name": "Summer Flounder",
+          "size": 396.7,
+          "location": "cliffside"
+        },
+        "Tautog": {
+          "name": "Tautog",
+          "size": 439.8,
+          "location": "cliffside"
+        },
+        "Tripletail": {
+          "name": "Tripletail",
+          "size": 520.2,
+          "location": "cliffside"
+        },
+        "Black Drum": {
+          "name": "Black Drum",
+          "size": 377.2,
+          "location": "cliffside"
+        },
+        "Acadian Redfish": {
+          "name": "Acadian Redfish",
+          "size": 298.7,
+          "location": "cliffside"
+        },
+        "Red Drum": {
+          "name": "Red Drum",
+          "size": 502.3,
+          "location": "cliffside"
         }
       },
-      "licenses": [],
+      "licenses": [
+        {
+          "name": "cliff license",
+          "type": "licenses",
+          "multi": false,
+          "location": "cliffside"
+        }
+      ],
       "lastChannel": 567182777716572170
     }
   },
@@ -679,7 +763,7 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.41999999999999993,
+        "timeCast": -0.9699999999999998,
         "prevnibs": 0
       },
       "rods": [
@@ -687,7 +771,7 @@
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.74,
+          "damage": 1.5499999999999998,
           "type": "rods",
           "multi": true
         }
@@ -697,7 +781,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.74,
+          "damage": 1.5499999999999998,
           "type": "lures",
           "multi": true
         }
@@ -708,6 +792,11 @@
           "size": 157.1,
           "location": "lagoon",
           "fisher": 625847996344565781
+        },
+        "Spot": {
+          "name": "Spot",
+          "size": 174.0,
+          "location": "lagoon"
         }
       },
       "licenses": [],
@@ -1589,7 +1678,7 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.18999999999999995,
+        "timeCast": -0.6999999999999993,
         "prevnibs": 0
       },
       "rods": [
@@ -1597,7 +1686,7 @@
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.8008069626741006,
+          "damage": 3.531033677684418,
           "type": "rods",
           "multi": true
         },
@@ -1605,7 +1694,7 @@
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.544782041982566,
+          "damage": 1.534782041982566,
           "type": "rods",
           "multi": true
         }
@@ -1615,15 +1704,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.7216733135262396,
-          "type": "lures",
-          "multi": true
-        },
-        {
-          "name": "broken can",
-          "efficacy": -0.8,
-          "durability": 5,
-          "damage": 0.3182160249034567,
+          "damage": 2.9132160249034564,
           "type": "lures",
           "multi": true
         },
@@ -1647,7 +1728,7 @@
       "records": {
         "False Pilchard": {
           "name": "False Pilchard",
-          "size": 150.5,
+          "size": 158.7,
           "location": "lagoon"
         },
         "Cunner": {
@@ -1673,7 +1754,7 @@
         },
         "Spanish Sardine": {
           "name": "Spanish Sardine",
-          "size": 83.1,
+          "size": 96.7,
           "location": "lagoon"
         },
         "Tomtate": {
@@ -1806,6 +1887,16 @@
         "Northern Kingfish": {
           "name": "Northern Kingfish",
           "size": 275.7,
+          "location": "lagoon"
+        },
+        "Pinfish": {
+          "name": "Pinfish",
+          "size": 20.0,
+          "location": "lagoon"
+        },
+        "Silver Perch": {
+          "name": "Silver Perch",
+          "size": 136.5,
           "location": "lagoon"
         }
       },
@@ -2229,18 +2320,10 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.9499999999999993,
+        "timeCast": -0.8999999999999999,
         "prevnibs": 0
       },
       "rods": [
-        {
-          "name": "old pine rod",
-          "efficacy": -0.5,
-          "durability": 10,
-          "damage": 7.129999999999999,
-          "type": "rods",
-          "multi": true
-        },
         {
           "name": "branch",
           "efficacy": -0.8,
@@ -2255,7 +2338,15 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.3227846132368177,
+          "damage": 1.2545008231140162,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 4.3977846132368175,
           "type": "lures",
           "multi": true
         },
@@ -2310,7 +2401,7 @@
         },
         "Scup": {
           "name": "Scup",
-          "size": 180.9,
+          "size": 303.9,
           "location": "lagoon"
         },
         "Silver Perch": {
@@ -2392,10 +2483,129 @@
           "name": "Scaled Sardine",
           "size": 51.7,
           "location": "lagoon"
+        },
+        "Largemouth Bass": {
+          "name": "Largemouth Bass",
+          "size": 287.1,
+          "location": "lagoon"
+        },
+        "Bluestriped Grunt": {
+          "name": "Bluestriped Grunt",
+          "size": 153.4,
+          "location": "lagoon"
         }
       },
       "licenses": [],
       "lastChannel": 785626538657579020
+    }
+  },
+  "89511224831660032": {
+    "games": [
+      "fishing"
+    ],
+    "fishing": {
+      "state": {
+        "location": "lagoon",
+        "state": "idle",
+        "timeCast": -0.6299999999999999,
+        "prevnibs": 0
+      },
+      "rods": [
+        {
+          "name": "bamboo rod",
+          "efficacy": -0.1,
+          "durability": 35,
+          "damage": 11.205,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.085,
+          "type": "rods",
+          "multi": true
+        }
+      ],
+      "lures": [
+        {
+          "name": "hook",
+          "efficacy": -0.5,
+          "durability": 10,
+          "damage": 9.020000000000001,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.2699999999999996,
+          "type": "lures",
+          "multi": true
+        }
+      ],
+      "records": {
+        "Scup": {
+          "name": "Scup",
+          "size": 250.2,
+          "location": "lagoon"
+        },
+        "Spanish Sardine": {
+          "name": "Spanish Sardine",
+          "size": 119.0,
+          "location": "lagoon"
+        },
+        "Round Scad": {
+          "name": "Round Scad",
+          "size": 136.0,
+          "location": "lagoon"
+        },
+        "Winter Flounder": {
+          "name": "Winter Flounder",
+          "size": 306.9,
+          "location": "lagoon"
+        },
+        "Gray Triggerfish": {
+          "name": "Gray Triggerfish",
+          "size": 244.6,
+          "location": "lagoon"
+        },
+        "Oyster Toadfish": {
+          "name": "Oyster Toadfish",
+          "size": 166.9,
+          "location": "lagoon"
+        },
+        "Atlantic Menhaden": {
+          "name": "Atlantic Menhaden",
+          "size": 256.8,
+          "location": "lagoon"
+        },
+        "Rainbow Smelt": {
+          "name": "Rainbow Smelt",
+          "size": 194.2,
+          "location": "lagoon"
+        },
+        "Cunner": {
+          "name": "Cunner",
+          "size": 324.2,
+          "location": "lagoon",
+          "fisher": 89511224831660032
+        },
+        "Spot": {
+          "name": "Spot",
+          "size": 217.5,
+          "location": "lagoon"
+        },
+        "Gulf Menhaden": {
+          "name": "Gulf Menhaden",
+          "size": 205.6,
+          "location": "lagoon"
+        }
+      },
+      "licenses": [],
+      "lastChannel": 777266814933008406
     }
   }
 }
