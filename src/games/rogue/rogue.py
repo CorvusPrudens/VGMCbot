@@ -1,7 +1,9 @@
 import json
+import pickle
 import math
 import copy
 import re
+import os
 import numpy as np
 
 # TODO LIST :
@@ -78,7 +80,7 @@ def drawText(string, center=False):
         # formatter = '{} {: >?} {: >!}\n'.replace('?', str(longestLine/2))
     # else:
     formatter = '{} {: <?} {}\n'.replace('?', str(longestLine))
-    print(formatter)
+    # print(formatter)
     for line in lines:
         output += formatter.format(textBox['lr'], line, textBox['lr'])
     return output + textBox['dl'] + textBox['ud']*(longestLine + 2) + textBox['dr'] + '\n'
@@ -124,7 +126,9 @@ roomTemplate = {
     'height': -1,
     'playerw': 3,
     'playerh': 3,
-    'ptog': []
+    'draww': -1,
+    'drawh': -1,
+    'ptog': {},
     'map': [],
     'things': [],
 }
@@ -149,9 +153,18 @@ sqRoom = {
 def od(x, y, width):
     return int(x + y*width)
 
+def regexFromDict(dic, command=False):
+    string = '('
+    for key in dic:
+        if command:
+            string += '(\\{})|'.format(key)
+        else:
+            string += '({})|'.format(key)
+    return re.compile(string[:-1] + ')\\b')
+
 def formatRoom(roomdict):
-    w = roomdict['width'] + 4
-    h = roomdict['height']*2 + 4
+    w = roomdict['draww']
+    h = roomdict['drawh']
     # for final discord use:
     # output = '```'
     output = ''
@@ -175,20 +188,22 @@ def formatRoom(roomdict):
     # output += '```'
     return output
 
-def genRoom(name, width, height, shape, fill=False):
+def genRoom(name, width, height, shape, fill=True):
     dict = copy.deepcopy(roomTemplate)
     dict['name'] = name
     dict['width'] = width
     dict['height'] = height
-    width += 4
+    width = width*2 + 3
     height = height*2 + 4
-    tempmap = [0 for x in range(width*height)]
-    # tempmap = np.zeros((width*height,), dtype='u1')
+    dict['draww'] = width
+    dict['drawh'] = height
+    tempmap = np.zeros((width*height,), dtype='u1')
 
     # note -- this will cause errors if the height is less than four
     wallTile = 2
     litTile = 1
     if shape == 'rect':
+        # smallest size for a rect is 5x5
         for y in range(height):
             for x in range(width):
                 if y == 0:
@@ -202,7 +217,14 @@ def genRoom(name, width, height, shape, fill=False):
 
                 if fill:
                     if x > 1 and x < width - 2 and y > 1 and y < height - 2:
-                        tempmap[od(x, y, width)] = litTile
+                        if x % 2 == 0:
+                            tempmap[od(x, y, width)] = litTile
+        # if width
+        # dict['playerw']
+        for y in range(3):
+            for x in range(3):
+                dict['ptog'][(x, y)] = (x*((dict['width'] - 1)//2),
+                                       y*((dict['height'] - 1)//2))
 
         # doors (hardcoded 2 pixels)
         unlit = 0
@@ -227,13 +249,13 @@ def genRoom(name, width, height, shape, fill=False):
     dict['map'] = tempmap
     return dict
 
-bigg = genRoom('sq', 18, 9, 'rect', fill=True)
+bigg = genRoom('sq', 18, 9, 'rect')
 
 def printRoom(roomdict):
-    for y in range(roomdict['height']):
+    for y in range(roomdict['drawh']):
         string = ''
-        for x in range(roomdict['width']):
-            string += str(roomdict['map'][od(x, y, roomdict['width'])])
+        for x in range(roomdict['draww']):
+            string += str(roomdict['map'][od(x, y, roomdict['draww'])])
         print(string)
 
 def mono(string):
@@ -241,10 +263,10 @@ def mono(string):
 
 # printRoom(bigg)
 
-roomTemplate = genRoom('chamber', 18, 9, 'rect', fill=True)
+rectTemplate = genRoom('chamber', 5, 5, 'rect')
 
 class Room:
-    def __init__(self, initdict=roomTemplate, name=None, width=None, height=None, shape=None):
+    def __init__(self, initdict=rectTemplate, name=None, width=None, height=None, shape=None):
         self.dict = copy.deepcopy(initdict)
         if name != None:
             self.dict['name'] = name
@@ -254,22 +276,29 @@ class Room:
             self.dict['height'] = height
         if shape != None:
             self.dict['shape'] = shape
-        self.buffer = formatRoom(self.dict)
 
     def draw(self, player):
-        tempbuff = self.buffer
+        tempbuff = formatRoom(self.dict)
         for thing in self.dict['things']:
             tempbuff = self.add(tempbuff, thing)
-        tempbuff = self.add(tempbuff, player)
+        tempbuff = self.addPlayer(tempbuff, player)
         return tempbuff
 
     def add(self, buff, thing):
         pos = self.buff2coord(thing.dict['x'], thing.dict['y'])
         return buff[:pos] + thing.dict['char'] + buff[pos + 1:]
 
+    def addPlayer(self, buff, player):
+        playerpos = (player.dict['x'], player.dict['y'])
+        temppos = self.dict['ptog'][playerpos]
+        pos = self.buff2coord(temppos[0], temppos[1])
+        # print(playerpos, temppos, pos)
+        return buff[:pos] + player.dict['char'] + buff[pos + 1:]
+
     def buff2coord(self, x, y):
-        # + 5 instead of 4 because of newline
-        return (x + 2) + (y + 1)*(self.dict['width'] + 5)
+        # self.dict['draww'] + 1 because of newline
+        # print(self.dict['draww'])
+        return (x*2 + 2) + (y + 1)*(self.dict['draww'] + 1)
 
     def insert(self, thing):
         self.dict['things'].append(thing)
@@ -305,8 +334,8 @@ playerTemplate = {
     'id': '-1',
     'type': 'player',
     'name': 'Player',
-    'x': 9,
-    'y': 4,
+    'x': 0,
+    'y': 0,
     'char': '@',
     'levels': [Level()], # need to make home level
     'state': {
@@ -333,9 +362,12 @@ class Player:
         return out
 
     def draw(self):
+        return self.getRoom().draw(self)
+
+    def getRoom(self):
         level = self.dict['state']['level']
         room = self.dict['state']['room']
-        return self.dict['levels'][level].dict['rooms'][room].draw(self)
+        return self.dict['levels'][level].dict['rooms'][room]
 
 
 class GameTemplate:
@@ -354,53 +386,105 @@ class GameTemplate:
         pass
 
 class GameRogue(GameTemplate):
-    def __init__(self, savepath='games/rogue/gamedata.json'):
+    def __init__(self, savepath='games/rogue/saves/'):
         self.savepath = savepath
-        self.savegames = {}
+        self.players = {}
+        self.load()
         self.commands = {
             # '.coins': self.fCoins,
             '.map': self.fMap,
             '.hello': self.fHello,
+            '.move': self.fMove,
         }
         # self.coins = 0
         # self.room = Room(width=19)
-        # self.savegames.append(Player())
+        # self.players.append(Player())
         # self.room.insert(self.player)
         self.helpDict = {'rogue': ''}
+        self.moveDict = {
+            'up': (0, -1),
+            'u': (0, -1),
+            'north': (0, -1),
+            'n': (0, -1),
+            'down': (0, 1),
+            'd': (0, 1),
+            'south': (0, 1),
+            's': (0, 1),
+            'left': (-1, 0),
+            'l': (-1, 0),
+            'west': (-1, 0),
+            'w': (-1, 0),
+            'right': (1, 0),
+            'r': (1, 0),
+            'east': (1, 0),
+            'e': (1, 0),
+        }
+        self.moveRegex = regexFromDict(self.moveDict)
 
-    def save(self):
-        # here we have to figure out how we balance
-        # the Player class within the players dict
-        savedict = {}
-        for key in self.savegames:
-            savedict[self.savegames[key].dict['id']] = self.savegames[key].save()
-        with open(self.savepath, 'w') as file:
-            # if this ends up being too slow/memory intensive, we
-            # can use pickle.dump
-            json.dump(savedict, file, indent=2)
-        del savedict
+    def save(self, player):
+        with open(self.savepath + player.dict['id'] + '.pkl', 'wb') as file:
+            pickle.dump(player, file, -1)
 
-    # in order to load, each dict needs a type field so we can load it
-    def load(self, client):
-        pass
+    def load(self):
+        files = os.listdir(self.savepath)
+        for file in files:
+            id = file.replace('.pkl', '')
+            with open(self.savepath + file, 'rb') as input:
+                self.players[id] = pickle.load(input)
 
     async def addPlayer(self, message, client):
         name = await client.fetch_user(message.author.id)
         id = str(message.author.id)
-        self.savegames[id] = Player(name=name.name, id=id)
+        self.players[id] = Player(name=name.name, id=id)
+        await message.channel.send('u have been initted')
 
     async def fCoins(self, message, client):
         string = 'You have {} coins\n'.format(self.coins)
         await message.channel.send(string)
 
     async def fMap(self, message, client):
+        id = str(message.author.id)
         try:
-            string = self.savegames[str(message.author.id)].draw()
+            string = self.players[id].draw()
         except  KeyError:
             await self.addPlayer(message, client)
-            string = self.savegames[str(message.author.id)].draw()
-        self.save()
+            string = self.players[id].draw()
+        # printRoom(self.players[id].dict['levels'][0].dict['rooms'][0].dict)
+        self.save(self.players[id])
         await message.channel.send(mono(string))
+
+    async def fMove(self, message, client):
+        tokens = message.content.lower().split(' ')
+        index = -1
+        for i in range(len(tokens)):
+            if tokens[i] == '.move':
+                index = i
+                break
+        if index == -1 or index == len(tokens) - 1:
+            mess = 'invalid move command'
+            await message.channel.send(mono(mess))
+        else:
+            match = self.moveRegex.search(tokens[index + 1])
+            if match == None:
+                mess = 'invalid move command'
+                await message.channel.send(mono(mess))
+            else:
+                id = str(message.author.id)
+                room = self.players[id].getRoom()
+                playergrid = (room.dict['playerw'], room.dict['playerh'])
+                # now for the actual moving
+                prevpos = (self.players[id].dict['x'], self.players[id].dict['y'])
+                matrix = self.moveDict[match.group(0)]
+                newpos = (prevpos[0] + matrix[0], prevpos[1] + matrix[1])
+                if newpos[0] < 0 or newpos[1] < 0 or newpos[0] >= playergrid[0] or newpos[1] >= playergrid[1]:
+                    mess = 'you did not move'
+                    await message.channel.send(mono(mess))
+                else:
+                    self.players[id].dict['x'] = newpos[0]
+                    self.players[id].dict['y'] = newpos[1]
+                    mess = 'you moved somewhere (should be in dict or smth)'
+                    await message.channel.send(mono(mess))
+
 
     async def fHello(self, message, client):
         mess = drawText("It's dangerous to go alone!\nTake this.")
