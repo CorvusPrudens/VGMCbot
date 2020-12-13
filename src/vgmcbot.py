@@ -23,7 +23,7 @@ async def on_message(message):
         return
 
     # Just so the bot doesn't feel neurotic
-    await asyncio.sleep(0.5)
+    # await asyncio.sleep(0)
 
     await client.preMention(message)
 

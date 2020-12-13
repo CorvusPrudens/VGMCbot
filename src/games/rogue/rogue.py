@@ -122,6 +122,9 @@ roomTemplate = {
     'name': 'room',
     'width' : -1,
     'height': -1,
+    'playerw': 3,
+    'playerh': 3,
+    'ptog': []
     'map': [],
     'things': [],
 }
@@ -131,6 +134,8 @@ sqRoom = {
     'name': 'square',
     'width': 5,
     'height': 5,
+    'playerw': 3,
+    'playerh': 3,
     'map': [
         2, 2, 2, 2, 2,
         2, 0, 0, 0, 2,
@@ -177,7 +182,8 @@ def genRoom(name, width, height, shape, fill=False):
     dict['height'] = height
     width += 4
     height = height*2 + 4
-    tempmap = np.zeros((width*height,), dtype='u1')
+    tempmap = [0 for x in range(width*height)]
+    # tempmap = np.zeros((width*height,), dtype='u1')
 
     # note -- this will cause errors if the height is less than four
     wallTile = 2
@@ -234,32 +240,27 @@ def mono(string):
     return '```' + string + '```'
 
 # printRoom(bigg)
-class Level:
-    def __init__(self):
-        self.dict = {
-            'type': 'level',
-            'rooms': [],
-        }
 
-    def addRoom(self, room):
-        self.dict['rooms'].append(room)
-
-    def save(self):
-        roomlist = []
-        for room in self.dict['rooms']:
-            roomlist.append(room.save())
-        return roomlist
+roomTemplate = genRoom('chamber', 18, 9, 'rect', fill=True)
 
 class Room:
-    def __init__(self, name='chamber', width=18, height=9, shape='rect'):
-        self.dict = genRoom(name, width, height, shape, fill=True)
+    def __init__(self, initdict=roomTemplate, name=None, width=None, height=None, shape=None):
+        self.dict = copy.deepcopy(initdict)
+        if name != None:
+            self.dict['name'] = name
+        if width != None:
+            self.dict['width'] = width
+        if height != None:
+            self.dict['height'] = height
+        if shape != None:
+            self.dict['shape'] = shape
         self.buffer = formatRoom(self.dict)
 
     def draw(self, player):
         tempbuff = self.buffer
         for thing in self.dict['things']:
             tempbuff = self.add(tempbuff, thing)
-        tempbuff = seld.add(tempbuff, player)
+        tempbuff = self.add(tempbuff, player)
         return tempbuff
 
     def add(self, buff, thing):
@@ -274,41 +275,67 @@ class Room:
         self.dict['things'].append(thing)
 
     def save(self):
-        out = copy.deepcopy(self.dict)
-        for i in range(len(out['things'])):
-            out['things'][i] = out['things'][i].save()
-        return out
+        for i in range(len(self.dict['things'])):
+            self.dict['things'][i] = self.dict['things'][i].save()
+        return self.dict
+
+class Level:
+    def __init__(self, initdict={'type': 'level', 'name': 'Emitter Precipice', 'rooms': [Room()]}):
+        self.dict = initdict
+
+    def addRoom(self, room):
+        self.dict['rooms'].append(room)
+
+    def save(self):
+        # the only time this will be called is when
+        # everything is deepcopied, so 'destroying' things
+        # is no biggie
+        for i in range(len(self.dict['rooms'])):
+            self.dict['rooms'][i] = self.dict['rooms'][i].save()
+        return self.dict
 
 class Thing:
-    def __init__(self):
-        self.dict = {
-            'type': 'thing',
-        }
+    def __init__(self, initdict={'type': 'thing'}):
+        self.dict = copy.deepcopy(initdict)
 
     def save(self):
         return self.dict
 
-class Player():
-    def __init__(self, name='Player', char='@', id='0'):
-        self.dict = {
-            'id': id,
-            'type': 'player',
-            'name': name,
-            'x': 9,
-            'y': 4,
-            'char': char,
-            'levels': [], # need to make home level
-            'state': {
-                'level': 0,
-                'room': 0,
-            }
-        }
+playerTemplate = {
+    'id': '-1',
+    'type': 'player',
+    'name': 'Player',
+    'x': 9,
+    'y': 4,
+    'char': '@',
+    'levels': [Level()], # need to make home level
+    'state': {
+        'level': 0,
+        'room': 0,
+    }
+}
+
+class Player:
+    def __init__(self, initdict=playerTemplate, name=None, char=None, id=None):
+        self.dict = copy.deepcopy(initdict)
+        if name != None:
+            self.dict['name'] = name
+        if char != None:
+            self.dict['char'] = char
+        if id != None:
+            self.dict['id'] = id
+
 
     def save(self):
         out = copy.deepcopy(self.dict)
         for i in range(len(out['levels'])):
             out['levels'][i] = out['levels'][i].save()
         return out
+
+    def draw(self):
+        level = self.dict['state']['level']
+        room = self.dict['state']['room']
+        return self.dict['levels'][level].dict['rooms'][room].draw(self)
 
 
 class GameTemplate:
@@ -329,38 +356,50 @@ class GameTemplate:
 class GameRogue(GameTemplate):
     def __init__(self, savepath='games/rogue/gamedata.json'):
         self.savepath = savepath
-        self.savegames = []
+        self.savegames = {}
         self.commands = {
             # '.coins': self.fCoins,
             '.map': self.fMap,
             '.hello': self.fHello,
         }
-        self.coins = 0
-        self.room = Room(width=19)
-        self.player = Player()
-        self.room.insert(self.player)
+        # self.coins = 0
+        # self.room = Room(width=19)
+        # self.savegames.append(Player())
+        # self.room.insert(self.player)
         self.helpDict = {'rogue': ''}
 
-    def save(self, client):
+    def save(self):
         # here we have to figure out how we balance
         # the Player class within the players dict
         savedict = {}
-        for player in self.savegames:
-            savedict[player.dict['id']] = player.save()
+        for key in self.savegames:
+            savedict[self.savegames[key].dict['id']] = self.savegames[key].save()
         with open(self.savepath, 'w') as file:
-            json.dump(savedict, file)
+            # if this ends up being too slow/memory intensive, we
+            # can use pickle.dump
+            json.dump(savedict, file, indent=2)
         del savedict
 
     # in order to load, each dict needs a type field so we can load it
     def load(self, client):
         pass
 
+    async def addPlayer(self, message, client):
+        name = await client.fetch_user(message.author.id)
+        id = str(message.author.id)
+        self.savegames[id] = Player(name=name.name, id=id)
+
     async def fCoins(self, message, client):
         string = 'You have {} coins\n'.format(self.coins)
         await message.channel.send(string)
 
     async def fMap(self, message, client):
-        string = self.room.draw()
+        try:
+            string = self.savegames[str(message.author.id)].draw()
+        except  KeyError:
+            await self.addPlayer(message, client)
+            string = self.savegames[str(message.author.id)].draw()
+        self.save()
         await message.channel.send(mono(string))
 
     async def fHello(self, message, client):
