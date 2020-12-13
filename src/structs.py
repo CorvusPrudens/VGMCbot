@@ -39,7 +39,7 @@ class extClient(discord.Client):
         self.helpDict = {'normal': self.data.peasantCommands,
                          'leader': self.data.leaderCommands}
 
-        self.games = games.Games('games/players.json', 'games/misc.json')
+        self.games = games.Games('games/players.json', 'games/fishing/misc.json')
         #
         # self.funcDict.update(self.games.commands)
         # print(self.funcDict)

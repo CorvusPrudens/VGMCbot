@@ -49,9 +49,9 @@
   },
   "Scup": {
     "name": "Scup",
-    "size": 325.3,
+    "size": 328.9,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 89511224831660032
   },
   "Scaled Sardine": {
     "name": "Scaled Sardine",
@@ -91,9 +91,9 @@
   },
   "Pinfish": {
     "name": "Pinfish",
-    "size": 139.2,
+    "size": 210.6,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 315544986571505667
   },
   "Blue Runner": {
     "name": "Blue Runner",
@@ -151,9 +151,9 @@
   },
   "Southern Kingfish": {
     "name": "Southern Kingfish",
-    "size": 340.1,
+    "size": 373.1,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 89511224831660032
   },
   "Pigfish": {
     "name": "Pigfish",
@@ -442,5 +442,11 @@
     "size": 280.3,
     "location": "cliffside",
     "fisher": 630486434360590355
+  },
+  "Striped Bass": {
+    "name": "Striped Bass",
+    "size": 640.0,
+    "location": "boat",
+    "fisher": 164224139316428800
   }
 }
