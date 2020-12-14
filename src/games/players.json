@@ -346,13 +346,70 @@
     ],
     "fishing": {
       "state": {
-        "location": "cliffside",
+        "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.620000000000001,
+        "timeCast": -0.94,
         "prevnibs": 0
       },
-      "rods": [],
+      "rods": [
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.5674050635742254,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.7608308477642063,
+          "type": "rods",
+          "multi": true
+        }
+      ],
       "lures": [
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.4639478258073395,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.3084222014368039,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.1190747933231635,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.048919147153617,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.4223396150849994,
+          "type": "lures",
+          "multi": true
+        },
         {
           "name": "broken can",
           "efficacy": -0.8,
@@ -1445,15 +1502,15 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.27,
-        "prevnibs": 2
+        "timeCast": -0.5899999999999999,
+        "prevnibs": 3
       },
       "rods": [
         {
           "name": "old pine rod",
           "efficacy": -0.5,
           "durability": 10,
-          "damage": 1.77,
+          "damage": 1.855,
           "type": "rods",
           "multi": true
         }
@@ -1463,7 +1520,7 @@
           "name": "popper",
           "efficacy": -0.2,
           "durability": 20,
-          "damage": 1.77,
+          "damage": 1.855,
           "type": "lures",
           "multi": true
         },
@@ -1579,7 +1636,7 @@
         }
       },
       "licenses": [],
-      "lastChannel": 567182777716572170
+      "lastChannel": 643294766561492992
     }
   },
   "548236443076657152": {
@@ -1590,15 +1647,15 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.2400000000000002,
-        "prevnibs": 0
+        "timeCast": -0.9299999999999997,
+        "prevnibs": 1
       },
       "rods": [
         {
           "name": "old pine rod",
           "efficacy": -0.5,
           "durability": 10,
-          "damage": 9.14,
+          "damage": 9.225000000000001,
           "type": "rods",
           "multi": true
         },
@@ -1624,7 +1681,7 @@
           "name": "popper",
           "efficacy": -0.2,
           "durability": 20,
-          "damage": 19.60000000000001,
+          "damage": 19.68500000000001,
           "type": "lures",
           "multi": true
         },
@@ -1773,7 +1830,7 @@
         }
       },
       "licenses": [],
-      "lastChannel": 567182777716572170
+      "lastChannel": 787800749294878730
     }
   },
   "315544986571505667": {

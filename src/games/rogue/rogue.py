@@ -153,8 +153,11 @@ sqRoom = {
 def od(x, y, width):
     return int(x + y*width)
 
-def regexFromDict(dic, command=False):
-    string = '('
+def regexFromDict(dic, command=False, bound=False):
+    if bound:
+        string = '\\b('
+    else:
+        string = '('
     for key in dic:
         if command:
             string += '(\\{})|'.format(key)
@@ -193,7 +196,7 @@ def genRoom(name, width, height, shape, fill=True):
     dict['name'] = name
     dict['width'] = width
     dict['height'] = height
-    width = width*2 + 3
+    width = width*3 + 2
     height = height*2 + 4
     dict['draww'] = width
     dict['drawh'] = height
@@ -217,7 +220,7 @@ def genRoom(name, width, height, shape, fill=True):
 
                 if fill:
                     if x > 1 and x < width - 2 and y > 1 and y < height - 2:
-                        if x % 2 == 0:
+                        if (x + 1) % 3 == 0:
                             tempmap[od(x, y, width)] = litTile
         # if width
         # dict['playerw']
@@ -259,11 +262,14 @@ def printRoom(roomdict):
         print(string)
 
 def mono(string):
-    return '```' + string + '```'
+    return '```\n' + string + '\n```'
+
+def monosyn(string):
+    return '```css\n' + string + '\n```'
 
 # printRoom(bigg)
 
-rectTemplate = genRoom('chamber', 5, 5, 'rect')
+rectTemplate = genRoom('chamber', 7, 7, 'rect')
 
 class Room:
     def __init__(self, initdict=rectTemplate, name=None, width=None, height=None, shape=None):
@@ -286,19 +292,21 @@ class Room:
 
     def add(self, buff, thing):
         pos = self.buff2coord(thing.dict['x'], thing.dict['y'])
-        return buff[:pos] + thing.dict['char'] + buff[pos + 1:]
+        offset = thing.dict['char']//2
+        return buff[:pos + offset] + thing.dict['char'] + buff[pos + 1 + offset:]
 
     def addPlayer(self, buff, player):
         playerpos = (player.dict['x'], player.dict['y'])
         temppos = self.dict['ptog'][playerpos]
         pos = self.buff2coord(temppos[0], temppos[1])
+        offset = len(player.dict['char'])//2
         # print(playerpos, temppos, pos)
-        return buff[:pos] + player.dict['char'] + buff[pos + 1:]
+        return buff[:pos - offset] + player.dict['char'] + buff[pos + 1 + offset:]
 
     def buff2coord(self, x, y):
         # self.dict['draww'] + 1 because of newline
         # print(self.dict['draww'])
-        return (x*2 + 2) + (y + 1)*(self.dict['draww'] + 1)
+        return (x*3 + 2) + (y + 1)*(self.dict['draww'] + 1)
 
     def insert(self, thing):
         self.dict['things'].append(thing)
@@ -336,7 +344,7 @@ playerTemplate = {
     'name': 'Player',
     'x': 0,
     'y': 0,
-    'char': '@',
+    'char': '.C ',
     'levels': [Level()], # need to make home level
     'state': {
         'level': 0,
@@ -389,7 +397,7 @@ class GameRogue(GameTemplate):
     def __init__(self, savepath='games/rogue/saves/'):
         self.savepath = savepath
         self.players = {}
-        self.load()
+        # self.load()
         self.commands = {
             # '.coins': self.fCoins,
             '.map': self.fMap,
@@ -419,7 +427,15 @@ class GameRogue(GameTemplate):
             'east': (1, 0),
             'e': (1, 0),
         }
-        self.moveRegex = regexFromDict(self.moveDict)
+        tempdict = {}
+        for key in self.moveDict:
+            if len(key) == 1:
+                self.commands['.m' + key] = self.fMove
+                tempdict['.m' + key] = ''
+
+        self.moveRegex = regexFromDict(self.moveDict, bound=True)
+        self.moveShort = regexFromDict(tempdict)
+        del tempdict
 
     def save(self, player):
         with open(self.savepath + player.dict['id'] + '.pkl', 'wb') as file:
@@ -451,7 +467,7 @@ class GameRogue(GameTemplate):
             string = self.players[id].draw()
         # printRoom(self.players[id].dict['levels'][0].dict['rooms'][0].dict)
         self.save(self.players[id])
-        await message.channel.send(mono(string))
+        await message.channel.send(monosyn(string))
 
     async def fMove(self, message, client):
         tokens = message.content.lower().split(' ')
@@ -460,30 +476,41 @@ class GameRogue(GameTemplate):
             if tokens[i] == '.move':
                 index = i
                 break
-        if index == -1 or index == len(tokens) - 1:
+        if index == -1:
+            match = self.moveShort.search(message.content.lower())
+            if match == None:
+                mess = 'invalid move command'
+                await message.channel.send(mono(mess))
+                return
+            else:
+                direction = match.group(0)[2:]
+        elif index == len(tokens) - 1:
             mess = 'invalid move command'
             await message.channel.send(mono(mess))
+            return
         else:
             match = self.moveRegex.search(tokens[index + 1])
             if match == None:
                 mess = 'invalid move command'
                 await message.channel.send(mono(mess))
+                return
             else:
-                id = str(message.author.id)
-                room = self.players[id].getRoom()
-                playergrid = (room.dict['playerw'], room.dict['playerh'])
-                # now for the actual moving
-                prevpos = (self.players[id].dict['x'], self.players[id].dict['y'])
-                matrix = self.moveDict[match.group(0)]
-                newpos = (prevpos[0] + matrix[0], prevpos[1] + matrix[1])
-                if newpos[0] < 0 or newpos[1] < 0 or newpos[0] >= playergrid[0] or newpos[1] >= playergrid[1]:
-                    mess = 'you did not move'
-                    await message.channel.send(mono(mess))
-                else:
-                    self.players[id].dict['x'] = newpos[0]
-                    self.players[id].dict['y'] = newpos[1]
-                    mess = 'you moved somewhere (should be in dict or smth)'
-                    await message.channel.send(mono(mess))
+                direction = match.group(0)[2:]
+        id = str(message.author.id)
+        room = self.players[id].getRoom()
+        playergrid = (room.dict['playerw'], room.dict['playerh'])
+        # now for the actual moving
+        prevpos = (self.players[id].dict['x'], self.players[id].dict['y'])
+        matrix = self.moveDict[direction]
+        newpos = (prevpos[0] + matrix[0], prevpos[1] + matrix[1])
+        if newpos[0] < 0 or newpos[1] < 0 or newpos[0] >= playergrid[0] or newpos[1] >= playergrid[1]:
+            mess = 'you did not move'
+            await message.channel.send(mono(mess))
+        else:
+            self.players[id].dict['x'] = newpos[0]
+            self.players[id].dict['y'] = newpos[1]
+            mess = 'you moved somewhere (should be in dict or smth)'
+            await message.channel.send(mono(mess))
 
 
     async def fHello(self, message, client):
