@@ -1,10 +1,11 @@
-import json
 import pickle
 import math
 import copy
 import re
 import os
 import numpy as np
+import random as rand
+from games.rogue.enemies import *
 
 # TODO LIST :
 # - room generation
@@ -292,21 +293,23 @@ class Room:
 
     def add(self, buff, thing):
         pos = self.buff2coord(thing.dict['x'], thing.dict['y'])
-        offset = thing.dict['char']//2
-        return buff[:pos + offset] + thing.dict['char'] + buff[pos + 1 + offset:]
+        offset = len(thing.dict['char'])//2
+        return buff[:pos - offset] + thing.dict['char'] + buff[pos + 1 + offset:]
 
     def addPlayer(self, buff, player):
-        playerpos = (player.dict['x'], player.dict['y'])
-        temppos = self.dict['ptog'][playerpos]
+        temppos = self.getPlayerPos(player)
         pos = self.buff2coord(temppos[0], temppos[1])
         offset = len(player.dict['char'])//2
         # print(playerpos, temppos, pos)
         return buff[:pos - offset] + player.dict['char'] + buff[pos + 1 + offset:]
 
     def buff2coord(self, x, y):
-        # self.dict['draww'] + 1 because of newline
-        # print(self.dict['draww'])
+        # + 1 because of newline
         return (x*3 + 2) + (y + 1)*(self.dict['draww'] + 1)
+
+    def getPlayerPos(self, player):
+        playerpos = (player.dict['x'], player.dict['y'])
+        return self.dict['ptog'][playerpos]
 
     def insert(self, thing):
         self.dict['things'].append(thing)
@@ -316,9 +319,14 @@ class Room:
             self.dict['things'][i] = self.dict['things'][i].save()
         return self.dict
 
+    def animate(self, player):
+        for thing in self.dict['things']:
+            thing.animate(player)
+
 class Level:
     def __init__(self, initdict={'type': 'level', 'name': 'Emitter Precipice', 'rooms': [Room()]}):
         self.dict = initdict
+        self.dict['rooms'][0].insert(Enemy(initdict=sentry))
 
     def addRoom(self, room):
         self.dict['rooms'].append(room)
@@ -332,14 +340,37 @@ class Level:
         return self.dict
 
 class Thing:
-    def __init__(self, initdict={'type': 'thing'}):
+    def __init__(self, initdict={'type': 'thing', 'name': 'object'}):
         self.dict = copy.deepcopy(initdict)
 
     def save(self):
         return self.dict
 
+    def apply(self, payload):
+        try:
+            for effect in payload['delta']:
+                self.dict[effect] += payload['delta'][effect]
+        except KeyError:
+            name = self.dict['name']
+            print('Error on {}; {} not present!'.format(name, effect))
+
+class Enemy(Thing):
+
+    def animate(self, player):
+        pass
+
+    def action(self, player):
+        item = rand.choice(self.dict['inventory'])
+        while item['type'] != 'active':
+            item = rand.choice(self.dict['inventory'])
+        act = rand.choice(item['moveset'])
+        payload = act['method'](self, [player])
+
+
+
 playerTemplate = {
     'id': '-1',
+    'lastChannel': None,
     'type': 'player',
     'name': 'Player',
     'x': 0,
@@ -349,7 +380,8 @@ playerTemplate = {
     'state': {
         'level': 0,
         'room': 0,
-    }
+        'state': 'exploration',
+    },
 }
 
 class Player:
@@ -362,12 +394,14 @@ class Player:
         if id != None:
             self.dict['id'] = id
 
-
     def save(self):
         out = copy.deepcopy(self.dict)
         for i in range(len(out['levels'])):
             out['levels'][i] = out['levels'][i].save()
         return out
+
+    def setLastChannel(self, message):
+        self.dict['lastChannel'] = message.channel
 
     def draw(self):
         return self.getRoom().draw(self)
@@ -376,6 +410,29 @@ class Player:
         level = self.dict['state']['level']
         room = self.dict['state']['room']
         return self.dict['levels'][level].dict['rooms'][room]
+
+    def apply(self, payload):
+        try:
+            for effect in payload['delta']:
+                self.dict[effect] += payload['delta'][effect]
+        except KeyError:
+            name = self.dict['name']
+            print('Error on {}; {} not present!'.format(name, effect))
+
+    async def encounter(self):
+        # for now, if the player is close to an enemy, combat will start
+        room = self.getRoom()
+        pos = room.getPlayerPos(self)
+        for thing in room.dict['things']:
+            dist = (pos[0] - thing.dict['x'])**2 + (pos[1] - thing.dict['y'])**2
+            if dist <= 2:
+                self.dict['state']['state'] = 'combat'
+                mess = 'you have entered combat'
+                await self.dict['lastChannel'].send(mess)
+
+    def combat(self):
+        pass
+
 
 
 class GameTemplate:
@@ -388,9 +445,9 @@ class GameTemplate:
         # dictionary safety
         keylist = list(players.keys())
         for key in keylist:
-            await self.execute(key, players, client)
+            await self.execute(key, client)
 
-    async def execute(self, playerKey, players, client):
+    async def execute(self, playerKey, client):
         pass
 
 class GameRogue(GameTemplate):
@@ -452,6 +509,7 @@ class GameRogue(GameTemplate):
         name = await client.fetch_user(message.author.id)
         id = str(message.author.id)
         self.players[id] = Player(name=name.name, id=id)
+        self.players[id].setLastChannel(message)
         await message.channel.send('u have been initted')
 
     async def fCoins(self, message, client):
@@ -466,12 +524,15 @@ class GameRogue(GameTemplate):
             await self.addPlayer(message, client)
             string = self.players[id].draw()
         # printRoom(self.players[id].dict['levels'][0].dict['rooms'][0].dict)
+        self.players[id].setLastChannel(message)
         self.save(self.players[id])
         await message.channel.send(monosyn(string))
 
     async def fMove(self, message, client):
+        id = str(message.author.id)
         tokens = message.content.lower().split(' ')
         index = -1
+        self.players[id].setLastChannel(message)
         for i in range(len(tokens)):
             if tokens[i] == '.move':
                 index = i
@@ -496,7 +557,6 @@ class GameRogue(GameTemplate):
                 return
             else:
                 direction = match.group(0)[2:]
-        id = str(message.author.id)
         room = self.players[id].getRoom()
         playergrid = (room.dict['playerw'], room.dict['playerh'])
         # now for the actual moving
@@ -512,7 +572,11 @@ class GameRogue(GameTemplate):
             mess = 'you moved somewhere (should be in dict or smth)'
             await message.channel.send(mono(mess))
 
-
     async def fHello(self, message, client):
         mess = drawText("It's dangerous to go alone!\nTake this.")
         await message.channel.send(mono(mess))
+
+    # TODO -- integrate this with the game loop
+    async def execute(self, playerKey, client):
+        state = players[playerKey]['fishing']['state']['state']
+        await self.loopCommands[state](playerKey, client)

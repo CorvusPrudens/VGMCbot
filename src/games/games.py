@@ -23,7 +23,7 @@ class Games:
         self.games = {}
         self.helpDict = {}
         self.games['fishing'] = fishing.GameFishing()
-        self.games['rogue'] = rogue.GameRogue()
+        # self.games['rogue'] = rogue.GameRogue()
         self.playerPath = playerPath
         self.miscPath = miscPath
 

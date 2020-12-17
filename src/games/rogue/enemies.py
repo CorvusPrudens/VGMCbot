@@ -1,9 +1,40 @@
 
+def longestKey(dic, indent=0):
+    longest = 0
+    for key in dic:
+        try:
+            temp = longestKey(dic[key], indent=indent+2)
+            if temp > longest:
+                longest = temp
+        except (AttributeError, TypeError) as error:
+            temp = len(' '*indent + key)
+            if temp > longest:
+                longest = temp
+    return longest
 
-def diagMethod():
-    pass
-    
-item1 = {
+def formatDict(dic, indent=0, longest=None):
+    string = ''
+    if longest == None:
+        longest = longestKey(dic)
+    for key in dic:
+        try:
+            temp = formatDict(dic[key], indent=indent+2, longest=longest)
+            string += '{}:\n'.format(key)
+            string += temp
+        except (AttributeError, TypeError) as error:
+            spaces = longest - len(' '*indent + key)
+            string += ' '*indent + '{}:{} {}\n'.format(key, spaces*' ', dic[key])
+    return string
+
+def diagMethod(user, targets):
+    payload = {
+        'message': formatDict(targets[0].dict['stats']),
+        'data': targets[0].dict['stats'],
+        'delta': {}, # this is where damage data would go
+    }
+    return payload
+
+lens = {
     'name': 'diagnostic lens',
     'desc': 'this lens grants insight',
     'type': 'active',
@@ -13,34 +44,55 @@ item1 = {
             'targets': 1,
             'method': diagMethod,
         }
-    ]
+    ],
     'stat bonus': {}
 }
 
-enemyTemplate = {
+def stunMethod(user, targets):
+    payload = {
+        'message': '{} has been stunned'.format(targets[0].dict['name']),
+        'data': {},
+        'delta': {'stun': 10},
+    }
+    return payload
+
+stun = {
+    'name': 'stun module',
+    'desc': 'short aparatus equipped with electrically disruptive contacts',
+    'type': 'active',
+    'moveset': [
+        {
+            'name': 'stun',
+            'targets': 1,
+            'method': stunMethod,
+        }
+    ],
+    'stat bonus': {}
+}
+
+sentry = {
     'name': 'sentry bot',
-    'x': 0,
+    'type': 'enemy',
+    'char': '[s]',
+    'x': 2,
     'y':0,
     'hp': 10.0,
     'inventory': [
-        {
-            'name': 'diagnostic lens',
-            'desc': 'this lens grants insight',
-            'type': 'active',
-        },
-        {
-            'name': 'stun module',
-        },
-    ]
-    #'attacks' these should come from inv items
-    #'armor' this as well
+        lens,
+        stun,
+    ],
     'stats': { #base stats
         'strength': 0,
         'tech': 5,
         'speed': 0.5, # units / sec
-        'heat resistance': 5,
-        'physical resistance': 2,
-        'electrical resistance': 1,
-        'radiation resistance': 3,
+        'resistance': {
+            'heat': 5,
+            'physical': 2,
+            'electrical': 1,
+            'radiation': 3,
+        },
     }
 }
+
+if __name__ == '__main__':
+    print(formatDict(enemyTemplate['stats']))
