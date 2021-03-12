@@ -1,23 +1,22 @@
 import aiohttp
 import discord
 import asyncio
+import json
 import re
+import random as rand
+
 from games import games
 import data
 import utils
-import random as rand
 
-class extClient(discord.Client):
+
+class extendedClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # this dictionary allows us to cleanly call the defined
         # functions without explicitly checking for the
         # commands in an if elif etc block
-
-        # while it is technically 'data,' I chose to include it
-        # here for clarity and to make sure the functions are
-        # properly defined before passing them to the dict
 
         self.funcDict = {
             '.give': self.fGive,
@@ -61,7 +60,7 @@ class extClient(discord.Client):
             commRegexString += '(\\{})|'.format(key)
         self.commRegex = re.compile(commRegexString[:-1] + ')\\b')
 
-        #WARNING: HARDCODED
+        # WARNING: HARDCODED
         self.nameRegex = re.compile('\\b@(({})|({}))\\b'.format('VGMCbot', 'VGMCtest'))
 
     async def gameLoop(self):
@@ -69,7 +68,8 @@ class extClient(discord.Client):
         while not self.is_closed():
             self.counter += 1
             await self.games.gameLoop(self)
-            await asyncio.sleep(1) # task runs every 60 seconds
+            await asyncio.sleep(1) # task runs every second
+
 
     def loadBank(self):
         try:
@@ -85,6 +85,28 @@ class extClient(discord.Client):
         with open(self.data.cachePath, 'w') as file:
             for key in self.data.bank:
                 file.write(f'{key},{self.data.bank[key]}\n')
+
+    def loadLedger(self):
+        try:
+            with open(self.data.ledgerPath, 'r') as file:
+                self.data.ledger = json.load(file)
+        except FileNotFoundError:
+            pass
+
+    def storeLedger(self):
+        with open(self.data.ledgerPath, 'w') as file:
+            json.dump(self.data.ledger, file, indent=2)
+
+    def loadNameCache(self):
+        try:
+            with open(self.data.nameCachePath, 'r') as file:
+                self.data.nameCache = json.load(file)
+        except FileNotFoundError:
+            pass
+
+    def storeNameCache(self):
+        with open(self.data.nameCachePath, 'w') as file:
+            json.dump(self.data.nameCache, file, indend=2)
 
     async def execComm(self, command, message):
         try:
@@ -127,22 +149,22 @@ class extClient(discord.Client):
 
         if name != None and name == 'VGMCoin':
             try:
-                giver = self.data.bank[user.id]
+                giver = self.data.ledger[str(user.id)]
             except KeyError:
-                self.data.bank[user.id] = 0
+                self.data.ledger[str(user.id)] = 0
             try:
-                receiver = self.data.bank[reaction.message.author.id]
+                receiver = self.data.ledger[str(reaction.message.author.id)]
             except KeyError:
-                self.data.bank[reaction.message.author.id] = 0
+                self.data.ledger[str(reaction.message.author.id)] = 0
 
-            if self.data.bank[user.id] >= 1:
-                self.data.bank[user.id] -= 1
-                self.data.bank[reaction.message.author.id] += 1
-                self.storeBank()
+            if self.data.ledger[str(user.id)] >= 1:
+                self.data.ledger[str(user.id)] -= 1
+                self.data.ledger[str(reaction.message.author.id)] += 1
+                self.storeLedger()
                 self.checkVoteAdd(reaction)
             else:
-                self.data.bank[user.id] -= 1
-                self.data.bank[reaction.message.author.id] += 1
+                self.data.ledger[str(user.id)] -= 1
+                self.data.ledger[str(reaction.message.author.id)] += 1
                 # this then triggers the reactionRemove event
                 self.checkVoteAdd(reaction)
                 await reaction.message.remove_reaction(reaction.emoji, user)
@@ -158,19 +180,19 @@ class extClient(discord.Client):
 
         if name != None and name == 'VGMCoin':
             try:
-                taker = self.data.bank[user.id]
+                taker = self.data.ledger[str(user.id)]
             except KeyError:
-                self.data.bank[user.id] = 0
+                self.data.ledger[str(user.id)] = 0
             try:
-                victim = self.data.bank[reaction.message.author.id]
+                victim = self.data.ledger[str(reaction.message.author.id)]
             except KeyError:
-                self.data.bank[reaction.message.author.id] = 0
+                self.data.ledger[str(reaction.message.author.id)] = 0
 
             # This is a bit troll since people can be put into debt if someone
             # removes a coin while the debtor has less than one coin
-            self.data.bank[reaction.message.author.id] -= 1
-            self.data.bank[user.id] += 1
-            self.storeBank()
+            self.data.ledger[str(reaction.message.author.id)] -= 1
+            self.data.ledger[str(user.id)] += 1
+            self.storeLedger()
             self.checkVoteRemove(reaction)
 
     ################################################################################
@@ -201,12 +223,12 @@ class extClient(discord.Client):
                 await message.channel.send(mess)
             else:
                 try:
-                    self.data.bank[user] += data['value']
+                    self.data.ledger[str(user)] += data['value']
                 except KeyError:
-                    self.data.bank[user] = data['value']
-                self.storeBank()
-                mess = self.data.responses['give'].format(data['name'], self.data.bank[user], rand.choice(self.data.cute))
-                if self.data.bank[user] == 1:
+                    self.data.ledger[str(user)] = data['value']
+                self.storeLedger()
+                mess = self.data.responses['give'].format(data['name'], self.data.ledger[str(user)], rand.choice(self.data.cute))
+                if round(self.data.value[user]['value'], 2) == 1:
                     mess = mess.replace('VGMCoins', 'VGMCoin')
                 await message.channel.send(mess)
         else:
@@ -232,7 +254,7 @@ class extClient(discord.Client):
 
     async def fHmc(self, message):
         try:
-            value = self.data.bank[message.author.id]
+            value = self.data.ledger[str(message.author.id)]
         except KeyError:
             value = 0
         mess = self.data.responses['hmc'].format(message.author.mention, value, rand.choice(self.data.cute))
@@ -245,17 +267,24 @@ class extClient(discord.Client):
         tempstr = ''
         templist = []
         longest = 0
-        sortedBank = sorted(self.data.bank.items(), key=lambda item: item[1], reverse=True)
-        sortedBank = dict(sortedBank)
+        sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
+        sortedLedger = dict(sortedLedger)
         # can't really use longest yet, but maybe we'll find a use eventually
-        for key in sortedBank:
-            fetched = await self.fetch_user(key)
-            templist.append([fetched.name, sortedBank[key]])
-            if len(fetched.name) > longest:
-                longest = len(fetched.name)
+        for key in sortedLedger:
+            try:
+                fetched = self.data.nameCache[key]
+            except KeyError:
+                user = await self.fetch_user(key)
+                fetched = user.name
+                self.data.nameCache[key] = fetched
+            templist.append([fetched, sortedLedger[key]])
+            if len(fetched) > longest:
+                longest = len(fetched)
         for pair in templist:
             if pair[1] != 0:
                 tempstr += self.data.responses['listItem'].format(pair[0], pair[1])
+
+        self.storeNameCache()
         await message.channel.send(tempstr)
 
     async def fUwu(self, message):

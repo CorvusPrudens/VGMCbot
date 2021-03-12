@@ -259,7 +259,7 @@ Fishing Commands:
 
     async def fShop(self, message, client):
         string = 'Hey {}, here\'s what we\'ve got! {}\n\n'.format(message.author.mention, rand.choice(client.data.cute))
-        t = 0
+
         for key in self.lureShop:
             tempstr = '{}.) **{}** -- durability: {} -- efficacy: {} -- price: {}\n'
             string += tempstr.format(self.lureShop[key]['id'], key,
@@ -620,12 +620,19 @@ If you'd like to visit one, just type .goto <location> {}
         else:
             await message.channel.send(client.data.responses['list'].format(rand.choice(client.data.cute)))
             tempstr = ''
-            templist = []
-            sortedFish = sorted(client.games.misc, key=lambda item: client.games.misc[item]['size'], reverse=True)
+            # sortedFish = sorted(client.games.misc, key=lambda item: client.games.misc[item]['size'], reverse=True)
+            sortedFish = sorted(client.games.misc.items(), key=lambda item: item[1]['size'], reverse=True)
+            sortedFish = dict(sortedFish)
             # can't really use longest yet, but maybe we'll find a use eventually
             for key in sortedFish:
-                fetched = await client.fetch_user(client.games.misc[key]['fisher'])
-                tempstr += '✿ **{}**: {:,.2f} cm, caught by {}\n'.format(key, client.games.misc[key]['size']/10, fetched.name)
+                try:
+                    fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
+                except KeyError:
+                    user = await client.fetch_user(client.games.misc[key]['fisher'])
+                    fetched = user.name
+                    client.data.nameCache[str(user.id)] = fetched
+                tempstr += '✿ **{}**: {:,.2f} cm, caught by {}\n'.format(key, client.games.misc[key]['size']/10, fetched)
+            client.storeNameCache()
             await message.channel.send(tempstr)
 
     async def lIdle(self, playerKey, players, client):
@@ -823,6 +830,6 @@ If you'd like to visit one, just type .goto <location> {}
                 players[playerKey]['fishing']['state']['state'] = 'idle'
 
 
-if __name__ == '__main__':
-    catch = retrieveFish(fishLocations, fishCatalog, 'boat', bias=0)
-    print(fishLine(fishLocations, fishCatalog, catch))
+# if __name__ == '__main__':
+#     catch = retrieveFish(fishLocations, fishCatalog, 'boat', bias=0)
+#     print(fishLine(fishLocations, fishCatalog, catch))

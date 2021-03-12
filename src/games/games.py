@@ -1,10 +1,6 @@
 import json
-import asyncio
-import math
-import random as rand
-import copy
 from games.fishing import fishing
-from games.rogue import rogue
+# from games.rogue import rogue
 
 # TODO -- fix changing dictionary size while iterating -- can just
 # copy the main dict before any iteration (memory intensive but safe?)
@@ -44,13 +40,13 @@ class Games:
         try:
             with open(self.playerPath, 'r') as file:
                 self.players = json.load(file)
-        except (FileNotFoundError, json.decoder.JSONDecodeError) as error:
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
             pass
         if misc:
             try:
                 with open(self.miscPath, 'r') as file:
                     self.misc = json.load(file)
-            except (FileNotFoundError, json.decoder.JSONDecodeError) as error:
+            except (FileNotFoundError, json.decoder.JSONDecodeError):
                 pass
 
     def save(self, misc=True):

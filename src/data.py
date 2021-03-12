@@ -8,9 +8,13 @@ class Data:
     def __init__(self):
         self.botID = '782113493797044224'
         self.cachePath = 'bank.csv'
+        self.ledgerPath = 'ledger.json'
+        self.namePath = 'nameCache.json'
         self.prevChoice = 0
         self.leader = 'Leader'
         self.bank = {}
+        self.ledger = {}
+        self.nameCache = {}
         self.timeBound = {
             'morning': [5, 12],
             'night': [17, 5]
