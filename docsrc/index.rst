@@ -12,10 +12,6 @@ Here's where you can learn all about the bot for Berklee's `Video Game Music Clu
 
 .. _Video Game Music Club: https://www.berklee.edu/clubs/vgmc
 
-.. image:: https://i.imgur.com/5o9NMCO.png
-  :width: 400
-  :alt: VGMC bot pfp
-
 .. toctree::
    :maxdepth: 2
    :caption: General Features:
