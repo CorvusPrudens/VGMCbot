@@ -466,7 +466,7 @@ If you'd like to visit one, just type .goto <location> {}
                 await message.channel.send(mess.format(rand.choice(client.data.sad)))
             else:
                 try:
-                    bands = client.data.ledger[int(currentPlayer)]
+                    bands = client.data.ledger[currentPlayer]
                 except KeyError:
                     bands = 0
                 if tempitem['price'] > bands:
@@ -493,8 +493,8 @@ If you'd like to visit one, just type .goto <location> {}
                     if not taken:
                         client.games.players[currentPlayer]['fishing'][type].insert(0, copy.deepcopy(tempitem['stats']))
                         mess = 'ok {}, a{} **{}** has been added to your inventory {}'
-                        client.data.ledger[int(currentPlayer)] -= tempitem['price']
-                        money = client.data.ledger[int(currentPlayer)]
+                        client.data.ledger[currentPlayer] -= tempitem['price']
+                        money = client.data.ledger[currentPlayer]
                         mess2 = '\n(you now have {:,.2f} VGMCoins)'.format(money)
                         mess = mess.format(message.author.name,
                                            self.detectAn(itemname),
@@ -829,9 +829,9 @@ If you'd like to visit one, just type .goto <location> {}
             ess = ''
         mess = mess.format(value, ess, rand.choice(client.data.cute))
         try:
-            client.data.ledger[int(playerKey)] += value
+            client.data.ledger[playerKey] += value
         except KeyError:
-            client.data.ledger[int(playerKey)] = value
+            client.data.ledger[playerKey] = value
         return mess
         # await lastChannel.send(mess)
 
