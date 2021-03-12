@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="" lang="" version="-//W3C//DTD XHTML 1.1//EN" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <title>Fishing &mdash; VGMC bot 1.0.0 documentation</title>
+  
+
+  
+
+  
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'/>
+    <link rel="stylesheet" href="../_static/css/pdj.css" type="text/css" />
+
+  
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/darker.css" type="text/css" />
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="VGMC bot 1.0.0 documentation" href="../index.html"/>
+        <link rel="next" title="Changelist" href="../history/changelist.html"/>
+        <link rel="prev" title="General Interaction" href="../general/interaction.html"/>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="cache-control" content="public" />
+    <meta name="robots" content="follow, all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+  </head>
+
+  <body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> VGMC bot </a>
+        <div role="search">
+	  <form id ="rtd-search-form" class="wy-form"
+		action="../search.html" method="get">
+	    <input type="text" name="q" placeholder="Search docs" />
+	    <input type="hidden" name="check_keywords" value="yes" />
+	    <input type="hidden" name="area" value="default" />
+	  </form>
+	</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	
+          
+          
+              <p class="caption"><span class="caption-text">General Features:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../general/interaction.html">General Interaction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../general/interaction.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../general/interaction.html#channels">Channels</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Games:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fishing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fishing-commands">Fishing Commands</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">History:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/changelist.html">Changelist</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../history/changelist.html#version-1-1-0">Version 1.1.0</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+
+      </div>
+      &nbsp;
+    </nav>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      <nav class="wy-nav-top" id="barra-mobile" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">Porão do Juca</a>
+      </nav>
+
+      <div class="wy-nav-content">
+	<div class="fundo-claro">
+	</div>
+	<div class="fundo-escuro">
+	</div>
+
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+	    
+	    <!-- <ul class="wy-breadcrumbs"> -->
+	    <!--   <li><a href="#">Docs</a> &raquo;</li> -->
+
+	    <!--   <li>Features</li> -->
+	    <!--   <li class="wy-breadcrumbs-aside"> -->
+
+	    <!-- 	<a href="_sources/index.txt" rel="nofollow"> View page source</a> -->
+
+	    <!--   </li> -->
+	    <!-- </ul> -->
+	    <!-- <hr/> -->
+	  </div>
+
+          <div role="main" class="">
+
+	    <div id="content" class="hfeed entry-container hentry">
+  <div class="section" id="fishing">
+<span id="id1"></span><h1>Fishing<a class="headerlink" href="#fishing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>You can go fishing with the VGMC bot! Cast your line and reel in some
+fish for bragging rights <em>and</em> VGMCoins. The size and rarity of your
+fish determines how much it’s worth, and better gear will help you get
+better fish. Once you master an area, feel free to move on to the next!
+You’ll find bigger fish and greater profits.</p>
+</div>
+<div class="section" id="fishing-commands">
+<h2>Fishing Commands<a class="headerlink" href="#fishing-commands" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.cast⠀</span></code></dt>
+<dd><p>Cast with the rod and lure set to primary in your inventory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.forage⠀</span></code></dt>
+<dd><p>Forage around for materials you can use to fish.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.shop⠀</span></code></dt>
+<dd><p>Pull up the shop, where you can buy rods, lures, and fishing licenses.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.buy</span> <span class="pre">&lt;item&gt;</span></code></dt>
+<dd><p>Buy the given <code class="docutils literal notranslate"><span class="pre">item</span></code>. The item is given as a single number, which is
+indicated in the shop by the number to the left of each item for sale.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.locations⠀</span></code></dt>
+<dd><p>Show the available locations for fishing.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.goto</span> <span class="pre">&lt;location&gt;</span></code></dt>
+<dd><p>Go to the given <code class="docutils literal notranslate"><span class="pre">location</span></code>. You may need a license to fish at certain
+places.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.inv⠀</span></code></dt>
+<dd><p>Show your fishing inventory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.setrod</span> <span class="pre">&lt;rod&gt;</span></code></dt>
+<dd><p>Set the given <code class="docutils literal notranslate"><span class="pre">rod</span></code> to your primary. <code class="docutils literal notranslate"><span class="pre">rod</span></code> is given as a single number,
+indicated to the left of the items in your inventory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt>
+<code class="sig-name descname"><span class="pre">.setlure</span> <span class="pre">&lt;lure&gt;</span></code></dt>
+<dd><p>Set the given <code class="docutils literal notranslate"><span class="pre">lure</span></code> to your primary. <code class="docutils literal notranslate"><span class="pre">lure</span></code> is given as a single number,
+indicated to the left of the items in your inventory.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+	    </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../history/changelist.html" class="btn btn-neutral float-right" title="Changelist">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../general/interaction.html" class="btn btn-neutral" title="General Interaction"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Corvus Prudens.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/jucacrispim/sphinx_pdj_theme">theme</a> provided by <a href="http://poraodojuca.net">Porão do Juca</a>.
+
+</footer>
+	</div>
+	</div>
+	  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/underscore.js">
+
+    </script>
+    <script type="text/javascript" src="../_static/doctools.js">
+
+    </script>
+
+  
+
+   <script type="text/javascript"
+           src="../_static/js/theme.js"></script>
+
+   <script type="text/javascript"
+           src="../_static/js/pdj.js"></script>
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+  </body>
+</html>
