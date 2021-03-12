@@ -8,13 +8,14 @@ import structs
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = structs.extClient(intents=intents)
+client = structs.extendedClient(intents=intents)
 
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    client.loadBank()
+    # client.loadBank()
+    client.loadLedger()
     client.loadNameCache()
     # loadBank(bank, cachePath)
     # client.addCommands()

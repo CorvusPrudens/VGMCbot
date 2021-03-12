@@ -35,7 +35,7 @@ class GameFishing(GameTemplate):
             '.forage': self.fForage,
             '.setrod': self.fSetrod,
             '.setlure': self.fSetlure,
-            # '.listfish': self.fListfish,
+            '.listfish': self.fListfish,
         }
         self.totalCasts = 0
 
@@ -50,6 +50,7 @@ Fishing Commands:
 ✿ .inv -- Show your fishy inventory!
 ✿ .setrod <item> -- Set the selected rod as your primary (where item = number on the left)
 ✿ .setlure <item> -- Set the selected lure as your primary (where item = number on the left)
+✿ .listfish -- List out all the record fish VGMC has caught!
 """
 # ✿ .listfish -- List out all the record fish VGMC has caught!
 
@@ -614,25 +615,56 @@ If you'd like to visit one, just type .goto <location> {}
                 await message.channel.send(mess)
 
     async def fListfish(self, message, client):
+        tempmax = 30
         if len(client.games.misc) == 0:
             mess = 'no records yet {}'.format(rand.choice(client.data.sad))
             await message.channel.send(mess)
         else:
-            await message.channel.send(client.data.responses['list'].format(rand.choice(client.data.cute)))
-            tempstr = ''
+            await message.channel.send('Here\'s the top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
             # sortedFish = sorted(client.games.misc, key=lambda item: client.games.misc[item]['size'], reverse=True)
             sortedFish = sorted(client.games.misc.items(), key=lambda item: item[1]['size'], reverse=True)
             sortedFish = dict(sortedFish)
             # can't really use longest yet, but maybe we'll find a use eventually
+            longestKey = 0
+            longestSize = 0
+            longestName = 0
+            numfish = 0
             for key in sortedFish:
+                if len(key) > longestKey:
+                    longestKey = len(key)
+                sizeStr = '{:,.2f}'.format(client.games.misc[key]['size']/10)
+                if len(sizeStr) > longestSize:
+                    longestSize = len(sizeStr)
                 try:
                     fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
                 except KeyError:
                     user = await client.fetch_user(client.games.misc[key]['fisher'])
                     fetched = user.name
                     client.data.nameCache[str(user.id)] = fetched
-                tempstr += '✿ **{}**: {:,.2f} cm, caught by {}\n'.format(key, client.games.misc[key]['size']/10, fetched)
+                if len(fetched) > longestName:
+                    longestName = len(fetched)
+                numfish += 1
+                if numfish > tempmax:
+                    break
+            tempstr = '```css\n'
+            header = '✿ [Fish]' + ' '*(longestKey - 3) + '| Size' + ' '*(longestSize) + '| Fisher' + ' '*(longestName - 5) + ';\n'
+            headfoot = '✿ ' + '='*(longestKey + 3) + '+' + '='*(longestSize + 5) + '+' + '='*(longestName + 1) + ' ;\n'
+            tempstr += header
+            tempstr += headfoot
+            numfish = 0
+            for key in sortedFish:
+                fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
+                sizeStr = '{:,.2f}'.format(client.games.misc[key]['size']/10)
+                keySpaces = ' '*(longestKey - len(key))
+                sizeSpace = ' '*(longestSize - len(sizeStr))
+                nameSpace = ' '*(longestName + 1 - len(fetched))
+                tempstr += '✿ [{}]{} | {} cm {}| {}{};\n'.format(key, keySpaces, sizeStr, sizeSpace, fetched, nameSpace)
+                numfish += 1
+                if numfish > tempmax:
+                    break
+            tempstr += headfoot + '```'
             client.storeNameCache()
+            print("Message length:", len(tempstr))
             await message.channel.send(tempstr)
 
     async def lIdle(self, playerKey, players, client):

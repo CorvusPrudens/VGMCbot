@@ -9,7 +9,7 @@ class Data:
         self.botID = '782113493797044224'
         self.cachePath = 'bank.csv'
         self.ledgerPath = 'ledger.json'
-        self.namePath = 'nameCache.json'
+        self.nameCachePath = 'nameCache.json'
         self.prevChoice = 0
         self.leader = 'Leader'
         self.bank = {}

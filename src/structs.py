@@ -106,7 +106,7 @@ class extendedClient(discord.Client):
 
     def storeNameCache(self):
         with open(self.data.nameCachePath, 'w') as file:
-            json.dump(self.data.nameCache, file, indend=2)
+            json.dump(self.data.nameCache, file, indent=2)
 
     async def execComm(self, command, message):
         try:
@@ -263,12 +263,16 @@ class extendedClient(discord.Client):
         await message.channel.send(mess)
 
     async def fList(self, message):
+        if self.data.ledger is None:
+            await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
+            return
         await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
         tempstr = ''
         templist = []
         longest = 0
         sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
         sortedLedger = dict(sortedLedger)
+        print(self.data.ledger)
         # can't really use longest yet, but maybe we'll find a use eventually
         for key in sortedLedger:
             try:
