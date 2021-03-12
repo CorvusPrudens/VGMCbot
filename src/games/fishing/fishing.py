@@ -35,7 +35,7 @@ class GameFishing(GameTemplate):
             '.forage': self.fForage,
             '.setrod': self.fSetrod,
             '.setlure': self.fSetlure,
-            '.listfish': self.fListfish,
+            # '.listfish': self.fListfish,
         }
         self.totalCasts = 0
 
@@ -50,8 +50,9 @@ Fishing Commands:
 ✿ .inv -- Show your fishy inventory!
 ✿ .setrod <item> -- Set the selected rod as your primary (where item = number on the left)
 ✿ .setlure <item> -- Set the selected lure as your primary (where item = number on the left)
-✿ .listfish -- List out all the record fish VGMC has caught!
 """
+# ✿ .listfish -- List out all the record fish VGMC has caught!
+
 
         self.helpDict = {'fishing': commandString}
 
