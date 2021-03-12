@@ -189,18 +189,10 @@
       "state": {
         "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.1899999999999995,
-        "prevnibs": 0
+        "timeCast": -0.9500000000000002,
+        "prevnibs": 1
       },
       "rods": [
-        {
-          "name": "old pine rod",
-          "efficacy": -0.5,
-          "durability": 10,
-          "damage": 11.800000000000004,
-          "type": "rods",
-          "multi": true
-        },
         {
           "name": "branch",
           "efficacy": -0.8,
@@ -215,7 +207,7 @@
           "name": "diver",
           "efficacy": 0.4,
           "durability": 80,
-          "damage": 3.9450000000000003,
+          "damage": 4.03,
           "type": "lures",
           "multi": true
         },
@@ -372,7 +364,7 @@
           "location": "cliffside"
         }
       ],
-      "lastChannel": 777266814933008406
+      "lastChannel": 643294766561492992
     }
   },
   "630486434360590355": {

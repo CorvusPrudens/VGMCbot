@@ -2,7 +2,17 @@ import json
 import asyncio
 import math
 import copy
+import re
 import random as rand
+from collections import namedtuple
+
+user_regex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
+
+def getUserFromMention(mention):
+    try:
+        return int(user_regex.search(mention).group(0))
+    except AttributeError:
+        return None
 
 class GameTemplate:
     def __init__(self):
@@ -614,58 +624,134 @@ If you'd like to visit one, just type .goto <location> {}
                 mess = mess.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
 
-    async def fListfish(self, message, client):
-        tempmax = 30
-        if len(client.games.misc) == 0:
-            mess = 'no records yet {}'.format(rand.choice(client.data.sad))
-            await message.channel.send(mess)
-        else:
-            await message.channel.send('Here\'s the top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
-            # sortedFish = sorted(client.games.misc, key=lambda item: client.games.misc[item]['size'], reverse=True)
-            sortedFish = sorted(client.games.misc.items(), key=lambda item: item[1]['size'], reverse=True)
-            sortedFish = dict(sortedFish)
-            # can't really use longest yet, but maybe we'll find a use eventually
-            longestKey = 0
-            longestSize = 0
-            longestName = 0
-            numfish = 0
-            for key in sortedFish:
-                if len(key) > longestKey:
-                    longestKey = len(key)
-                sizeStr = '{:,.2f}'.format(client.games.misc[key]['size']/10)
-                if len(sizeStr) > longestSize:
-                    longestSize = len(sizeStr)
+    async def sortFish(self, client, fishdict, all=False, total=30):
+        max = total if len(fishdict) >= total else len(fishdict)
+        Longest = namedtuple('Longest', ['key', 'size', 'name'])
+
+        sortedFish = sorted(fishdict.items(), key=lambda item: item[1]['size'], reverse=True)
+        sortedFish = dict(sortedFish)
+        # can't really use longest yet, but maybe we'll find a use eventually
+        numfish = 0
+        longestKey = 0
+        longestSize = 0
+        longestName = 0
+        for key in sortedFish:
+            if len(key) > longestKey:
+                longestKey = len(key)
+            sizeStr = '{:,.2f}'.format(fishdict[key]['size']/10)
+            if len(sizeStr) > longestSize:
+                longestSize = len(sizeStr)
+            if all:
                 try:
-                    fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
+                    fetched = client.data.nameCache[str(fishdict[key]['fisher'])]
                 except KeyError:
-                    user = await client.fetch_user(client.games.misc[key]['fisher'])
+                    user = await client.fetch_user(fishdict[key]['fisher'])
                     fetched = user.name
                     client.data.nameCache[str(user.id)] = fetched
                 if len(fetched) > longestName:
                     longestName = len(fetched)
-                numfish += 1
-                if numfish > tempmax:
-                    break
-            tempstr = '```css\n'
-            header = '✿ [Fish]' + ' '*(longestKey - 3) + '| Size' + ' '*(longestSize) + '| Fisher' + ' '*(longestName - 5) + ';\n'
-            headfoot = '✿ ' + '='*(longestKey + 3) + '+' + '='*(longestSize + 5) + '+' + '='*(longestName + 1) + ' ;\n'
+            numfish += 1
+            if numfish > max:
+                break
+        longest = Longest(longestKey, longestSize, longestName)
+        return sortedFish, longest
+
+    def verifyRecord(self, userid, client, fish):
+        try:
+            return client.games.misc[fish['name']]['fisher'] == userid
+        except KeyError:
+            return False
+
+    async def fishTable(self, client, sortedFish, longest, all=False, total=30, userid=None):
+        tempstr = '```css\n'
+        if all:
+            header = '✿ [Fish]' + ' '*(longest.key - 3) + '| Size' + ' '*(longest.size) + '| Fisher' + ' '*(longest.name - 5) + ';\n'
+            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 5) + '+' + '='*(longest.name + 1) + ' ;\n'
             tempstr += header
             tempstr += headfoot
-            numfish = 0
-            for key in sortedFish:
+        else:
+            try:
+                username = client.data.nameCache[str(userid)]
+            except KeyError:
+                user = await client.fetch_user(userid)
+                username = user.name
+                client.data.nameCache[str(userid)] = username
+            header = '✿ Fish' + ' '*(longest.key - 1) + '| Size' + ' '*(longest.size - 1) + ' ; ' + username + '\n'
+            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 4) + ' ;\n'
+            tempstr += header
+            tempstr += headfoot[:-1] + ' [Fish] -> VGMC record\n';
+        numfish = 0
+        tempmax = total if len(sortedFish) >= total else len(sortedFish)
+        for key in sortedFish:
+            sizeStr = '{:,.2f}'.format(sortedFish[key]['size']/10)
+            keySpaces = ' '*(longest.key - len(key))
+            sizeSpace = ' '*(longest.size - len(sizeStr))
+            if all:
                 fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
-                sizeStr = '{:,.2f}'.format(client.games.misc[key]['size']/10)
-                keySpaces = ' '*(longestKey - len(key))
-                sizeSpace = ' '*(longestSize - len(sizeStr))
-                nameSpace = ' '*(longestName + 1 - len(fetched))
+                nameSpace = ' '*(longest.name + 1 - len(fetched))
                 tempstr += '✿ [{}]{} | {} cm {}| {}{};\n'.format(key, keySpaces, sizeStr, sizeSpace, fetched, nameSpace)
-                numfish += 1
-                if numfish > tempmax:
-                    break
-            tempstr += headfoot + '```'
+            else:
+                if self.verifyRecord(userid, client, sortedFish[key]):
+                    tempstr += '✿ [{}]{} | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
+                else:
+                    tempstr += '✿ {}{}   | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
+            numfish += 1
+            if numfish > tempmax:
+                break
+        tempstr += headfoot + '```'
+
+        return tempstr
+
+
+    async def fListfish(self, message, client):
+        arg1 = message.content.find('.listfish')
+        arg1 = message.content[arg1 + 10:].split(' ')[0]
+        if arg1 == '' or arg1.lower() == 'all':
+            tempmax = 30
+            if len(client.games.misc) == 0:
+                mess = 'no records yet {}'.format(rand.choice(client.data.sad))
+                await message.channel.send(mess)
+                return
+            await message.channel.send('Here\'s the top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
+            sortedFish, longest = await self.sortFish(client, client.games.misc, all=True, total=tempmax)
+            tempstr = await self.fishTable(client, sortedFish, longest, all=True, total=tempmax)
             client.storeNameCache()
-            print("Message length:", len(tempstr))
-            await message.channel.send(tempstr)
+        elif arg1.lower() == 'me':
+            tempmax = 15
+            try:
+                mefish = client.games.players[str(message.author.id)]['fishing']['records']
+            except KeyError:
+                self.initFishing(message, client)
+            if len(mefish) == 0:
+                mess = 'no records yet {}'.format(rand.choice(client.data.sad))
+                await message.channel.send(mess)
+                return
+            sortedFish, longest = await self.sortFish(client, mefish, total=tempmax)
+            tempmax = tempmax if len(sortedFish) >= tempmax else len(sortedFish)
+            await message.channel.send('Here\'s your top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
+            tempstr = await self.fishTable(client, sortedFish, longest, total=tempmax, userid=message.author.id)
+        elif user_regex.search(arg1) is not None:
+            tempmax = 15
+            userid = getUserFromMention(arg1)
+            try:
+                mefish = client.games.players[str(userid)]['fishing']['records']
+            except KeyError:
+                mess = 'no records yet {}'.format(rand.choice(client.data.sad))
+                await message.channel.send(mess)
+                return
+            if len(mefish) == 0:
+                mess = 'no records yet {}'.format(rand.choice(client.data.sad))
+                await message.channel.send(mess)
+                return
+            sortedFish, longest = await self.sortFish(client, mefish, total=tempmax)
+            tempmax = tempmax if len(sortedFish) >= tempmax else len(sortedFish)
+            await message.channel.send('Here\'s {}\'s top {} fish from the VGMSea {}'.format(arg1, tempmax, rand.choice(client.data.cute)))
+            tempstr = await self.fishTable(client, sortedFish, longest, total=tempmax, userid=userid)
+        else:
+            await message.channel.send('Sorry, I don\'t understand \"{}\" {}'.format(arg1, rand.choice(client.data.sad)))
+            return
+
+        await message.channel.send(tempstr)
 
     async def lIdle(self, playerKey, players, client):
         pass

@@ -228,7 +228,7 @@ class extendedClient(discord.Client):
                     self.data.ledger[str(user)] = data['value']
                 self.storeLedger()
                 mess = self.data.responses['give'].format(data['name'], self.data.ledger[str(user)], rand.choice(self.data.cute))
-                if round(self.data.value[user]['value'], 2) == 1:
+                if round(self.data.ledger[str(user)], 2) == 1:
                     mess = mess.replace('VGMCoins', 'VGMCoin')
                 await message.channel.send(mess)
         else:
@@ -262,18 +262,96 @@ class extendedClient(discord.Client):
             mess = mess.replace('VGMCoins', 'VGMCoin')
         await message.channel.send(mess)
 
+    async def sortFish(self, client, fishdict, all=False, total=30):
+        max = total if len(fishdict) >= total else len(fishdict)
+        Longest = namedtuple('Longest', ['key', 'size', 'name'])
+
+        sortedFish = sorted(fishdict.items(), key=lambda item: item[1]['size'], reverse=True)
+        sortedFish = dict(sortedFish)
+        # can't really use longest yet, but maybe we'll find a use eventually
+        numfish = 0
+        longestKey = 0
+        longestSize = 0
+        longestName = 0
+        for key in sortedFish:
+            if len(key) > longestKey:
+                longestKey = len(key)
+            sizeStr = '{:,.2f}'.format(fishdict[key]['size']/10)
+            if len(sizeStr) > longestSize:
+                longestSize = len(sizeStr)
+            if all:
+                try:
+                    fetched = client.data.nameCache[str(fishdict[key]['fisher'])]
+                except KeyError:
+                    user = await client.fetch_user(fishdict[key]['fisher'])
+                    fetched = user.name
+                    client.data.nameCache[str(user.id)] = fetched
+                if len(fetched) > longestName:
+                    longestName = len(fetched)
+            numfish += 1
+            if numfish > max:
+                break
+        longest = Longest(longestKey, longestSize, longestName)
+        return sortedFish, longest
+
+    def verifyRecord(self, userid, client, fish):
+        try:
+            return client.games.misc[fish['name']]['fisher'] == userid
+        except KeyError:
+            return False
+
+    async def fishTable(self, client, sortedFish, longest, all=False, total=30, userid=None):
+        tempstr = '```css\n'
+        if all:
+            header = '✿ [Fish]' + ' '*(longest.key - 3) + '| Size' + ' '*(longest.size) + '| Fisher' + ' '*(longest.name - 5) + ';\n'
+            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 5) + '+' + '='*(longest.name + 1) + ' ;\n'
+            tempstr += header
+            tempstr += headfoot
+        else:
+            try:
+                username = client.data.nameCache[str(userid)]
+            except KeyError:
+                user = await client.fetch_user(userid)
+                username = user.name
+                client.data.nameCache[str(userid)] = username
+            header = '✿ Fish' + ' '*(longest.key - 1) + '| Size' + ' '*(longest.size - 1) + ' ; ' + username + '\n'
+            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 4) + ' ;\n'
+            tempstr += header
+            tempstr += headfoot[:-1] + ' [Fish] -> VGMC record\n';
+        numfish = 0
+        tempmax = total if len(sortedFish) >= total else len(sortedFish)
+        for key in sortedFish:
+            sizeStr = '{:,.2f}'.format(sortedFish[key]['size']/10)
+            keySpaces = ' '*(longest.key - len(key))
+            sizeSpace = ' '*(longest.size - len(sizeStr))
+            if all:
+                fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
+                nameSpace = ' '*(longest.name + 1 - len(fetched))
+                tempstr += '✿ [{}]{} | {} cm {}| {}{};\n'.format(key, keySpaces, sizeStr, sizeSpace, fetched, nameSpace)
+            else:
+                if self.verifyRecord(userid, client, sortedFish[key]):
+                    tempstr += '✿ [{}]{} | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
+                else:
+                    tempstr += '✿ {}{}   | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
+            numfish += 1
+            if numfish > tempmax:
+                break
+        tempstr += headfoot + '```'
+
+        return tempstr
+
     async def fList(self, message):
         if self.data.ledger is None:
             await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
             return
         await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
-        tempstr = ''
+        tempstr = '```\n'
         templist = []
         longest = 0
+        longestValue = 0
         sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
         sortedLedger = dict(sortedLedger)
-        print(self.data.ledger)
-        # can't really use longest yet, but maybe we'll find a use eventually
+        maxNameLen = 16
         for key in sortedLedger:
             try:
                 fetched = self.data.nameCache[key]
@@ -281,13 +359,37 @@ class extendedClient(discord.Client):
                 user = await self.fetch_user(key)
                 fetched = user.name
                 self.data.nameCache[key] = fetched
-            templist.append([fetched, sortedLedger[key]])
             if len(fetched) > longest:
                 longest = len(fetched)
-        for pair in templist:
-            if pair[1] != 0:
-                tempstr += self.data.responses['listItem'].format(pair[0], pair[1])
+            valstr = '{:,.2f}'.format(sortedLedger[key])
+            if len(valstr) > longestValue:
+                longestValue = len(valstr)
 
+        if len('VGMCoins') > longestValue:
+            longestValue = len('VGMCoins')
+
+        longest = maxNameLen if longest > maxNameLen else longest
+
+        header = '✿ Connoisseur' + ' '*(longest - 10) + '| VGMCoins' + ' '*(longestValue - 8) + ' ;\n'
+        headfoot = '✿ ' + '='*(longest + 1) + '+' + '='*(longestValue + 1) + ' ;\n'
+
+        tempstr += header
+        tempstr += headfoot
+
+        for key in sortedLedger:
+            if sortedLedger[key] == 0:
+                continue
+            fetched = self.data.nameCache[key]
+            if len(fetched) > longest:
+                fetched = fetched[:longest - 3] + '...'
+            nameSpace = ' '*(longest - len(fetched))
+            valstr = '{:,.2f}'.format(sortedLedger[key])
+            valueSpace = ' '*(longestValue - len(valstr))
+            tempstr += '✿ {}{} | {}{} ;\n'.format(fetched, nameSpace, valstr, valueSpace)
+
+            templist.append([fetched, sortedLedger[key]])
+
+        tempstr += headfoot + '```'
         self.storeNameCache()
         await message.channel.send(tempstr)
 
