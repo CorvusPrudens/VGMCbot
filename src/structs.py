@@ -32,6 +32,7 @@ class extClient(discord.Client):
             '.addimg': self.fAddimg,
             '.mgmvote': self.fMgmvote,
             '.mgmwin': self.fMgmwin,
+            '.gimme': self.fGimme,
         }
 
         self.data = data.Data()
@@ -343,3 +344,7 @@ class extClient(discord.Client):
         else:
             mess = self.data.responses['mgmwinPerm'].format(message.author.mention, rand.choice(self.data.sad))
             await message.channel.send(mess)
+
+    async def fGimme(self, message):
+        mess = f'sorry... no {rand.choice(self.data.sad)}'
+        await message.channel.send(mess)
