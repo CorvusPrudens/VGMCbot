@@ -6,6 +6,103 @@ import re
 import random as rand
 from collections import namedtuple
 
+def getCodeName(line):
+    style = line.strip(' \n')
+    return style.replace(' ', '').replace('```', '')
+
+# this is truly horrible
+async def sendBigMess(message, string):
+    # print(len(string))
+    if len(string) < 2000:
+        await message.channel.send(string)
+    else:
+        max = 1999
+        fragments = []
+        totalLen = len(string)
+        numMess = math.ceil(totalLen / (max - 50))
+        idealLen = math.ceil(totalLen / numMess)
+        minSize = math.ceil((totalLen / numMess)*0.25)
+        rest = string
+        regex_sentence = re.compile(r'([A-Za-z_][A-Za-z_.0-9]*)(\.)( {1,}|$|\n)')
+        styling = {'```': []}
+
+        while len(rest) > 0:
+            currentIndex = idealLen
+            # the actual number of messages may deviate from numMess
+            # if we are not able to match the ideal length, so don't
+            # depend on numMess
+            for style in styling:
+                if len(styling[style]) > 0:
+                    for codeName in styling[style]:
+                        rest = style + codeName + '\n' + rest
+                        currentIndex += len(style + codeName + '\n')
+
+            if len(rest) <= idealLen:
+                for style in styling:
+                    if len(styling[style]) > 0:
+                        for codeName in styling[style]:
+                            rest = rest + style
+                fragments.append(rest)
+                break
+
+            while rest[currentIndex] != '\n' and currentIndex > -1:
+                currentIndex -= 1
+            if currentIndex  < minSize:
+                currentIndex = idealLen
+                # try to find the end of a sentence
+                matches = regex_sentence.findall(rest, endpos=currentIndex)
+                for i in range(len(matches) - 1, -1, -1):
+                    if len(matches[i]) == 0:
+                        matches.pop(i)
+
+                if len(matches) > 0:
+                    currentIndex = rest[:currentIndex].rfind(matches[-1][0]) + len(''.join(matches[-1])) - 1
+                else:
+                    # last-ditch separation
+                    currentIndex = idealLen
+                rest = rest[:currentIndex] + '\n' + rest[currentIndex:]
+                currentIndex += 1
+
+            if len(rest) < max:
+                currentIndex = len(rest)
+
+            for style in styling:
+                regex_style = re.compile(style)
+                matches = regex_style.findall(rest, endpos=currentIndex)
+                styleIndex = 0
+                for match in matches:
+                    styleIndex = rest[styleIndex:currentIndex].find(match) + len(match)
+                    rightIndex =  rest[styleIndex:currentIndex].find('\n')
+                    if rightIndex == -1:
+                        rightIndex = currentIndex - styleIndex
+                    codeName =  getCodeName(rest[styleIndex:styleIndex + rightIndex])
+                    if codeName != '':
+                        if codeName not in styling[style]:
+                            styling[style].append(codeName)
+                    else:
+                        styling[style] = styling[style][:-1]
+
+
+            for style in styling:
+                if len(styling[style]) > 0:
+                    for codeName in styling[style]:
+                        rest = rest[:currentIndex] + style + rest[currentIndex:]
+                        currentIndex += len(style)
+
+            fragments.append(rest[:currentIndex])
+
+            rest = rest[currentIndex + 1:]
+
+        for i in range(len(fragments) - 1, 0, -1):
+            if len(fragments[i]) + len(fragments[i - 1]) < max:
+                fragments[i - 1] += fragments[i]
+                fragments.pop(i)
+        # print(fragments)
+
+        for fragment in fragments:
+            if fragment.replace(' ', '').replace('\n', '') != '':
+                await message.channel.send(fragment)
+
 user_regex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
 
 def getUserFromMention(mention):
@@ -293,7 +390,8 @@ Fishing Commands:
                                      self.licenseShop[key]['price'])
 
         string += '\nIf you\'d like to buy something, type .buy <left number>'
-        await message.channel.send(string)
+        await sendBigMess(message, string)
+        # await message.channel.send(string)
         await self.lastChannel(message, client)
 
     async def fGoto(self, message, client):
@@ -412,7 +510,8 @@ If you'd like to visit one, just type .goto <location> {}
                 string += tempstr.format(i + 1, licenses[i]['name'])
         else:
             string += 'nothing {}'.format(rand.choice(client.data.sad))
-        await message.channel.send(string)
+        # await message.channel.send(string)
+        await sendBigMess(message, string)
 
     def extractValue(self, tokens, keyword):
         for i in range(len(tokens)):
@@ -707,7 +806,7 @@ If you'd like to visit one, just type .goto <location> {}
         arg1 = message.content.find('.listfish')
         arg1 = message.content[arg1 + 10:].split(' ')[0]
         if arg1 == '' or arg1.lower() == 'all':
-            tempmax = 30
+            tempmax = 50
             if len(client.games.misc) == 0:
                 mess = 'no records yet {}'.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
@@ -751,7 +850,8 @@ If you'd like to visit one, just type .goto <location> {}
             await message.channel.send('Sorry, I don\'t understand \"{}\" {}'.format(arg1, rand.choice(client.data.sad)))
             return
 
-        await message.channel.send(tempstr)
+        # await message.channel.send(tempstr)
+        await sendBigMess(message, tempstr)
 
     async def lIdle(self, playerKey, players, client):
         pass

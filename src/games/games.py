@@ -40,7 +40,8 @@ class Games:
         try:
             with open(self.playerPath, 'r') as file:
                 self.players = json.load(file)
-        except (FileNotFoundError, json.decoder.JSONDecodeError):
+        except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+            print("NOT FOUND", e)
             pass
         if misc:
             try:

@@ -314,7 +314,8 @@ class extendedClient(discord.Client):
 
         tempstr += headfoot + '```'
         self.storeNameCache()
-        await message.channel.send(tempstr)
+        # await message.channel.send(tempstr)
+        await utils.sendBigMess(message, tempstr)
 
     async def fUwu(self, message):
         await message.channel.send(self.data.responses['uwu'].format(rand.choice(self.data.cute)))
