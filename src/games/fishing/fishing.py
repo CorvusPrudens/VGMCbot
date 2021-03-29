@@ -6,102 +6,7 @@ import re
 import random as rand
 from collections import namedtuple
 
-def getCodeName(line):
-    style = line.strip(' \n')
-    return style.replace(' ', '').replace('```', '')
-
-# this is truly horrible
-async def sendBigMess(message, string):
-    # print(len(string))
-    if len(string) < 2000:
-        await message.channel.send(string)
-    else:
-        max = 1999
-        fragments = []
-        totalLen = len(string)
-        numMess = math.ceil(totalLen / (max - 50))
-        idealLen = math.ceil(totalLen / numMess)
-        minSize = math.ceil((totalLen / numMess)*0.25)
-        rest = string
-        regex_sentence = re.compile(r'([A-Za-z_][A-Za-z_.0-9]*)(\.)( {1,}|$|\n)')
-        styling = {'```': []}
-
-        while len(rest) > 0:
-            currentIndex = idealLen
-            # the actual number of messages may deviate from numMess
-            # if we are not able to match the ideal length, so don't
-            # depend on numMess
-            for style in styling:
-                if len(styling[style]) > 0:
-                    for codeName in styling[style]:
-                        rest = style + codeName + '\n' + rest
-                        currentIndex += len(style + codeName + '\n')
-
-            if len(rest) <= idealLen:
-                for style in styling:
-                    if len(styling[style]) > 0:
-                        for codeName in styling[style]:
-                            rest = rest + style
-                fragments.append(rest)
-                break
-
-            while rest[currentIndex] != '\n' and currentIndex > -1:
-                currentIndex -= 1
-            if currentIndex  < minSize:
-                currentIndex = idealLen
-                # try to find the end of a sentence
-                matches = regex_sentence.findall(rest, endpos=currentIndex)
-                for i in range(len(matches) - 1, -1, -1):
-                    if len(matches[i]) == 0:
-                        matches.pop(i)
-
-                if len(matches) > 0:
-                    currentIndex = rest[:currentIndex].rfind(matches[-1][0]) + len(''.join(matches[-1])) - 1
-                else:
-                    # last-ditch separation
-                    currentIndex = idealLen
-                rest = rest[:currentIndex] + '\n' + rest[currentIndex:]
-                currentIndex += 1
-
-            if len(rest) < max:
-                currentIndex = len(rest)
-
-            for style in styling:
-                regex_style = re.compile(style)
-                matches = regex_style.findall(rest, endpos=currentIndex)
-                styleIndex = 0
-                for match in matches:
-                    styleIndex = rest[styleIndex:currentIndex].find(match) + len(match)
-                    rightIndex =  rest[styleIndex:currentIndex].find('\n')
-                    if rightIndex == -1:
-                        rightIndex = currentIndex - styleIndex
-                    codeName =  getCodeName(rest[styleIndex:styleIndex + rightIndex])
-                    if codeName != '':
-                        if codeName not in styling[style]:
-                            styling[style].append(codeName)
-                    else:
-                        styling[style] = styling[style][:-1]
-
-
-            for style in styling:
-                if len(styling[style]) > 0:
-                    for codeName in styling[style]:
-                        rest = rest[:currentIndex] + style + rest[currentIndex:]
-                        currentIndex += len(style)
-
-            fragments.append(rest[:currentIndex])
-
-            rest = rest[currentIndex + 1:]
-
-        for i in range(len(fragments) - 1, 0, -1):
-            if len(fragments[i]) + len(fragments[i - 1]) < max:
-                fragments[i - 1] += fragments[i]
-                fragments.pop(i)
-        # print(fragments)
-
-        for fragment in fragments:
-            if fragment.replace(' ', '').replace('\n', '') != '':
-                await message.channel.send(fragment)
+import utils
 
 user_regex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
 
@@ -390,7 +295,7 @@ Fishing Commands:
                                      self.licenseShop[key]['price'])
 
         string += '\nIf you\'d like to buy something, type .buy <left number>'
-        await sendBigMess(message, string)
+        await utils.sendBigMess(message, string)
         # await message.channel.send(string)
         await self.lastChannel(message, client)
 
@@ -464,6 +369,11 @@ If you'd like to visit one, just type .goto <location> {}
         await message.channel.send(mess)
         await self.lastChannel(message, client)
 
+    def itemEq(self, idx, item):
+        name = f"[{item['name']}]" if idx == 0 else item['name']
+        dur = '{:,.2f} / {}'.format(item['durability'] - item['damage'], item['durability'])
+        return [name, dur, str(item['efficacy'])]
+
     async def fInv(self, message, client):
         currentPlayer = str(message.author.id)
         try:
@@ -475,43 +385,23 @@ If you'd like to visit one, just type .goto <location> {}
         lures = client.games.players[currentPlayer]['fishing']['lures']
         licenses = client.games.players[currentPlayer]['fishing']['licenses']
 
+        rods = [self.itemEq(x, y) for x, y in enumerate(rods)] if len(rods) > 0 else [['---']]
+        lures = [self.itemEq(x, y) for x, y in enumerate(lures)] if len(lures) > 0 else [['---']]
+        licenses = [[x['name']] for x in licenses] if len(licenses) > 0 else [['---']]
+
+        rodHead = [['Rods', 'Condition', 'Efficacy']]
+        lureHead = [['Lures', 'Condition', 'Efficacy']]
+        liceHead = [['Licenses']]
+        extra = ['[item] -> equipped']
+
+        rods = utils.tablegen(rodHead + rods, header=True, numbered=True, extra=extra)
+        lures = utils.tablegen(lureHead + lures, header=True, numbered=True)
+        licenses = utils.tablegen(liceHead + licenses, header=True)
+        greet = 'hey {}, here\'s what you\'ve got {}\n'.format(message.author.name, rand.choice(client.data.cute))
+
         await self.lastChannel(message, client)
 
-        len1 = len(rods)
-        len2 = len(lures)
-        len3 = len(licenses)
-        string = 'hey {}, here\'s what you\'ve got {}\n'.format(message.author.name, rand.choice(client.data.cute))
-        string += 'Lures:\n(primary)'
-        if len2 > 0:
-            for i in range(len(lures)):
-                tempstr = '\t{}.) **{}** -- condition: {:,.2f}/{} -- efficacy: {}\n'
-                string += tempstr.format(i + 1, lures[i]['name'],
-                                        lures[i]['durability'] - lures[i]['damage'],
-                                        lures[i]['durability'],
-                                        lures[i]['efficacy'])
-        else:
-            string += 'nothing {}'.format(rand.choice(client.data.sad))
-
-        string += '\nRods:\n(primary)'
-        if len1 > 0:
-            for i in range(len(rods)):
-                tempstr = '\t{}.) **{}** -- condition: {:,.2f}/{} -- efficacy: {}\n'
-                string += tempstr.format(i + 1, rods[i]['name'],
-                                        rods[i]['durability'] - rods[i]['damage'],
-                                        rods[i]['durability'],
-                                        rods[i]['efficacy'])
-        else:
-            string += 'nothing {}'.format(rand.choice(client.data.sad))
-
-        string += '\nLicenses:\n'
-        if len3 > 0:
-            for i in range(len(licenses)):
-                tempstr = '\t{}.) **{}**\n'
-                string += tempstr.format(i + 1, licenses[i]['name'])
-        else:
-            string += 'nothing {}'.format(rand.choice(client.data.sad))
-        # await message.channel.send(string)
-        await sendBigMess(message, string)
+        await utils.sendBigMess(message, greet + rods + lures + licenses)
 
     def extractValue(self, tokens, keyword):
         for i in range(len(tokens)):
@@ -723,37 +613,6 @@ If you'd like to visit one, just type .goto <location> {}
                 mess = mess.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
 
-    async def sortFish(self, client, fishdict, all=False, total=30):
-        max = total if len(fishdict) >= total else len(fishdict)
-        Longest = namedtuple('Longest', ['key', 'size', 'name'])
-
-        sortedFish = sorted(fishdict.items(), key=lambda item: item[1]['size'], reverse=True)
-        sortedFish = dict(sortedFish)
-        # can't really use longest yet, but maybe we'll find a use eventually
-        numfish = 0
-        longestKey = 0
-        longestSize = 0
-        longestName = 0
-        for key in sortedFish:
-            if len(key) > longestKey:
-                longestKey = len(key)
-            sizeStr = '{:,.2f}'.format(fishdict[key]['size']/10)
-            if len(sizeStr) > longestSize:
-                longestSize = len(sizeStr)
-            if all:
-                try:
-                    fetched = client.data.nameCache[str(fishdict[key]['fisher'])]
-                except KeyError:
-                    user = await client.fetch_user(fishdict[key]['fisher'])
-                    fetched = user.name
-                    client.data.nameCache[str(user.id)] = fetched
-                if len(fetched) > longestName:
-                    longestName = len(fetched)
-            numfish += 1
-            if numfish > max:
-                break
-        longest = Longest(longestKey, longestSize, longestName)
-        return sortedFish, longest
 
     def verifyRecord(self, userid, client, fish):
         try:
@@ -761,45 +620,45 @@ If you'd like to visit one, just type .goto <location> {}
         except KeyError:
             return False
 
-    async def fishTable(self, client, sortedFish, longest, all=False, total=30, userid=None):
-        tempstr = '```css\n'
+
+    def sortFish(self, fishdict):
+        sortedFish = sorted(fishdict.items(), key=lambda item: item[1]['size'], reverse=True)
+        sortedFish = dict(sortedFish)
+        return sortedFish
+
+
+    async def fishTable(self, client, sortedFish, all=False, total=30, userid=None):
+        extra = []
+
         if all:
-            header = '✿ [Fish]' + ' '*(longest.key - 3) + '| Size' + ' '*(longest.size) + '| Fisher' + ' '*(longest.name - 5) + ';\n'
-            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 5) + '+' + '='*(longest.name + 1) + ' ;\n'
-            tempstr += header
-            tempstr += headfoot
+            header = [['[Fish]', 'Size', 'Fisher']]
+            tempmax = total
+            extra = None
         else:
+            tempmax = 15
             try:
                 username = client.data.nameCache[str(userid)]
             except KeyError:
                 user = await client.fetch_user(userid)
                 username = user.name
                 client.data.nameCache[str(userid)] = username
-            header = '✿ Fish' + ' '*(longest.key - 1) + '| Size' + ' '*(longest.size - 1) + ' ; ' + username + '\n'
-            headfoot = '✿ ' + '='*(longest.key + 3) + '+' + '='*(longest.size + 4) + ' ;\n'
-            tempstr += header
-            tempstr += headfoot[:-1] + ' [Fish] -> VGMC record\n';
-        numfish = 0
-        tempmax = total if len(sortedFish) >= total else len(sortedFish)
-        for key in sortedFish:
-            sizeStr = '{:,.2f}'.format(sortedFish[key]['size']/10)
-            keySpaces = ' '*(longest.key - len(key))
-            sizeSpace = ' '*(longest.size - len(sizeStr))
-            if all:
-                fetched = client.data.nameCache[str(client.games.misc[key]['fisher'])]
-                nameSpace = ' '*(longest.name + 1 - len(fetched))
-                tempstr += '✿ [{}]{} | {} cm {}| {}{};\n'.format(key, keySpaces, sizeStr, sizeSpace, fetched, nameSpace)
-            else:
-                if self.verifyRecord(userid, client, sortedFish[key]):
-                    tempstr += '✿ [{}]{} | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
-                else:
-                    tempstr += '✿ {}{}   | {} cm {};\n'.format(key, keySpaces, sizeStr, sizeSpace)
-            numfish += 1
-            if numfish > tempmax:
-                break
-        tempstr += headfoot + '```'
+            header = [['Fish', 'Size']]
+            extra += [username, '[Fish] -> VGMC record']
 
-        return tempstr
+        sf = '{:,.2f}'
+        templist = []
+        for num, key in enumerate(sortedFish):
+            if all:
+                rf = '[{}]'
+                fisher = client.data.nameCache[str(client.games.misc[key]['fisher'])]
+                templist.append([rf.format(key), sf.format(sortedFish[key]['size']/10), fisher])
+            else:
+                rf = '[{}]' if self.verifyRecord(userid, client, sortedFish[key]) else '{}'
+                templist.append([rf.format(key), sf.format(sortedFish[key]['size']/10)])
+            if num > tempmax:
+                break
+
+        return utils.tablegen(header + templist, header=True, extra=extra)
 
 
     async def fListfish(self, message, client):
@@ -811,9 +670,10 @@ If you'd like to visit one, just type .goto <location> {}
                 mess = 'no records yet {}'.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
                 return
-            await message.channel.send('Here\'s the top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
-            sortedFish, longest = await self.sortFish(client, client.games.misc, all=True, total=tempmax)
-            tempstr = await self.fishTable(client, sortedFish, longest, all=True, total=tempmax)
+            mess = 'Here\'s the top {} fish from the VGMSea {}'
+            await message.channel.send(mess.format(tempmax, rand.choice(client.data.cute)))
+            sortedFish = self.sortFish(client.games.misc)
+            tempstr = await self.fishTable(client, sortedFish, all=True, total=tempmax)
             client.storeNameCache()
         elif arg1.lower() == 'me':
             tempmax = 15
@@ -825,10 +685,10 @@ If you'd like to visit one, just type .goto <location> {}
                 mess = 'no records yet {}'.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
                 return
-            sortedFish, longest = await self.sortFish(client, mefish, total=tempmax)
-            tempmax = tempmax if len(sortedFish) >= tempmax else len(sortedFish)
-            await message.channel.send('Here\'s your top {} fish from the VGMSea {}'.format(tempmax, rand.choice(client.data.cute)))
-            tempstr = await self.fishTable(client, sortedFish, longest, total=tempmax, userid=message.author.id)
+            sortedFish = self.sortFish(mefish)
+            mess = 'Here\'s your top {} fish from the VGMSea {}'
+            await message.channel.send(mess.format(tempmax, rand.choice(client.data.cute)))
+            tempstr = await self.fishTable(client, sortedFish, total=tempmax, userid=message.author.id)
         elif user_regex.search(arg1) is not None:
             tempmax = 15
             userid = getUserFromMention(arg1)
@@ -842,16 +702,17 @@ If you'd like to visit one, just type .goto <location> {}
                 mess = 'no records yet {}'.format(rand.choice(client.data.sad))
                 await message.channel.send(mess)
                 return
-            sortedFish, longest = await self.sortFish(client, mefish, total=tempmax)
-            tempmax = tempmax if len(sortedFish) >= tempmax else len(sortedFish)
-            await message.channel.send('Here\'s {}\'s top {} fish from the VGMSea {}'.format(arg1, tempmax, rand.choice(client.data.cute)))
-            tempstr = await self.fishTable(client, sortedFish, longest, total=tempmax, userid=userid)
+            sortedFish = self.sortFish(mefish)
+            mess = 'Here\'s {}\'s top {} fish from the VGMSea {}'
+            await message.channel.send(mess.format(arg1, tempmax, rand.choice(client.data.cute)))
+            tempstr = await self.fishTable(client, sortedFish, total=tempmax, userid=userid)
         else:
-            await message.channel.send('Sorry, I don\'t understand \"{}\" {}'.format(arg1, rand.choice(client.data.sad)))
+            mess = 'Sorry, I don\'t understand \"{}\" {}'
+            await message.channel.send(mess.format(arg1, rand.choice(client.data.sad)))
             return
 
-        # await message.channel.send(tempstr)
-        await sendBigMess(message, tempstr)
+        await utils.sendBigMess(message, tempstr)
+
 
     async def lIdle(self, playerKey, players, client):
         pass
