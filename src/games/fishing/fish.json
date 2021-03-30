@@ -1,4 +1,40 @@
 {
+  "Humboldt Squid": {
+    "mu": 1500,
+    "sigma": 500,
+    "pop": 1000
+  },
+  "Giant Squid": {
+    "mu": 6000,
+    "sigma": 1000,
+    "pop": 1000
+  },
+  "Manta Ray": {
+    "mu": 5000,
+    "sigma": 800,
+    "pop": 1000
+  },
+  "Oceanic Whitetip Shark": {
+    "mu": 2000,
+    "sigma": 500,
+    "pop": 1000
+  },
+  "Devil Fish": {
+    "mu": 2000,
+    "sigma": 500,
+    "pop": 1000
+  },
+  "Ocean Sunfish": {
+    "mu": 2000,
+    "sigma": 500,
+    "pop": 1000
+  },
+  "Swordfish": {
+    "mu": 3000,
+    "sigma": 600,
+    "pop": 1000
+  },
+
   "Bluefin Tuna": {
     "mu": 1167.8179959100205,
     "sigma": 411.8344337489779,

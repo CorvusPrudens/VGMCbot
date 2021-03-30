@@ -1,11 +1,33 @@
 import aiohttp
 import math
+from copy import deepcopy
 from data import *
+
+
+class LineWidthError(Exception):
+    pass
+
+class ExtraIndexError(Exception):
+    pass
 
 
 ################################################################################
 ########################## general functions ###################################
 ################################################################################
+
+def remap(x, min1, max1, min2, max2):
+    range1 = max1 - min1
+    prop = (x - min1) / range1
+
+    range2 = max2 - min2
+
+    return range2*prop + min2
+
+
+def expBias(x, bias):
+    k = (1 - bias)**3
+    return (x*k) / (x*k - x + 1)
+
 
 def getUserFromMention(mention, regex):
     try:
@@ -31,90 +53,99 @@ def hasPermission(user, role):
             return True
     return False
 
-def getCodeName(line):
-    style = line.strip(' \n')
-    return style.replace(' ', '').replace('```', '')
+def manageStyling(strings, styling):
+    active = False
+    stylingStart = f'```{styling}\n'
+    stylingEnd = '```'
+    regex_search = {
+        'styleStart': re.compile(f'``` *{styling}' + r'\b'),
+        'styleEnd': re.compile(f'```(?! *{styling}' + r'\b)'),
+    }
+    pos = 0
+    for idx, string in enumerate(strings):
+        if active:
+            strings[idx] = stylingStart + string
+        for key in regex_search:
+            match = regex_search[key].search(string, pos=pos)
+            while match is not None:
+                if key == 'styleStart':
+                    active = True
+                elif key == 'styleEnd':
+                    active = False
+                pos = match.end()
+                match = regex_search[key].search(string, pos=pos)
+        if active:
+            strings[idx] += stylingEnd
 
-# this is truly horrible
+
+def breakMessage(string, maxlen=1399, minlen=500, buffer=100, styling='css'):
+    # Message-break points in descending ideality
+
+    if not isinstance(string, str):
+        raise TypeError("string input must be a string")
+
+    if maxlen < 500:
+        raise ValueError("maxlen cannot be less than 500 characters")
+    if buffer < 50:
+        raise ValueError("character buffer must be greater than 50 characters")
+    if 100 > minlen > maxlen:
+        raise ValueError("minlen must be greater than 100 and less than maxlen")
+
+    if not isinstance(styling, str):
+        raise TypeError("styling kwarg must be a string")
+
+    if len(string) == 0:
+        return []
+
+    # need a variable to track how long extra codeblock characters can be
+    maxStyling = len(f'```{styling}```')
+
+    regex_search = [
+        re.compile(r'\n'),
+        re.compile(r'([A-Za-z_][A-Za-z_.0-9]*)(\.)( {1,}|$|\n)'), # sentence end
+        re.compile(r' ')
+    ]
+
+    combinedBuffer = (maxlen - (buffer + maxStyling))
+    numMess = math.ceil(len(string) / combinedBuffer)
+    idealLen = round(len(string) / numMess)
+
+    outstrings = []
+    prevError = 0
+
+    while len(string) > maxlen - maxStyling:
+        for search in regex_search:
+            found = False
+            endIndex = min(idealLen - prevError, maxlen - maxStyling)
+            for i in range(endIndex - 10, minlen, -1):
+                match = search.search(string, pos=i, endpos=endIndex)
+                if match is not None:
+                    outstrings.append(string[:match.end()])
+                    string = string[match.end():]
+                    prevError = i - idealLen
+                    found = True
+                    break
+            # not sure if there's a better way to manage this
+            if found:
+                break
+        if not found:
+            # fallback message break
+            outstrings.append(string[:idealLen] + '-')
+            string = string[idealLen:]
+            prevError = 0
+
+    if len(string) > 0:
+        outstrings.append(string)
+
+    manageStyling(outstrings, styling)
+
+    return outstrings
+
+# ~~this is truly horrible~~
+# fixed! now it's lovely <3
 async def sendBigMess(message, string):
-    print(len(string))
-    if len(string) < 1400:
-        await message.channel.send(string)
-    else:
-        fragments = []
-        totalLen = len(string)
-        numMess = math.ceil(totalLen / 1350.0)
-        idealLen = int(totalLen / numMess)
-        minSize = int((totalLen / numMess)*0.25)
-        rest = string
-        regex_sentence = re.compile(r'([A-Za-z_][A-Za-z_.0-9]*)(\.)( {1,}|$|\n)')
-        styling = {'```': []}
-
-        while len(rest) > 0:
-            if len(rest) <= idealLen:
-                fragments.append(rest)
-                break
-            currentIndex = idealLen
-            # the actual number of messages may deviate from numMess
-            # if we are not able to match the ideal length, so don't
-            # depend on numMess
-            for style in styling:
-                if len(styling[style]) > 0:
-                    for codeName in styling[style]:
-                        rest = style + codeName + '\n' + rest
-
-            if len(rest) <= 1399:
-                fragments.append(rest)
-                break
-
-            while rest[currentIndex] != '\n' and currentIndex > -1:
-                currentIndex -= 1
-            if currentIndex  < minSize:
-                currentIndex = idealLen
-                # try to find the end of a sentence
-                matches = regex_sentence.findall(rest, endpos=currentIndex)
-                for i in range(len(matches) - 1, -1, -1):
-                    if len(matches[i]) == 0:
-                        matches.pop(i)
-
-                if len(matches) > 0:
-                    currentIndex = rest[:currentIndex].rfind(matches[-1][0]) + len(''.join(matches[-1])) - 1
-                else:
-                    # last-ditch separation
-                    currentIndex = idealLen
-                rest = rest[:currentIndex] + '\n' + rest[currentIndex:]
-                currentIndex += 1
-
-            for style in styling:
-                regex_style = re.compile(style)
-                matches = regex_style.findall(rest, endpos=currentIndex)
-                styleIndex = 0
-                for match in matches:
-                    styleIndex = rest[styleIndex:currentIndex].find(match) + len(match)
-                    rightIndex =  rest[styleIndex:currentIndex].find('\n')
-                    if rightIndex == -1:
-                        rightIndex = currentIndex - styleIndex
-                    codeName =  getCodeName(rest[styleIndex:styleIndex + rightIndex])
-                    if codeName != '':
-                        if codeName not in styling[style]:
-                            styling[style].append(codeName)
-                    else:
-                        styling[style] = styling[style][:-1]
-
-
-            for style in styling:
-                if len(styling[style]) > 0:
-                    for codeName in styling[style]:
-                        rest = rest[:currentIndex] + style + rest[currentIndex:]
-                        currentIndex += len(style)
-
-            fragments.append(rest[:currentIndex])
-
-            rest = rest[currentIndex + 1:]
-
-        for fragment in fragments:
-            if fragment.replace(' ', '').replace('\n', '') != '':
-                await message.channel.send(fragment)
+    for fragment in breakMessage(string):
+        await message.channel.send(fragment)
 
 def rowGen(colWidth, dot, row=None, sep='='):
     # optional feature, may remove later
@@ -137,7 +168,7 @@ def splitStrings(strings, maxlen):
     breaks = ('\n', ' ')
     outstrings = []
     for string in strings:
-        if len(string) <= maxlen:
+        if len(string.replace('\n', '')) <= maxlen:
             outstrings.append(string)
         else:
             tempstr = deepcopy(string)
@@ -159,6 +190,11 @@ def splitStrings(strings, maxlen):
                 outstrings.append(tempstr)
     return outstrings
 
+# cell format
+def cf(cell, width):
+    regex_special = re.compile(r'\[.*\]')
+    ell = '..]' if regex_special.search(cell) is not None else '...'
+    return cell if len(cell) <= width else cell[:width - 3] + ell
 
 def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='', width=32, lineWidth=60):
     # all tables are formatted with css highlighting
@@ -195,7 +231,8 @@ def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='',
 
     # shortening long entries
     for idx, row in enumerate(data):
-        data[idx] = [x if len(x) <= width else x[:width - 3] + '...' for x in row]
+        # data[idx] = [x if len(x) <= width else x[:width - 3] + '...' for x in row]
+        data[idx] = [cf(x, width) for x in row]
 
     string = [rowGen(colWidth, dot, row=x) for x in data + ['=']]
 
@@ -203,9 +240,7 @@ def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='',
         genWidth = len(string[0])
         if (genWidth >= lineWidth - 5):
             raise LineWidthError("Table width of {} exceeds {} characters.".format(genWidth, lineWidth))
-        print(genWidth)
         broken = splitStrings(extra, (lineWidth - genWidth) - 1)
-        print(broken)
         offset = 1 if header else 0
         try:
             for idx, line in enumerate(broken):

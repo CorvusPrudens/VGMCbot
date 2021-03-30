@@ -3,6 +3,7 @@ import discord
 import asyncio
 import json
 import re
+import time
 import random as rand
 
 from games import games
@@ -114,17 +115,21 @@ class extendedClient(discord.Client):
         except KeyError:
             await self.games.execComm(command, message, self)
 
-    async def getHour(self):
-        response = {'datetime': ''}
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.data.timeUrl) as r:
-                if r.status == 200:
-                    response = await r.json()
-        hour = self.data.timeRegex.search(response['datetime'])
-        if hour == None:
-            return None
-        else:
-            return int(hour.group(0))
+    # async def getHour(self):
+    #     response = {'datetime': ''}
+    #     async with aiohttp.ClientSession() as session:
+    #         async with session.get(self.data.timeUrl) as r:
+    #             if r.status == 200:
+    #                 response = await r.json()
+    #     hour = self.data.timeRegex.search(response['datetime'])
+    #     if hour == None:
+    #         return None
+    #     else:
+    #         return int(hour.group(0))
+
+    def getHour(self):
+        boston_time = 19 # equivalent to -5
+        return (time.gmtime().tm_hour + boston_time) % 24
 
     def mentioned(self, message):
         men = False
@@ -264,7 +269,7 @@ class extendedClient(discord.Client):
 
 
     async def fList(self, message):
-        if self.data.ledger is None:
+        if self.data.ledger is None or len(self.data.ledger) == 0:
             await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
             return
         await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
@@ -317,6 +322,33 @@ class extendedClient(discord.Client):
         # await message.channel.send(tempstr)
         await utils.sendBigMess(message, tempstr)
 
+    async def fList(self, message):
+        if self.data.ledger is None or len(self.data.ledger) == 0:
+            await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
+            return
+        await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
+
+        sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
+        sortedLedger = dict(sortedLedger)
+
+        rows = [['Connoisseur', 'VGMCoins']]
+        extra = ['To get some coins of your own, you can participate in [VGMC] activities! (or fish ^o^)']
+
+        for key in sortedLedger:
+            try:
+                fetched = self.data.nameCache[key]
+            except KeyError:
+                user = await self.fetch_user(key)
+                fetched = user.name
+                self.data.nameCache[key] = fetched
+            if sortedLedger[key] != 0:
+                valstr = '{:,.2f}'.format(sortedLedger[key])
+                rows.append([fetched, valstr])
+
+        self.storeNameCache()
+        # await message.channel.send(tempstr)
+        await utils.sendBigMess(message, utils.tablegen(rows, header=True, width=16, extra=extra, lineWidth=55))
+
     async def fUwu(self, message):
         await message.channel.send(self.data.responses['uwu'].format(rand.choice(self.data.cute)))
 
@@ -324,7 +356,7 @@ class extendedClient(discord.Client):
         time = self.data.timePartRegex.search(message.content.lower())
         if time != None:
             period = time.group(0)
-            hour = await self.getHour()
+            hour = self.getHour()
             if period == 'morning':
                 if  hour == None or (hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]):
                     mess = self.data.responses['time'].format('morning', rand.choice(self.data.cute))

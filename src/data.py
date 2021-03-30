@@ -38,20 +38,20 @@ class Data:
         self.commandsHeader = "if you prefix something with a dot, I'll do a command for you! {}"
         self.leaderCommands = """
 Leader commands:
-✿ .give @<username> <value> coins -- this will give <username> the <value> of coins!
-✿ .addimg <image url> -- this will add the given image to the current mgm raffle!
-✿ .mgmvote -- this will kick off mgm voting!
-✿ .mgmwin -- this will end mgm voting and announce the winning images!
+✿ .**give** @<username> <value> coins -- this will give <username> the <value> of coins!
+✿ .**addimg** <image url> -- this will add the given image to the current mgm raffle!
+✿ .**mgmvote** -- this will kick off mgm voting!
+✿ .**mgmwin** -- this will end mgm voting and announce the winning images!
 """
 
         self.peasantCommands = """
-✿ .help <option> -- I'll list out all these commands for you! (options: {})
-✿ .coins -- I'll tell you how many you've got!
-✿ .hmc -- "How Many Coins;" legacy command, equivalent to .coins
-✿ .list -- List out all the VGMConnoisseurs!
-✿ .uwu -- UwU
-✿ .morning -- I'll saw good morning!
-✿ .night -- I'll say goodnight!
+✿ .**help** <option> -- I'll list out all these commands for you! (options: {})
+✿ .**coins** -- I'll tell you how many you've got!
+✿ .**hmc** -- "How Many Coins;" legacy command, equivalent to .coins
+✿ .**list** -- List out all the VGMConnoisseurs!
+✿ .**uwu** -- UwU
+✿ .**morning** -- I'll saw good morning!
+✿ .**night** -- I'll say goodnight!
 """
 
         self.responses = {
@@ -64,7 +64,7 @@ The \"give\" syntax is \"give @<username> <number> coins\" {}""",
             'listItem': '✿ {}\n  -- {:,.2f} VGMCoins\n',
             'uwu': 'UwU {}',
             'time': '✧ good {} gamer {} ✧',
-            'nottime': 'b-but... it\'s not {} {}',
+            'nottime': 'b-but... it\'s not {} ᶦⁿ ᵇᵒˢᵗᵒⁿ {}',
             'addimg': 'Ok! I\'ve added that to the list {}',
             'addimgErr': 'I\'m sorry, I didn\'t catch that {}\nMake sure the image is given as a link!',
             'addimgPerm': "sorry {}, you don't have permission to add images {}",
@@ -92,7 +92,7 @@ The \"give\" syntax is \"give @<username> <number> coins\" {}""",
             'o(╥﹏╥)o',
             '(⊙﹏⊙✿)',
             '◄.►',
-            '┐(‘～`；)┌',
+            '┐(‘～‘；)┌',
             '(∩︵∩)',
             '●︿●',
             'ਉ_ਉ'
