@@ -24,9 +24,13 @@ def remap(x, min1, max1, min2, max2):
     return range2*prop + min2
 
 
-def expBias(x, bias):
-    k = (1 - bias)**3
-    return (x*k) / (x*k - x + 1)
+def expBias(x, bias, steep=1):
+    # k = (1 - bias)**3
+    k = bias
+    return (x*k) / (x*k*steep - x + 1)
+
+def clamp(x, minval, maxval):
+    return min(max(x, minval), maxval)
 
 
 def getUserFromMention(mention, regex):

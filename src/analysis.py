@@ -4,6 +4,8 @@ from matplotlib.widgets import Slider, Button
 import numpy as np
 from games.fishing import fishing
 
+# TODO -- each location needs a custom curve so that the
+# fishing gear can serve a niche for each area
 
 # catch analysis, to be run from src folder
 def scale(val, min1, max1, min2, max2):
@@ -14,9 +16,11 @@ def scale(val, min1, max1, min2, max2):
 
     return range2*prop + min2
 
+def an(location, bias):
+    catch, valid = fish.retrieveFish(location, bias=bias)
+    return catch['size']/10 if valid else 0
+
 def genTimeSize(efficacy, numSteps=100):
-    # an = lambda x, y : fish.calcDamage(fish.retrieveFish(x, bias=y)['size'])**1.2
-    an = lambda x, y : fish.retrieveFish(x, bias=y)['size']/10
 
     # time generator
     tg = lambda z : [[fish.calcCastTime(y, z) for x in range(numSteps)] for y in fish.locations]
@@ -30,7 +34,7 @@ def genTimeSize(efficacy, numSteps=100):
 
 def genData(averageTimes, averageSizes, exp=1.2):
 
-    cph = lambda t, s : ((60**2) / t) * (fish.calcDamage(s*10)**exp)
+    cph = lambda t, s : ((60**2) / t) * ((fish.calcDamage(s*10)**exp) - fish.calcDamage(s*10))
     coins = []
     for time, size in zip(averageTimes, averageSizes):
         coins.append([cph(x, y) for x, y in zip(time, size)])
@@ -41,11 +45,40 @@ def genData(averageTimes, averageSizes, exp=1.2):
 
     return timeplt, sizeplt, coinplt
 
-def updateCoins(times, sizes, exp=1.2):
-    cph = lambda t, s : ((60**2) / t) * (fish.calcDamage(s*10)**exp)
+def genPrice(numSteps):
+    prices = [0] + [fish.lureShop[x]['price'] + fish.rodShop[y]['price'] for x, y in zip(fish.lureShop, fish.rodShop)]
+    durabilities = [fish.newLure()['durability'] + fish.newRod()['durability']]
+    durabilities += [fish.lureShop[x]['stats']['durability'] + fish.rodShop[y]['stats']['durability'] for x, y in zip(fish.lureShop, fish.rodShop)]
+    priceContour = []
+    durabilityContour = []
+    priceSteps = int(numSteps / (len(prices) - 1))
+    durabilitySteps = int(numSteps / (len(durabilities) - 1))
+    # for idx, price in enumerate(prices, 1):
+    #     priceContour += [scale(x, 0, priceSteps, prices[idx - 1], price) for x in range(priceSteps)]
+    for i in range(1, len(prices)):
+        priceContour += [scale(x, 0, priceSteps, prices[i - 1], prices[i]) for x in range(priceSteps)]
+
+    for i in range(1, len(durabilities)):
+        durabilityContour += [scale(x, 0, durabilitySteps, durabilities[i - 1], durabilities[i]) for x in range(durabilitySteps)]
+
+    while len(priceContour) < numSteps:
+        priceContour.append(priceContour[-1])
+
+    while len(durabilityContour) < numSteps:
+        durabilityContour.append(durabilityContour[-1])
+
+    print(len(durabilityContour))
+    return priceContour, durabilityContour
+
+def genLike(linEff):
+    return [fish.catchChance(x) for x in linEff]
+
+
+def updateCoins(times, sizes, costs, likely, exp=1.2):
+    cph = lambda t, s, c, l : (((60**2) / t) * l) * (((fish.calcDamage(s*10)*exp)**1) - (fish.calcDamage(s*10) * c))
     coins = []
-    for time, size in zip(times, sizes):
-        coins.append([cph(x, y) for x, y in zip(time, size)])
+    for time, size, cost, like in zip(times, sizes, costs, likely):
+        coins.append([cph(x, y, cost, like) for x, y in zip(time, size)])
     return [[x[y] for x in coins] for y, _ in enumerate(coins[0])]
 
 # okay so here we're shortening way too much with comprehensions and lambdas
@@ -59,14 +92,17 @@ if __name__ == '__main__':
 
     worstEff = fish.minEff
     bestEff = fish.maxEff
-    numSteps = 10
+    numSteps = 25
     linEff = [scale(x, 0, numSteps, worstEff, bestEff) for x in range(numSteps)]
 
-    avgTime, avgSize = genTimeSize(linEff, numSteps=10000)
-    timeplt, sizeplt, coinplt = genData(avgTime, avgSize, exp=1.2)
+    exp = 1.35
+    priceContour, durabilityContour = genPrice(numSteps)
+    avgTime, avgSize = genTimeSize(linEff, numSteps=5000)
+    timeplt, sizeplt, coinplt = genData(avgTime, avgSize, exp=exp)
+    likely = genLike(linEff)
 
     colors = ['red', 'green', 'blue', 'yellow']
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, constrained_layout=False, sharex=True, figsize=(8, 8))
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, constrained_layout=False, sharex=True, figsize=(8, 8))
 
     for column, color, name in zip(timeplt, colors, header):
         ax1.plot(linEff, column, color=color, label=name)
@@ -80,12 +116,19 @@ if __name__ == '__main__':
     ax2.set_title('Fish Size')
     ax2.set_ylabel('Size (cm)')
 
-    for column, color in zip(coinplt, colors):
-        ax3.plot(linEff, column, color=color)
+    cpd = [x / y for x, y in zip(priceContour, durabilityContour)]
+    ax3.plot(linEff, cpd, color='red')
+    ax3.set_title('Cost')
+    ax3.set_ylabel('Coins per durability')
 
-    ax3.set_title('Fish Size')
-    ax3.set_xlabel('efficacy')
-    ax3.set_ylabel('Coins per Hour')
+    coinplt = updateCoins(avgTime, avgSize, cpd, likely, exp=exp)
+
+    for column, color in zip(coinplt, colors):
+        ax4.plot(linEff, column, color=color)
+
+    ax4.set_title('Profit')
+    ax4.set_xlabel('efficacy')
+    ax4.set_ylabel('Coins per Hour')
 
     fig.legend()
     fig.suptitle('Fishing Analysis', fontsize=16)
@@ -97,23 +140,27 @@ if __name__ == '__main__':
         label='Exponent',
         valmin=1,
         valmax=1.5,
-        valinit=1,
+        valinit=exp,
     )
 
     def update(val):
         # timeplt, sizeplt, coinplt = genData(linEff, numSteps=100, exp=slider.val)
         # ax1.clear()
         # ax2.clear()
-        ax3.clear()
+        ax4.clear()
+        ax4.set_title('Profit')
+        ax4.set_xlabel('efficacy')
+        ax4.set_ylabel('Coins per Hour')
         # for column, color, name in zip(timeplt, colors, header):
         #     ax1.plot(linEff, column, color=color, label=name)
         # for column, color in zip(sizeplt, colors):
         #     ax2.plot(linEff, column, color=color)
 
-        coinplt = updateCoins(avgTime, avgSize, exp=slider.val)
+        coinplt = updateCoins(avgTime, avgSize, cpd, likely, exp=slider.val)
 
         for column, color in zip(coinplt, colors):
-            ax3.plot(linEff, column, color=color)
+            ax4.plot(linEff, column, color=color)
+
 
         fig.canvas.draw()
 

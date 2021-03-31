@@ -71,23 +71,23 @@ Fishing Commands:
 
         self.lureShop = {
             # 'broken can': newLure()
-            'hook': {'id': 1, 'price': 10, 'stats': self.newLure(name='hook', efficacy=-0.5, durability=10)},
+            'hook': {'id': 1, 'price': 5, 'stats': self.newLure(name='hook', efficacy=-0.5, durability=5)},
             'popper': {'id': 2, 'price': 20, 'stats': self.newLure(name='popper', efficacy=-0.2, durability=20)},
-            'spinner': {'id': 3, 'price': 40, 'stats': self.newLure(name='spinner', efficacy=0.1, durability=40)},
-            'diver': {'id': 4, 'price': 100, 'stats': self.newLure(name='diver', efficacy=0.4, durability=80)}
+            'spinner': {'id': 3, 'price': 80, 'stats': self.newLure(name='spinner', efficacy=0.1, durability=80)},
+            'diver': {'id': 4, 'price': 240, 'stats': self.newLure(name='diver', efficacy=0.4, durability=240)}
         }
 
         self.rodShop = {
             'old pine rod': {'id': 5, 'price': 10, 'stats': self.newRod(name='old pine rod', efficacy=-0.5, durability=10)},
-            'bamboo rod': {'id': 6, 'price': 50, 'stats': self.newRod(name='bamboo rod', efficacy=-0.1, durability=35)},
-            'aluminum rod': {'id': 7, 'price': 100, 'stats': self.newRod(name='aluminum rod', efficacy=0.3, durability=80)},
-            'carbon fiber rod': {'id': 8, 'price': 250, 'stats': self.newRod(name='carbon fiber rod', efficacy=0.7, durability=150)}
+            'bamboo rod': {'id': 6, 'price': 50, 'stats': self.newRod(name='bamboo rod', efficacy=-0.1, durability=40)},
+            'aluminum rod': {'id': 7, 'price': 200, 'stats': self.newRod(name='aluminum rod', efficacy=0.3, durability=160)},
+            'carbon fiber rod': {'id': 8, 'price': 800, 'stats': self.newRod(name='carbon fiber rod', efficacy=0.7, durability=640)}
         }
 
         self.licenseShop = {
-            'cliffside license': {'id': 9, 'price': 100, 'stats': self.newLicense()},
-            'boat license': {'id': 10, 'price': 350, 'stats': self.newLicense(name='boat license', location='boat')},
-            'sail boat': {'id': 11, 'price': 500, 'stats': self.newLicense(name='sail boat', location='oilrig')},
+            'cliffside license': {'id': 9, 'price': 20, 'stats': self.newLicense()},
+            'boat license': {'id': 10, 'price': 300, 'stats': self.newLicense(name='boat license', location='boat')},
+            'sail boat': {'id': 11, 'price': 1200, 'stats': self.newLicense(name='sail boat', location='oilrig')},
         }
 
         self.minEff = self.newLure()['efficacy'] + self.newRod()['efficacy']
@@ -144,9 +144,25 @@ Fishing Commands:
 
     def retrieveFish(self, currentLocation, bias=0):
         # bias /= 2
-        bias *= 1.5
-        bias = abs(bias)*bias
-        min = 20.0
+        # bias *= 1.5
+        # bias = abs(bias)*bias
+        bias = utils.remap(bias, self.minEff, self.maxEff, 0, 1)
+
+        numPoints = len(self.locations[currentLocation]['curve'])
+        bias = self.locations[currentLocation]['curve'][int(utils.clamp(bias * numPoints, 0, 99))]
+
+        valid = False if bias < 0.001 else True
+
+        # slope = self.locations[currentLocation]['slope']
+        # bias = utils.expBias(bias, slope)
+        # bias = utils.remap(bias, 0, 1, -1, 1)
+
+        scaledBias = utils.remap(bias, 0, 1, 0.1, 2)
+
+        # bias = utils.remap(bias, 0, 1, -1, 1)
+
+        minval = 20.0
+        scaled_mu = self.locations[currentLocation]['mu-scaled'] * scaledBias
         mu = self.locations[currentLocation]['mu']
         sigma = self.locations[currentLocation]['sigma']
         mu += bias*sigma
@@ -158,20 +174,24 @@ Fishing Commands:
         # catch = locations[currentLocation]['fishlist'][]
         # catch = ''
         # silly workaround to catch being too small:
-        catch = rand.choice(self.locations[currentLocation]['fishlist'])
+        # catch = rand.choice(self.locations[currentLocation]['fishlist'])
         for i in range(len(self.locations[currentLocation]['fishlist']) - 1, -1, -1):
             if size >= self.fish[self.locations[currentLocation]['fishlist'][i]]['mu']:
                 catch = self.locations[currentLocation]['fishlist'][i]
             else:
                 break
 
-        size = rand.gauss(self.fish[catch]['mu'] + self.fish[catch]['sigma']*bias, self.fish[catch]['sigma'])
+        scaleFac = scaled_mu/mu
+        fmu = self.fish[catch]['mu'] * scaleFac
+        fsig = self.fish[catch]['sigma'] * scaleFac
+        # mu_bias = max(fmu + fsig*bias, fsig)
+        size = rand.gauss(fmu, fsig)
         size = round(size, 1)
 
-        if size < min:
-            size = min
+        if size < minval:
+            size = minval
 
-        return {'name': catch, 'size': size, 'location': currentLocation}
+        return {'name': catch, 'size': size, 'location': currentLocation}, valid
 
     # while it may seem obtuse, I'm going to operate on everything
     # more or less as a dictionary. That way, saving is much easier
@@ -250,7 +270,7 @@ Fishing Commands:
         totalEff = client.games.players[currentPlayer]['fishing']['rods'][0]['efficacy']
         totalEff += client.games.players[currentPlayer]['fishing']['lures'][0]['efficacy']
 
-        time = calcCastTime(loc, totalEff)
+        time = self.calcCastTime(loc, totalEff)
         client.games.players[currentPlayer]['fishing']['state']['timeCast'] = time
 
     def setForageTime(self, message, client):
@@ -744,20 +764,25 @@ Fishing Commands:
         pass
 
     def calcDamage(self, size):
+        if size <= 0:
+            return 0
         # size /= 10
         # srange = 150
-        maxCoins = 25
+        maxCoins = 10
         #
         # if size > srange:
         #     return maxCoins
         # else:
         #     return round(math.sin(size*2*math.pi/(srange*4))*maxCoins, 2)
 
-        # size /= 10
-        sizeRaw = max(utils.remap(size, self.minSize, self.maxSize, 0, 1), 0)
-        sizeRaw = min(utils.expBias(sizeRaw, 0.5), 1)
-        return round(sizeRaw*maxCoins, 2)
+        # exponential (too much)
+        # sizeRaw = max(utils.remap(size, self.minSize, self.maxSize, 0, 1), 0.001)
+        # sizeRaw = min(sizeRaw, 1.3)
+        # sizeRaw = min(utils.expBias(sizeRaw, 0.19, steep=0.5), 2)
+        # return round(sizeRaw*maxCoins, 2)
 
+        sizeRaw = utils.clamp(utils.remap(size, self.minSize, self.maxSize, 0.01, 1), 0.01, 2)
+        return sizeRaw*maxCoins
 
 
     def progBar(self, value, min, max, step=20):
@@ -833,22 +858,29 @@ Fishing Commands:
         record = False
         try:
             if catch['size'] > client.games.misc[catch['name']]['size']:
-                prevname = await client.fetch_user(client.games.misc[catch['name']]['fisher'])
+                # prevname = await client.fetch_user(client.games.misc[catch['name']]['fisher'])
+                try:
+                    prevname = client.data.nameCache[str(client.games.misc[catch['name']]['fisher'])]
+                except KeyError:
+                    prevname = await client.fetch_user(int(client.games.misc[catch['name']]['fisher']))
+                    prevname = prevname.name
                 prev = client.games.misc[catch['name']]
                 client.games.misc[catch['name']] = catch
-                client.games.misc[catch['name']]['fisher'] = int(playerkey)
-                mess = '\n**Wow! That\'s a new VGMC record! +5 coins! {} (you beat {}\'s record of {:,.2f} cm!)**'
-                mess = mess.format(rand.choice(client.data.cute), prevname.name, prev['catch']/10)
+                client.games.misc[catch['name']]['fisher'] = playerkey
+                mess = '\n**Wow! That\'s a new VGMC record! {} (you beat {}\'s record of {:,.2f} cm!) +1 coin!**'
+                mess = mess.format(rand.choice(client.data.cute), prevname, prev['catch']/10)
                 return mess
             else:
                 return ''
         except KeyError:
             client.games.misc[catch['name']] = catch
             client.games.misc[catch['name']]['fisher'] = int(playerkey)
-            mess = '\n**Wow! That\'s a new VGMC record! +5 coins!**'
+            mess = '\n**Wow! That\'s a new VGMC record! +1 coin!**'
             mess = mess.format(rand.choice(client.data.cute))
             return mess
 
+    def catchChance(self, totalEff):
+        return utils.remap(totalEff, self.minEff, self.maxEff, 0.4, 0.7)
 
     async def lCast(self, playerKey, players, client):
         players[playerKey]['fishing']['state']['timeCast'] -= 1
@@ -862,7 +894,9 @@ Fishing Commands:
             # print(0.4 - 0.1*totalEff)
 
             hooked = False
-            if rand.random() > 0.4 - 0.1*totalEff:
+            chances = self.catchChance(totalEff)
+            print(chances)
+            if rand.random() <= chances:
                 hooked = True
                 players[playerKey]['fishing']['state']['prevnibs'] = 0
             else:
@@ -873,8 +907,18 @@ Fishing Commands:
 
             if hooked:
                 #caught
-                catch = self.retrieveFish(players[playerKey]['fishing']['state']['location'], bias=totalEff)
-                tempstring = self.fishLine(catch)
+                catch, valid = self.retrieveFish(players[playerKey]['fishing']['state']['location'], bias=totalEff)
+
+                if not valid:
+                    tempstring = 'shoot! it got away... i think the fish here are too big for your gear {}'.format(rand.choice(client.data.sad))
+                    tempstring += self.applyDamage(playerKey, players, client, catch['size'], playerName)
+                    players[playerKey]['fishing']['state']['state'] = 'idle'
+                    await lastChannel.send(tempstring)
+                    client.storeLedger()
+                    client.games.save()
+                    return
+                else:
+                    tempstring = self.fishLine(catch)
                 newClubRecord = 0
                 # await lastChannel.send(self.fishLine(catch))
 
@@ -882,26 +926,28 @@ Fishing Commands:
                     if players[playerKey]['fishing']['records'][catch['name']]['size'] < catch['size']:
                         prev = players[playerKey]['fishing']['records'][catch['name']]['size']
                         players[playerKey]['fishing']['records'][catch['name']] = catch
-                        mess = '\n✿✿ hey that\'s a new personal best! {} '.format(rand.choice(client.data.cute))
+                        mess = '\n✿✿ hey that\'s a new personal best! {} **+1 coin** '.format(rand.choice(client.data.cute))
                         mess += 'your previous best was {:,.2f} cm! ✿✿'.format(prev/10)
                         tempmess = await self.checkRecord(playerKey, players, catch, client)
                         mess += tempmess
+                        newClubRecord += 0.2
                         if len(tempmess) > 0:
-                            newClubRecord = 0.5
+                            newClubRecord += 0.2
                         tempstring += mess
                         # add coins here
                 except KeyError:
-                    mess = '\n✿✿ oh that\'s your first {} {} ✿✿'.format(catch['name'], rand.choice(client.data.cute))
+                    mess = '\n✿✿ oh that\'s your first {} {} **+0.5 coins** ✿✿'.format(catch['name'], rand.choice(client.data.cute))
                     players[playerKey]['fishing']['records'][catch['name']] = catch
                     tempmess = await self.checkRecord(playerKey, players, catch, client)
                     mess += tempmess
+                    newClubRecord += 0.1
                     if len(tempmess) > 0:
-                        newClubRecord = 0.5
+                        newClubRecord += 0.2
                     # await lastChannel.send(mess)
                     tempstring += mess
                     # add coins here
                 tempstring += self.applyDamage(playerKey, players, client, catch['size'], playerName)
-                tempstring += self.addCoins(playerKey, players, self.calcDamage(catch['size'])**1.2 + newClubRecord*5, client)
+                tempstring += self.addCoins(playerKey, players, self.calcDamage(catch['size'])*1.35 + newClubRecord*5, client)
                 players[playerKey]['fishing']['state']['state'] = 'idle'
                 await lastChannel.send(tempstring)
                 client.storeLedger()
