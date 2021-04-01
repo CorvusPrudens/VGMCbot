@@ -11,7 +11,7 @@ class Data:
         self.ledgerPath = 'ledger.json'
         self.nameCachePath = 'nameCache.json'
         self.prevChoice = 0
-        self.leader = 'Leader'
+        self.leader = 'Leaders'
         self.bank = {}
         self.ledger = {}
         self.nameCache = {}
