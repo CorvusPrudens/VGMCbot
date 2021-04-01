@@ -5,17 +5,33 @@
     ],
     "fishing": {
       "state": {
-        "location": "lagoon",
+        "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.6299999999999999,
-        "prevnibs": 1
+        "timeCast": -0.3699999999999992,
+        "prevnibs": 0
       },
       "rods": [
         {
-          "name": "bamboo rod",
-          "efficacy": -0.1,
-          "durability": 35,
-          "damage": 25.120000000000015,
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.6741275121282633,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.0530104213710718,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 4.821796531700819,
           "type": "rods",
           "multi": true
         }
@@ -25,7 +41,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 4.293303162401112,
+          "damage": 1.96424620082021,
           "type": "lures",
           "multi": true
         },
@@ -33,7 +49,87 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 2.8447755517531683,
+          "damage": 3.1471371492013964,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.6791906745070997,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.51587006762595,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "diver",
+          "efficacy": 0.4,
+          "durability": 80,
+          "damage": 3.235,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.7400440587984654,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.0288778411165396,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.3860310876209647,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.6267115190220967,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.5402230090456523,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.163708238679169,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.893327026812007,
           "type": "lures",
           "multi": true
         }
@@ -82,7 +178,7 @@
         },
         "Round Scad": {
           "name": "Round Scad",
-          "size": 172.9,
+          "size": 189.4,
           "location": "lagoon"
         },
         "Atlantic Menhaden": {
@@ -97,12 +193,12 @@
         },
         "Scup": {
           "name": "Scup",
-          "size": 259.1,
+          "size": 295.9,
           "location": "lagoon"
         },
         "Northern Puffer": {
           "name": "Northern Puffer",
-          "size": 201.6,
+          "size": 203.4,
           "location": "lagoon"
         },
         "Atlantic Thread Herring": {
@@ -118,7 +214,7 @@
         },
         "Spot": {
           "name": "Spot",
-          "size": 163.7,
+          "size": 247.5,
           "location": "lagoon"
         },
         "Blue Runner": {
@@ -133,17 +229,17 @@
         },
         "Striped Mullet": {
           "name": "Striped Mullet",
-          "size": 345.7,
-          "location": "lagoon"
+          "size": 391.3,
+          "location": "cliffside"
         },
         "Atlantic Herring": {
           "name": "Atlantic Herring",
-          "size": 194.3,
-          "location": "lagoon"
+          "size": 249.8,
+          "location": "cliffside"
         },
         "Winter Flounder": {
           "name": "Winter Flounder",
-          "size": 274.4,
+          "size": 298.2,
           "location": "lagoon"
         },
         "Rainbow Smelt": {
@@ -163,7 +259,7 @@
         },
         "Cunner": {
           "name": "Cunner",
-          "size": 125.0,
+          "size": 295.3,
           "location": "lagoon"
         },
         "Spottail Pinfish": {
@@ -173,11 +269,128 @@
         },
         "Spanish Sardine": {
           "name": "Spanish Sardine",
-          "size": 77.2,
+          "size": 99.7,
           "location": "lagoon"
+        },
+        "Lane Snapper": {
+          "name": "Lane Snapper",
+          "size": 313.1,
+          "location": "lagoon"
+        },
+        "Atlantic Croaker": {
+          "name": "Atlantic Croaker",
+          "size": 287.1,
+          "location": "cliffside"
+        },
+        "Weakfish": {
+          "name": "Weakfish",
+          "size": 90.0,
+          "location": "cliffside"
+        },
+        "Yellowtail Snapper": {
+          "name": "Yellowtail Snapper",
+          "size": 293.0,
+          "location": "cliffside"
+        },
+        "Red Drum": {
+          "name": "Red Drum",
+          "size": 583.3,
+          "location": "cliffside"
+        },
+        "Blue Catfish": {
+          "name": "Blue Catfish",
+          "size": 342.3,
+          "location": "cliffside"
+        },
+        "Gulf Flounder": {
+          "name": "Gulf Flounder",
+          "size": 316.5,
+          "location": "cliffside"
+        },
+        "Atlantic Mackerel": {
+          "name": "Atlantic Mackerel",
+          "size": 100.6,
+          "location": "cliffside"
+        },
+        "Tautog": {
+          "name": "Tautog",
+          "size": 214.0,
+          "location": "cliffside"
+        },
+        "Southern Flounder": {
+          "name": "Southern Flounder",
+          "size": 364.7,
+          "location": "cliffside"
+        },
+        "Gray Triggerfish": {
+          "name": "Gray Triggerfish",
+          "size": 333.5,
+          "location": "cliffside"
+        },
+        "Northern Kingfish": {
+          "name": "Northern Kingfish",
+          "size": 228.0,
+          "location": "cliffside"
+        },
+        "Hogfish": {
+          "name": "Hogfish",
+          "size": 382.5,
+          "location": "cliffside"
+        },
+        "Striped Searobin": {
+          "name": "Striped Searobin",
+          "size": 189.8,
+          "location": "cliffside"
+        },
+        "Banded Rudderfish": {
+          "name": "Banded Rudderfish",
+          "size": 556.7,
+          "location": "cliffside"
+        },
+        "Black Drum": {
+          "name": "Black Drum",
+          "size": 335.0,
+          "location": "cliffside"
+        },
+        "Crevalle Jack": {
+          "name": "Crevalle Jack",
+          "size": 312.2,
+          "location": "cliffside"
+        },
+        "Summer Flounder": {
+          "name": "Summer Flounder",
+          "size": 487.2,
+          "location": "cliffside"
+        },
+        "Scamp": {
+          "name": "Scamp",
+          "size": 528.4,
+          "location": "cliffside"
+        },
+        "Bluefish": {
+          "name": "Bluefish",
+          "size": 219.9,
+          "location": "cliffside"
+        },
+        "Spanish Mackerel": {
+          "name": "Spanish Mackerel",
+          "size": 326.0,
+          "location": "cliffside"
+        },
+        "Sand Seatrout": {
+          "name": "Sand Seatrout",
+          "size": 284.7,
+          "location": "cliffside"
         }
       },
-      "licenses": [],
+      "licenses": [
+        {
+          "name": "cliff license",
+          "type": "licenses",
+          "multi": false,
+          "location": "cliffside"
+        }
+      ],
       "lastChannel": 777266814933008406
     }
   },
@@ -187,17 +400,25 @@
     ],
     "fishing": {
       "state": {
-        "location": "cliffside",
+        "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.9500000000000002,
-        "prevnibs": 1
+        "timeCast": -0.8200000000000001,
+        "prevnibs": 0
       },
       "rods": [
+        {
+          "name": "carbon fiber composite rod",
+          "efficacy": 0.7,
+          "durability": 150,
+          "damage": 1.23,
+          "type": "rods",
+          "multi": true
+        },
         {
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.035,
+          "damage": 3.205,
           "type": "rods",
           "multi": true
         }
@@ -207,7 +428,7 @@
           "name": "diver",
           "efficacy": 0.4,
           "durability": 80,
-          "damage": 4.03,
+          "damage": 7.43,
           "type": "lures",
           "multi": true
         },
@@ -348,6 +569,11 @@
           "name": "Yellowtail Snapper",
           "size": 249.2,
           "location": "cliffside"
+        },
+        "Atlantic Herring": {
+          "name": "Atlantic Herring",
+          "size": 298.4,
+          "location": "lagoon"
         }
       },
       "licenses": [
@@ -364,7 +590,7 @@
           "location": "cliffside"
         }
       ],
-      "lastChannel": 643294766561492992
+      "lastChannel": 777266814933008406
     }
   },
   "630486434360590355": {
@@ -884,7 +1110,7 @@
           "location": "cliffside"
         }
       ],
-      "lastChannel": 777266814933008406
+      "lastChannel": 785343383211606056
     }
   },
   "412259499458428929": {
@@ -1239,15 +1465,15 @@
       "state": {
         "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.8699999999999992,
-        "prevnibs": 3
+        "timeCast": -0.8200000000000003,
+        "prevnibs": 1
       },
       "rods": [
         {
-          "name": "branch",
-          "efficacy": -0.8,
-          "durability": 5,
-          "damage": 3.9879010307563023,
+          "name": "old pine rod",
+          "efficacy": -0.5,
+          "durability": 10,
+          "damage": 9.180000000000003,
           "type": "rods",
           "multi": true
         }
@@ -1257,15 +1483,23 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 3.2488169678232706,
+          "damage": 0.44560602957547785,
           "type": "lures",
           "multi": true
         },
         {
-          "name": "hook",
-          "efficacy": -0.5,
-          "durability": 10,
-          "damage": 9.99,
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.7291155949786616,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.9820874006741214,
           "type": "lures",
           "multi": true
         }
@@ -1375,8 +1609,8 @@
         },
         "Blue Runner": {
           "name": "Blue Runner",
-          "size": 184.1,
-          "location": "lagoon"
+          "size": 297.7,
+          "location": "cliffside"
         },
         "Gulf Menhaden": {
           "name": "Gulf Menhaden",
@@ -3231,27 +3465,18 @@
     ],
     "fishing": {
       "state": {
-        "location": "lagoon",
+        "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.8800000000000008,
-        "prevnibs": 1
+        "timeCast": -0.7100000000000009,
+        "prevnibs": 0
       },
-      "rods": [
-        {
-          "name": "old pine rod",
-          "efficacy": -0.5,
-          "durability": 10,
-          "damage": 7.709999999999999,
-          "type": "rods",
-          "multi": true
-        }
-      ],
+      "rods": [],
       "lures": [
         {
           "name": "spinner",
           "efficacy": 0.1,
           "durability": 40,
-          "damage": 19.240000000000013,
+          "damage": 35.560000000000024,
           "type": "lures",
           "multi": true
         },
@@ -3304,8 +3529,8 @@
         },
         "Gray Triggerfish": {
           "name": "Gray Triggerfish",
-          "size": 244.6,
-          "location": "lagoon"
+          "size": 385.8,
+          "location": "cliffside"
         },
         "Oyster Toadfish": {
           "name": "Oyster Toadfish",
@@ -3366,8 +3591,8 @@
         },
         "Atlantic Herring": {
           "name": "Atlantic Herring",
-          "size": 322.3,
-          "location": "lagoon"
+          "size": 342.1,
+          "location": "cliffside"
         },
         "White Mullet": {
           "name": "White Mullet",
@@ -3391,8 +3616,9 @@
         },
         "Sheepshead": {
           "name": "Sheepshead",
-          "size": 364.9,
-          "location": "lagoon"
+          "size": 485.2,
+          "location": "lagoon",
+          "fisher": 89511224831660032
         },
         "Silver Seatrout": {
           "name": "Silver Seatrout",
@@ -3418,9 +3644,36 @@
           "name": "Florida Pompano",
           "size": 163.3,
           "location": "lagoon"
+        },
+        "White Grunt": {
+          "name": "White Grunt",
+          "size": 128.0,
+          "location": "lagoon"
+        },
+        "Pollock": {
+          "name": "Pollock",
+          "size": 555.4,
+          "location": "cliffside"
+        },
+        "Northern Kingfish": {
+          "name": "Northern Kingfish",
+          "size": 232.7,
+          "location": "cliffside"
+        },
+        "Atlantic Croaker": {
+          "name": "Atlantic Croaker",
+          "size": 302.8,
+          "location": "cliffside"
         }
       },
-      "licenses": [],
+      "licenses": [
+        {
+          "name": "cliff license",
+          "type": "licenses",
+          "multi": false,
+          "location": "cliffside"
+        }
+      ],
       "lastChannel": 777266814933008406
     }
   },
@@ -3757,7 +4010,7 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.16000000000000014,
+        "timeCast": -0.019999999999999574,
         "prevnibs": 0
       },
       "rods": [
@@ -3765,7 +4018,15 @@
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.3414718821650813,
+          "damage": 1.3837772539683175,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.331471882165081,
           "type": "rods",
           "multi": true
         },
@@ -3779,14 +4040,6 @@
         }
       ],
       "lures": [
-        {
-          "name": "broken can",
-          "efficacy": -0.8,
-          "durability": 5,
-          "damage": 2.4149580067103593,
-          "type": "lures",
-          "multi": true
-        },
         {
           "name": "broken can",
           "efficacy": -0.8,
@@ -3845,6 +4098,21 @@
           "name": "Scaled Sardine",
           "size": 104.3,
           "location": "lagoon"
+        },
+        "Lane Snapper": {
+          "name": "Lane Snapper",
+          "size": 214.2,
+          "location": "lagoon"
+        },
+        "Hardhead Catfish": {
+          "name": "Hardhead Catfish",
+          "size": 203.8,
+          "location": "lagoon"
+        },
+        "Gulf Menhaden": {
+          "name": "Gulf Menhaden",
+          "size": 182.0,
+          "location": "lagoon"
         }
       },
       "licenses": [],
@@ -3859,23 +4127,15 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.7599999999999998,
-        "prevnibs": 2
+        "timeCast": -0.3000000000000007,
+        "prevnibs": 4
       },
       "rods": [
         {
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.7757539786381633,
-          "type": "rods",
-          "multi": true
-        },
-        {
-          "name": "branch",
-          "efficacy": -0.8,
-          "durability": 5,
-          "damage": 4.813599866322597,
+          "damage": 0.9005873191662488,
           "type": "rods",
           "multi": true
         }
@@ -3885,7 +4145,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 2.14419000268823,
+          "damage": 1.7386363256547588,
           "type": "lures",
           "multi": true
         },
@@ -3893,7 +4153,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 3.842488417250455,
+          "damage": 1.5231983996098286,
           "type": "lures",
           "multi": true
         },
@@ -3901,7 +4161,31 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.09006629315067416,
+          "damage": 4.813010881596933,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.1930487867121005,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.0284683204322675,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.095066293150674,
           "type": "lures",
           "multi": true
         },
@@ -4127,7 +4411,7 @@
         },
         "Lane Snapper": {
           "name": "Lane Snapper",
-          "size": 255.1,
+          "size": 269.5,
           "location": "lagoon"
         },
         "Silver Perch": {
@@ -4188,8 +4472,9 @@
         },
         "Florida Pompano": {
           "name": "Florida Pompano",
-          "size": 296.5,
-          "location": "lagoon"
+          "size": 358.6,
+          "location": "lagoon",
+          "fisher": 328374934797680641
         },
         "Northern Puffer": {
           "name": "Northern Puffer",
@@ -4299,25 +4584,105 @@
       "state": {
         "location": "lagoon",
         "state": "idle",
-        "timeCast": -0.5999999999999996,
-        "prevnibs": 1
+        "timeCast": -0.9699999999999998,
+        "prevnibs": 0
       },
       "rods": [
+        {
+          "name": "old pine rod",
+          "efficacy": -0.5,
+          "durability": 10,
+          "damage": 2.19,
+          "type": "rods",
+          "multi": true
+        },
         {
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 2.9558750472136786,
+          "damage": 4.772545774267981,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 4.9883812606467615,
           "type": "rods",
           "multi": true
         }
       ],
       "lures": [
         {
+          "name": "hook",
+          "efficacy": -0.5,
+          "durability": 10,
+          "damage": 2.19,
+          "type": "lures",
+          "multi": true
+        },
+        {
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 0.48034659014356335,
+          "damage": 2.597291410173716,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 4.556315746445271,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.2240754663944209,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.72599304334875,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.0431449236137866,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.3882492620871822,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.246203879342466,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.510346590143563,
           "type": "lures",
           "multi": true
         },
@@ -4377,7 +4742,7 @@
         },
         "Tomtate": {
           "name": "Tomtate",
-          "size": 137.5,
+          "size": 176.1,
           "location": "lagoon"
         },
         "Sheepshead": {
@@ -4387,7 +4752,7 @@
         },
         "Round Scad": {
           "name": "Round Scad",
-          "size": 161.8,
+          "size": 195.8,
           "location": "lagoon"
         },
         "Gulf Menhaden": {
@@ -4398,6 +4763,26 @@
         "Oyster Toadfish": {
           "name": "Oyster Toadfish",
           "size": 253.7,
+          "location": "lagoon"
+        },
+        "Spot": {
+          "name": "Spot",
+          "size": 165.3,
+          "location": "lagoon"
+        },
+        "White Mullet": {
+          "name": "White Mullet",
+          "size": 267.7,
+          "location": "lagoon"
+        },
+        "Pinfish": {
+          "name": "Pinfish",
+          "size": 97.6,
+          "location": "lagoon"
+        },
+        "Silver Seatrout": {
+          "name": "Silver Seatrout",
+          "size": 298.3,
           "location": "lagoon"
         }
       },
@@ -4447,27 +4832,155 @@
     ],
     "fishing": {
       "state": {
-        "location": "cliffside",
+        "location": "boat",
         "state": "idle",
-        "timeCast": -0.6899999999999995,
-        "prevnibs": 1
+        "timeCast": -0.5199999999999996,
+        "prevnibs": 0
       },
       "rods": [
         {
-          "name": "bamboo rod",
-          "efficacy": -0.1,
-          "durability": 35,
-          "damage": 23.200000000000014,
+          "name": "carbon fiber composite rod",
+          "efficacy": 0.7,
+          "durability": 150,
+          "damage": 72.605,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 4.4983214541418715,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.2179329668083954,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.848357588162034,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.547932667850763,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.601633957626424,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.22816785392772854,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.1784010543195054,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.6304081947271492,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.818223129563716,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.705379174045908,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.840333061495681,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.2504637212156688,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.47353260773550243,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.688743762060164,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.878154436440605,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.351657911269103,
           "type": "rods",
           "multi": true
         }
       ],
       "lures": [
         {
-          "name": "broken can",
-          "efficacy": -0.8,
-          "durability": 5,
-          "damage": 4.913764447885235,
+          "name": "diver",
+          "efficacy": 0.4,
+          "durability": 80,
+          "damage": 1.73,
           "type": "lures",
           "multi": true
         },
@@ -4475,7 +4988,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 3.605015300252937,
+          "damage": 3.2114502133827187,
           "type": "lures",
           "multi": true
         },
@@ -4483,7 +4996,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 3.8568871111469663,
+          "damage": 3.856022573460547,
           "type": "lures",
           "multi": true
         },
@@ -4491,7 +5004,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.0331251632632186,
+          "damage": 1.2306546685580972,
           "type": "lures",
           "multi": true
         },
@@ -4499,7 +5012,439 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 2.325040157049963,
+          "damage": 1.9328788306082707,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.8501725993666014,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.3945899723441944,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.3638460082859916,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.3287182731852334,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.4813267691771141,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.779499807014901,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.327155033226421,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.8030011140015576,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.414946751317251,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.12376743967579129,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.7150426949618724,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.723248098963079,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.9595267858874403,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.9646670691192449,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.968075376412848,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.8799989309942697,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.07959322705904404,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.175407372096904,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.178360765453991,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.6729922481884207,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.833591019766752,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.5912594393973998,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.8319863310488906,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.0939222378429343,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.9557072938637012,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.542913610201787,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.767966297777783,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.32091425233964,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.712213769316651,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.6018850448469086,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.7483209379936264,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.947892752554741,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.241555890478501,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.484413514203544,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.1653370913294272,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.607903583023873,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.9830587692058859,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.4930771158578464,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.5018793966277877,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.913403502844677,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.1438656843458754,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.9141952404379037,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.5971912340874939,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.342144294033141,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.970831052952917,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.558915343780568,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.318014142678565,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.7021216895374063,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.8766835440851204,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.345286756673064,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.09747756845853761,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.4638953970323048,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.3427171188469034,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 1.2950689301586866,
           "type": "lures",
           "multi": true
         },
@@ -4673,8 +5618,8 @@
         },
         "Acadian Redfish": {
           "name": "Acadian Redfish",
-          "size": 336.0,
-          "location": "lagoon",
+          "size": 357.7,
+          "location": "cliffside",
           "fisher": 419355809940504576
         },
         "Atlantic Thread Herring": {
@@ -4758,7 +5703,7 @@
         },
         "Atlantic Mackerel": {
           "name": "Atlantic Mackerel",
-          "size": 375.9,
+          "size": 430.6,
           "location": "cliffside",
           "fisher": 419355809940504576
         },
@@ -4769,17 +5714,18 @@
         },
         "Channel Catfish": {
           "name": "Channel Catfish",
-          "size": 421.0,
-          "location": "cliffside"
+          "size": 629.1,
+          "location": "boat",
+          "fisher": 419355809940504576
         },
         "Tautog": {
           "name": "Tautog",
-          "size": 452.2,
+          "size": 541.4,
           "location": "cliffside"
         },
         "Gulf Flounder": {
           "name": "Gulf Flounder",
-          "size": 439.4,
+          "size": 522.7,
           "location": "cliffside"
         },
         "Ladyfish": {
@@ -4796,8 +5742,9 @@
         },
         "Summer Flounder": {
           "name": "Summer Flounder",
-          "size": 523.5,
-          "location": "cliffside"
+          "size": 679.0,
+          "location": "cliffside",
+          "fisher": 419355809940504576
         },
         "Scamp": {
           "name": "Scamp",
@@ -4807,14 +5754,13 @@
         },
         "Southern Flounder": {
           "name": "Southern Flounder",
-          "size": 473.4,
+          "size": 474.0,
           "location": "cliffside"
         },
         "Red Snapper": {
           "name": "Red Snapper",
-          "size": 534.3,
-          "location": "cliffside",
-          "fisher": 419355809940504576
+          "size": 622.9,
+          "location": "boat"
         },
         "Tripletail": {
           "name": "Tripletail",
@@ -4856,17 +5802,17 @@
         },
         "Spotted Seatrout": {
           "name": "Spotted Seatrout",
-          "size": 361.1,
+          "size": 388.6,
           "location": "cliffside"
         },
         "Black Drum": {
           "name": "Black Drum",
-          "size": 688.1,
+          "size": 721.4,
           "location": "cliffside"
         },
         "Crevalle Jack": {
           "name": "Crevalle Jack",
-          "size": 610.0,
+          "size": 625.8,
           "location": "cliffside",
           "fisher": 419355809940504576
         },
@@ -4877,8 +5823,9 @@
         },
         "Blue Catfish": {
           "name": "Blue Catfish",
-          "size": 481.0,
-          "location": "cliffside"
+          "size": 690.3,
+          "location": "cliffside",
+          "fisher": 419355809940504576
         },
         "Almaco Jack": {
           "name": "Almaco Jack",
@@ -4887,8 +5834,9 @@
         },
         "Spanish Mackerel": {
           "name": "Spanish Mackerel",
-          "size": 499.7,
-          "location": "cliffside"
+          "size": 549.3,
+          "location": "cliffside",
+          "fisher": 419355809940504576
         },
         "Whitebone Porgy": {
           "name": "Whitebone Porgy",
@@ -4897,8 +5845,8 @@
         },
         "Pollock": {
           "name": "Pollock",
-          "size": 610.1,
-          "location": "cliffside",
+          "size": 934.2,
+          "location": "boat",
           "fisher": 419355809940504576
         },
         "Red Drum": {
@@ -4908,11 +5856,143 @@
         },
         "Red Hake": {
           "name": "Red Hake",
-          "size": 457.1,
-          "location": "cliffside"
+          "size": 523.6,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Spiny Dogfish": {
+          "name": "Spiny Dogfish",
+          "size": 955.9,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Greater Amberjack": {
+          "name": "Greater Amberjack",
+          "size": 1435.3,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Yellowfin Tuna": {
+          "name": "Yellowfin Tuna",
+          "size": 1187.1,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Common Snook": {
+          "name": "Common Snook",
+          "size": 971.4,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Great Barracuda": {
+          "name": "Great Barracuda",
+          "size": 1190.6,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Gag": {
+          "name": "Gag",
+          "size": 832.6,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Cusk": {
+          "name": "Cusk",
+          "size": 587.0,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Striped Bass": {
+          "name": "Striped Bass",
+          "size": 967.0,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Smooth Dogfish": {
+          "name": "Smooth Dogfish",
+          "size": 882.8,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Cobia": {
+          "name": "Cobia",
+          "size": 1348.9,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Dolphin": {
+          "name": "Dolphin",
+          "size": 786.1,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Black Grouper": {
+          "name": "Black Grouper",
+          "size": 707.8,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Blacktip Shark": {
+          "name": "Blacktip Shark",
+          "size": 626.9,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Atlantic Cod": {
+          "name": "Atlantic Cod",
+          "size": 681.9,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Blueline Tilefish": {
+          "name": "Blueline Tilefish",
+          "size": 500.2,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Skipjack Tuna": {
+          "name": "Skipjack Tuna",
+          "size": 829.5,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Atlantic Sharpnose Shark": {
+          "name": "Atlantic Sharpnose Shark",
+          "size": 931.1,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Bluefin Tuna": {
+          "name": "Bluefin Tuna",
+          "size": 2046.5,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "King Mackerel": {
+          "name": "King Mackerel",
+          "size": 1175.9,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Haddock": {
+          "name": "Haddock",
+          "size": 545.6,
+          "location": "boat",
+          "fisher": 419355809940504576
+        },
+        "Atlantic Bonito": {
+          "name": "Atlantic Bonito",
+          "size": 613.6,
+          "location": "boat"
         }
       },
       "licenses": [
+        {
+          "name": "boat license",
+          "type": "licenses",
+          "multi": false,
+          "location": "boat"
+        },
         {
           "name": "cliff license",
           "type": "licenses",
@@ -4978,17 +6058,33 @@
     ],
     "fishing": {
       "state": {
-        "location": "lagoon",
+        "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.5499999999999998,
-        "prevnibs": 1
+        "timeCast": -0.5199999999999996,
+        "prevnibs": 2
       },
       "rods": [
         {
           "name": "branch",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.33,
+          "damage": 3.1214867339609897,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.910630460030485,
+          "type": "rods",
+          "multi": true
+        },
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 2.3899430527532965,
           "type": "rods",
           "multi": true
         }
@@ -4998,7 +6094,7 @@
           "name": "broken can",
           "efficacy": -0.8,
           "durability": 5,
-          "damage": 1.33,
+          "damage": 3.162355300650022,
           "type": "lures",
           "multi": true
         }
@@ -5006,11 +6102,278 @@
       "records": {
         "Atlantic Herring": {
           "name": "Atlantic Herring",
-          "size": 218.0,
+          "size": 302.6,
           "location": "lagoon"
+        },
+        "Pigfish": {
+          "name": "Pigfish",
+          "size": 158.9,
+          "location": "lagoon"
+        },
+        "Silver Seatrout": {
+          "name": "Silver Seatrout",
+          "size": 516.6,
+          "location": "lagoon",
+          "fisher": 542782392872730624
+        },
+        "False Pilchard": {
+          "name": "False Pilchard",
+          "size": 155.6,
+          "location": "lagoon"
+        },
+        "Scup": {
+          "name": "Scup",
+          "size": 297.2,
+          "location": "lagoon"
+        },
+        "White Mullet": {
+          "name": "White Mullet",
+          "size": 214.2,
+          "location": "lagoon"
+        },
+        "Rainbow Smelt": {
+          "name": "Rainbow Smelt",
+          "size": 204.5,
+          "location": "lagoon"
+        },
+        "Spot": {
+          "name": "Spot",
+          "size": 180.2,
+          "location": "lagoon"
+        },
+        "Gulf Kingfish": {
+          "name": "Gulf Kingfish",
+          "size": 232.1,
+          "location": "lagoon"
+        },
+        "Tomtate": {
+          "name": "Tomtate",
+          "size": 199.3,
+          "location": "lagoon"
+        },
+        "Largemouth Bass": {
+          "name": "Largemouth Bass",
+          "size": 374.6,
+          "location": "cliffside"
+        },
+        "Gray Triggerfish": {
+          "name": "Gray Triggerfish",
+          "size": 472.0,
+          "location": "lagoon"
+        },
+        "Vermilion Snapper": {
+          "name": "Vermilion Snapper",
+          "size": 367.7,
+          "location": "cliffside"
+        },
+        "Lane Snapper": {
+          "name": "Lane Snapper",
+          "size": 335.2,
+          "location": "lagoon"
+        },
+        "Atlantic Croaker": {
+          "name": "Atlantic Croaker",
+          "size": 354.7,
+          "location": "cliffside"
+        },
+        "Northern Puffer": {
+          "name": "Northern Puffer",
+          "size": 235.3,
+          "location": "lagoon"
+        },
+        "Spottail Pinfish": {
+          "name": "Spottail Pinfish",
+          "size": 162.0,
+          "location": "lagoon"
+        },
+        "Striped Mullet": {
+          "name": "Striped Mullet",
+          "size": 397.2,
+          "location": "cliffside"
+        },
+        "Whitebone Porgy": {
+          "name": "Whitebone Porgy",
+          "size": 230.8,
+          "location": "cliffside"
+        },
+        "Round Scad": {
+          "name": "Round Scad",
+          "size": 199.0,
+          "location": "lagoon"
+        },
+        "Atlantic Menhaden": {
+          "name": "Atlantic Menhaden",
+          "size": 322.9,
+          "location": "lagoon"
+        },
+        "Atlantic Mackerel": {
+          "name": "Atlantic Mackerel",
+          "size": 299.6,
+          "location": "lagoon"
+        },
+        "Sheepshead": {
+          "name": "Sheepshead",
+          "size": 234.5,
+          "location": "lagoon"
+        },
+        "Spanish Sardine": {
+          "name": "Spanish Sardine",
+          "size": 96.4,
+          "location": "lagoon"
+        },
+        "Sand Perch": {
+          "name": "Sand Perch",
+          "size": 175.7,
+          "location": "lagoon"
+        },
+        "Acadian Redfish": {
+          "name": "Acadian Redfish",
+          "size": 331.0,
+          "location": "cliffside"
+        },
+        "Ladyfish": {
+          "name": "Ladyfish",
+          "size": 558.2,
+          "location": "cliffside",
+          "fisher": 542782392872730624
+        },
+        "Summer Flounder": {
+          "name": "Summer Flounder",
+          "size": 558.7,
+          "location": "cliffside"
+        },
+        "Hardhead Catfish": {
+          "name": "Hardhead Catfish",
+          "size": 291.1,
+          "location": "cliffside"
+        },
+        "Gafftopsail Catfish": {
+          "name": "Gafftopsail Catfish",
+          "size": 442.5,
+          "location": "cliffside"
+        },
+        "Bluefish": {
+          "name": "Bluefish",
+          "size": 142.3,
+          "location": "cliffside"
+        },
+        "Banded Rudderfish": {
+          "name": "Banded Rudderfish",
+          "size": 482.2,
+          "location": "cliffside"
+        },
+        "Red Snapper": {
+          "name": "Red Snapper",
+          "size": 441.8,
+          "location": "cliffside"
+        },
+        "Spotted Seatrout": {
+          "name": "Spotted Seatrout",
+          "size": 410.0,
+          "location": "cliffside"
+        },
+        "Channel Catfish": {
+          "name": "Channel Catfish",
+          "size": 468.3,
+          "location": "cliffside"
+        },
+        "Weakfish": {
+          "name": "Weakfish",
+          "size": 393.3,
+          "location": "cliffside"
+        },
+        "Southern Flounder": {
+          "name": "Southern Flounder",
+          "size": 528.1,
+          "location": "cliffside"
+        },
+        "Gray Snapper": {
+          "name": "Gray Snapper",
+          "size": 316.8,
+          "location": "cliffside"
+        },
+        "Mutton Snapper": {
+          "name": "Mutton Snapper",
+          "size": 680.5,
+          "location": "cliffside",
+          "fisher": 542782392872730624
+        },
+        "Red Drum": {
+          "name": "Red Drum",
+          "size": 783.2,
+          "location": "cliffside",
+          "fisher": 542782392872730624
+        },
+        "Yellowtail Snapper": {
+          "name": "Yellowtail Snapper",
+          "size": 302.7,
+          "location": "cliffside"
+        },
+        "Gulf Flounder": {
+          "name": "Gulf Flounder",
+          "size": 470.7,
+          "location": "cliffside"
+        },
+        "Tripletail": {
+          "name": "Tripletail",
+          "size": 686.5,
+          "location": "cliffside"
+        },
+        "Black Drum": {
+          "name": "Black Drum",
+          "size": 656.1,
+          "location": "cliffside"
+        },
+        "Almaco Jack": {
+          "name": "Almaco Jack",
+          "size": 706.4,
+          "location": "cliffside"
+        },
+        "Spanish Mackerel": {
+          "name": "Spanish Mackerel",
+          "size": 494.7,
+          "location": "cliffside"
+        },
+        "Crevalle Jack": {
+          "name": "Crevalle Jack",
+          "size": 670.1,
+          "location": "cliffside",
+          "fisher": 542782392872730624
+        },
+        "Hogfish": {
+          "name": "Hogfish",
+          "size": 418.7,
+          "location": "cliffside"
+        },
+        "Scamp": {
+          "name": "Scamp",
+          "size": 493.1,
+          "location": "cliffside"
+        },
+        "Tautog": {
+          "name": "Tautog",
+          "size": 548.3,
+          "location": "cliffside"
+        },
+        "Sand Seatrout": {
+          "name": "Sand Seatrout",
+          "size": 284.7,
+          "location": "cliffside"
+        },
+        "Northern Kingfish": {
+          "name": "Northern Kingfish",
+          "size": 232.8,
+          "location": "cliffside"
         }
       },
-      "licenses": [],
+      "licenses": [
+        {
+          "name": "cliff license",
+          "type": "licenses",
+          "multi": false,
+          "location": "cliffside"
+        }
+      ],
       "lastChannel": 777266814933008406
     }
   },
@@ -5136,6 +6499,282 @@
         "Atlantic Herring": {
           "name": "Atlantic Herring",
           "size": 243.5,
+          "location": "lagoon"
+        }
+      },
+      "licenses": [],
+      "lastChannel": 777266814933008406
+    }
+  },
+  "538007158181199873": {
+    "games": [
+      "fishing"
+    ],
+    "fishing": {
+      "state": {
+        "location": "lagoon",
+        "state": "idle",
+        "timeCast": -0.05000000000000071,
+        "prevnibs": 2
+      },
+      "rods": [
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.17,
+          "type": "rods",
+          "multi": true
+        }
+      ],
+      "lures": [
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.17,
+          "type": "lures",
+          "multi": true
+        }
+      ],
+      "records": {},
+      "licenses": [],
+      "lastChannel": 777266814933008406
+    }
+  },
+  "447700240133390347": {
+    "games": [
+      "fishing"
+    ],
+    "fishing": {
+      "state": {
+        "location": "lagoon",
+        "state": "idle",
+        "timeCast": -0.8799999999999999,
+        "prevnibs": 0
+      },
+      "rods": [
+        {
+          "name": "bamboo rod",
+          "efficacy": -0.1,
+          "durability": 35,
+          "damage": 3.805,
+          "type": "rods",
+          "multi": true
+        }
+      ],
+      "lures": [
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.4122356082315624,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.930260365357434,
+          "type": "lures",
+          "multi": true
+        },
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 3.7316659491395123,
+          "type": "lures",
+          "multi": true
+        }
+      ],
+      "records": {
+        "False Pilchard": {
+          "name": "False Pilchard",
+          "size": 149.1,
+          "location": "lagoon"
+        },
+        "Rainbow Smelt": {
+          "name": "Rainbow Smelt",
+          "size": 191.5,
+          "location": "lagoon"
+        },
+        "Sand Perch": {
+          "name": "Sand Perch",
+          "size": 224.1,
+          "location": "lagoon"
+        },
+        "Gulf Menhaden": {
+          "name": "Gulf Menhaden",
+          "size": 202.7,
+          "location": "lagoon"
+        },
+        "Northern Puffer": {
+          "name": "Northern Puffer",
+          "size": 234.7,
+          "location": "lagoon"
+        },
+        "Round Scad": {
+          "name": "Round Scad",
+          "size": 173.9,
+          "location": "lagoon"
+        },
+        "White Grunt": {
+          "name": "White Grunt",
+          "size": 258.9,
+          "location": "lagoon"
+        },
+        "Scup": {
+          "name": "Scup",
+          "size": 277.8,
+          "location": "lagoon"
+        },
+        "Sheepshead": {
+          "name": "Sheepshead",
+          "size": 333.8,
+          "location": "lagoon"
+        },
+        "Pinfish": {
+          "name": "Pinfish",
+          "size": 166.8,
+          "location": "lagoon"
+        },
+        "Northern Kingfish": {
+          "name": "Northern Kingfish",
+          "size": 203.5,
+          "location": "lagoon"
+        },
+        "Yellowtail Snapper": {
+          "name": "Yellowtail Snapper",
+          "size": 277.5,
+          "location": "lagoon"
+        },
+        "Cunner": {
+          "name": "Cunner",
+          "size": 228.7,
+          "location": "lagoon"
+        },
+        "Scaled Sardine": {
+          "name": "Scaled Sardine",
+          "size": 59.0,
+          "location": "lagoon"
+        },
+        "Atlantic Herring": {
+          "name": "Atlantic Herring",
+          "size": 232.6,
+          "location": "lagoon"
+        },
+        "White Mullet": {
+          "name": "White Mullet",
+          "size": 188.0,
+          "location": "lagoon"
+        },
+        "Blue Runner": {
+          "name": "Blue Runner",
+          "size": 199.3,
+          "location": "lagoon"
+        },
+        "Gulf Kingfish": {
+          "name": "Gulf Kingfish",
+          "size": 210.0,
+          "location": "lagoon"
+        },
+        "Tomtate": {
+          "name": "Tomtate",
+          "size": 143.3,
+          "location": "lagoon"
+        }
+      },
+      "licenses": [],
+      "lastChannel": 777266814933008406
+    }
+  },
+  "371029510906445829": {
+    "games": [
+      "fishing"
+    ],
+    "fishing": {
+      "state": {
+        "location": "lagoon",
+        "state": "idle",
+        "timeCast": -0.0600000000000005,
+        "prevnibs": 0
+      },
+      "rods": [
+        {
+          "name": "branch",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.64,
+          "type": "rods",
+          "multi": true
+        }
+      ],
+      "lures": [
+        {
+          "name": "broken can",
+          "efficacy": -0.8,
+          "durability": 5,
+          "damage": 0.64,
+          "type": "lures",
+          "multi": true
+        }
+      ],
+      "records": {
+        "Northern Puffer": {
+          "name": "Northern Puffer",
+          "size": 153.7,
+          "location": "lagoon"
+        },
+        "Scaled Sardine": {
+          "name": "Scaled Sardine",
+          "size": 82.7,
+          "location": "lagoon"
+        },
+        "Lane Snapper": {
+          "name": "Lane Snapper",
+          "size": 334.1,
+          "location": "lagoon"
+        },
+        "Atlantic Menhaden": {
+          "name": "Atlantic Menhaden",
+          "size": 206.7,
+          "location": "lagoon"
+        },
+        "Rainbow Smelt": {
+          "name": "Rainbow Smelt",
+          "size": 171.8,
+          "location": "lagoon"
+        },
+        "Southern Kingfish": {
+          "name": "Southern Kingfish",
+          "size": 243.8,
+          "location": "lagoon"
+        },
+        "Tomtate": {
+          "name": "Tomtate",
+          "size": 129.8,
+          "location": "lagoon"
+        },
+        "Cunner": {
+          "name": "Cunner",
+          "size": 232.0,
+          "location": "lagoon"
+        },
+        "Pigfish": {
+          "name": "Pigfish",
+          "size": 230.0,
+          "location": "lagoon"
+        },
+        "Winter Flounder": {
+          "name": "Winter Flounder",
+          "size": 328.7,
+          "location": "lagoon"
+        },
+        "Black Sea Bass": {
+          "name": "Black Sea Bass",
+          "size": 301.6,
           "location": "lagoon"
         }
       },
