@@ -48,6 +48,7 @@ class GameFishing(GameTemplate):
             '.setrod': self.fSetrod,
             '.setlure': self.fSetlure,
             '.listfish': self.fListfish,
+            '.recycle': self.fRecycle,
         }
         self.totalCasts = 0
 
@@ -60,6 +61,7 @@ Fishing Commands:
 ✿ .**locations** -- Take a look at the places you can fish!
 ✿ .**goto** <location> -- Go to the given location for fishing!
 ✿ .**inv** -- Show your fishy inventory!
+✿ .**recycle** -- Recycle your extra cans!
 ✿ .**setrod** <item> -- Set the selected rod as your primary (where item = number on the left)
 ✿ .**setlure** <item> -- Set the selected lure as your primary (where item = number on the left)
 ✿ .**listfish** <target> -- List out all the record fish of <target> (options: all, me, @mention)!
@@ -122,7 +124,7 @@ Fishing Commands:
 
     # TODO record code ought to execute here too
     # TODO consider adding image urls to fish list
-    def fishLine(self, fishcatch, threshold=2):
+    def fishLine(self, fishcatch, threshold=2.5):
         catch = '✿ You caught a{} **{}**! ({:,.2f} cm) {} ✿'
 
         small = '\nThat\'s a pretty small one though... {}'
@@ -130,10 +132,17 @@ Fishing Commands:
 
         rare = '\nYou don\'t see those every day around here {}'
 
+        loc = fishcatch['location']
+        loc_mu = self.locations[loc]['mu']
+        scale = self.locations[loc]['mu-scaled'] / loc_mu
+
+        fish_mu = self.fish[fishcatch['name']]['mu'] * scale
+        fish_sigma = self.fish[fishcatch['name']]['sigma'] * scale
+
         output = catch.format(self.detectAn(fishcatch['name']), fishcatch['name'], fishcatch['size']/10, 'UwU')
-        if fishcatch['size'] <= self.fish[fishcatch['name']]['mu'] + self.fish[fishcatch['name']]['sigma']*-threshold:
+        if fishcatch['size'] <= fish_mu + fish_sigma*-threshold:
             output += small.format(':c')
-        if fishcatch['size'] >= self.fish[fishcatch['name']]['mu'] + self.fish[fishcatch['name']]['sigma']*threshold:
+        if fishcatch['size'] >= fish_mu + fish_sigma*threshold:
             output += big.format(self.detectAn(fishcatch['name']), fishcatch['name'], 'UwU')
 
         return output
@@ -759,6 +768,41 @@ Fishing Commands:
 
         await utils.sendBigMess(message, tempstr)
 
+
+    async def fRecycle(self, message, client):
+        currentPlayer = str(message.author.id)
+        try:
+            currentState = client.games.players[currentPlayer]['fishing']['state']['state']
+        except KeyError:
+            await self.initFishing(message, client)
+            currentState = client.games.players[currentPlayer]['fishing']['state']['state']
+        if currentState != 'idle':
+            mess = 'whoa wait let\'s chill until you\'re done with that {} {} o.o'.format(currentState, message.author.name)
+            await message.channel.send(mess)
+
+        if len(client.games.players[currentPlayer]['fishing']['rods']) > 0:
+            worstIndex = -1
+            worstDamage = -1
+
+            for index, lure in enumerate(client.games.players[currentPlayer]['fishing']['lures']):
+                if lure['name'] == self.newLure()['name'] and lure['damage'] > worstDamage:
+                    worstIndex = index
+                    worstDamage = lure['damage']
+
+            if worstIndex == -1:
+                mess = 'hey {}, looks like you don\'t have any broken cans {}'
+                mess = mess.format(message.author.name, rand.choice(client.data.sad))
+            else:
+                client.games.players[currentPlayer]['fishing']['lures'].pop(worstIndex)
+                mess = 'ok {}, I **responsibly** recycled your worst broken can {}'
+                mess = mess.format(message.author.name, rand.choice(client.data.cute))
+                client.games.save()
+        else:
+            mess = 'hey {}, looks like you don\'t have any broken cans {}'
+            mess = mess.format(message.author.name, rand.choice(client.data.sad))
+
+        await message.channel.send(mess)
+        pass
 
     async def lIdle(self, playerKey, players, client):
         pass
