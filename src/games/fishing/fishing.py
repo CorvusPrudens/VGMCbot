@@ -220,6 +220,12 @@ Fishing Commands:
     def newLicense(self, name='cliff license', location='cliffside'):
         return {'name': name, 'type': 'licenses', 'multi': False, 'location': location}
 
+    def checkNumRecords(self, playerid, client):
+        num = 0
+        for record in client.games.misc:
+            num = num + 1 if str(client.games.misc[record]['fisher']) == playerid else num
+        return num
+
 
     async def initFishing(self, message, client):
         playerid = str(message.author.id)
@@ -238,6 +244,7 @@ Fishing Commands:
             'records': {},
             'licenses': [],
             'lastChannel': -1,
+            'stats': [],
         }
         client.games.players[playerid]['fishing'] = templateDict
 
@@ -313,6 +320,11 @@ Fishing Commands:
                 loc = client.games.players[currentPlayer]['fishing']['state']['location']
                 mess = 'Ok! You\'ve cast from the {} {}'.format(loc, rand.choice(client.data.cute))
                 await message.channel.send(mess)
+                try:
+                    client.games.players[currentPlayer]['fishing']['stats']['casts'] += 1
+                except KeyError:
+                    client.games.players[currentPlayer]['fishing']['stats']['casts'] = 1
+
             else:
                 string = 'You don\'t have any {}{} {}'
                 if len1 == 0 and len2 == 0:
@@ -440,6 +452,10 @@ Fishing Commands:
         lures = client.games.players[currentPlayer]['fishing']['lures']
         licenses = client.games.players[currentPlayer]['fishing']['licenses']
 
+        playerRod = rods[0]['efficacy'] if len(rods) > 0 else 0
+        playerLure = lures[0]['efficacy'] if len(lures) > 0 else 0
+        extra2 = ['Equipped efficacy -> {:,.2f}'.format(playerRod + playerLure)]
+
         rods = [self.itemEq(x, y) for x, y in enumerate(rods)] if len(rods) > 0 else [['---']]
         lures = [self.itemEq(x, y) for x, y in enumerate(lures)] if len(lures) > 0 else [['---']]
         licenses = [[x['name']] for x in licenses] if len(licenses) > 0 else [['---']]
@@ -447,10 +463,10 @@ Fishing Commands:
         rodHead = [['Rods', 'Condition', 'Efficacy']]
         lureHead = [['Lures', 'Condition', 'Efficacy']]
         liceHead = [['Special Items']]
-        extra = ['{:,.2f} VGMCoins'.format(client.data.ledger[currentPlayer]), '[item] -> equipped']
+        extra1 = ['{:,.2f} VGMCoins'.format(client.data.ledger[currentPlayer]), '[item] -> equipped']
 
-        rods = utils.tablegen(rodHead + rods, header=True, numbered=True, extra=extra, width=14)
-        lures = utils.tablegen(lureHead + lures, header=True, numbered=True)
+        rods = utils.tablegen(rodHead + rods, header=True, numbered=True, extra=extra1, width=14)
+        lures = utils.tablegen(lureHead + lures, header=True, numbered=True, extra=extra2, width=14)
         licenses = utils.tablegen(liceHead + licenses, header=True)
         greet = 'hey {}, here\'s what you\'ve got {}\n'.format(message.author.name, rand.choice(client.data.cute))
 
@@ -537,6 +553,12 @@ Fishing Commands:
                     if not taken:
                         client.games.players[currentPlayer]['fishing'][type].insert(0, copy.deepcopy(tempitem['stats']))
                         mess = 'ok {}, a{} **{}** has been added to your inventory {}'
+
+                        try:
+                            client.games.players[currentPlayer]['fishing']['stats']['spent'] += tempitem['price']
+                        except KeyError:
+                            client.games.players[currentPlayer]['fishing']['stats']['spent'] = tempitem['price']
+
                         client.data.ledger[currentPlayer] -= tempitem['price']
                         money = client.data.ledger[currentPlayer]
                         mess2 = '\n(you now have {:,.2f} VGMCoins)'.format(money)
@@ -939,7 +961,6 @@ Fishing Commands:
 
             hooked = False
             chances = self.catchChance(totalEff)
-            print(chances)
             if rand.random() <= chances:
                 hooked = True
                 players[playerKey]['fishing']['state']['prevnibs'] = 0
@@ -958,10 +979,18 @@ Fishing Commands:
                     tempstring += self.applyDamage(playerKey, players, client, catch['size'], playerName)
                     players[playerKey]['fishing']['state']['state'] = 'idle'
                     await lastChannel.send(tempstring)
+                    try:
+                        players[playerKey]['fishing']['stats']['nibbles'] += 1
+                    except KeyError:
+                        players[playerKey]['fishing']['stats']['nibbles'] = 1
                     client.storeLedger()
                     client.games.save()
                     return
                 else:
+                    try:
+                        players[playerKey]['fishing']['stats']['hooked'] += 1
+                    except KeyError:
+                        players[playerKey]['fishing']['stats']['hooked'] = 1
                     tempstring = self.fishLine(catch)
                 newClubRecord = 0
                 # await lastChannel.send(self.fishLine(catch))
@@ -976,7 +1005,8 @@ Fishing Commands:
                         mess += tempmess
                         newClubRecord += 0.2
                         if len(tempmess) > 0:
-                            newClubRecord += 0.2
+                            newClubRecord += 0.2 # new record
+
                         tempstring += mess
                         # add coins here
                 except KeyError:
@@ -986,21 +1016,52 @@ Fishing Commands:
                     mess += tempmess
                     newClubRecord += 0.1
                     if len(tempmess) > 0:
-                        newClubRecord += 0.2
+                        newClubRecord += 0.2 # new record
                     # await lastChannel.send(mess)
                     tempstring += mess
                     # add coins here
                 tempstring += self.applyDamage(playerKey, players, client, catch['size'], playerName)
-                tempstring += self.addCoins(playerKey, players, self.calcDamage(catch['size'])*1.35 + newClubRecord*5, client)
+                money = self.calcDamage(catch['size'])*1.35 + newClubRecord*5
+                tempstring += self.addCoins(playerKey, players, money, client)
+
+                # Stats collection
+
+                try:
+                    players[playerKey]['fishing']['stats']['earned'] += money
+                except KeyError:
+                    players[playerKey]['fishing']['stats']['earned'] = money
+
+                try:
+                    players[playerKey]['fishing']['stats']['numfish'][catch['name']] += 1
+                except KeyError:
+                    try:
+                        players[playerKey]['fishing']['stats']['numfish'][catch['name']] = 1
+                    except KeyError:
+                        players[playerKey]['fishing']['stats']['numfish'] = {catch['name']: 1}
+
+                # endstats
                 players[playerKey]['fishing']['state']['state'] = 'idle'
                 await lastChannel.send(tempstring)
                 client.storeLedger()
             else:
                 mess = 'you got a nibble! but it got away {}'.format(rand.choice(client.data.sad))
                 # await lastChannel.send(mess)
-                mess +=  self.applyDamage(playerKey, players, client, 20, playerName)
+                mess +=  self.applyDamage(playerKey, players, client, 10, playerName)
                 await lastChannel.send(mess)
                 players[playerKey]['fishing']['state']['state'] = 'idle'
+
+                try:
+                    players[playerKey]['fishing']['stats']['nibbles'] += 1
+                except KeyError:
+                    players[playerKey]['fishing']['stats']['nibbles'] = 1
+
+
+            totalRecords = self.checkNumRecords(str(playerKey), client)
+            try:
+                if totalRecords > players[playerKey]['fishing']['stats']['records']:
+                    players[playerKey]['fishing']['stats']['records'] = totalRecords
+            except KeyError:
+                players[playerKey]['fishing']['stats']['records'] = totalRecords
             client.games.save()
 
     async def lForage(self, playerKey, players, client):
