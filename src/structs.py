@@ -40,8 +40,8 @@ class extendedClient(discord.Client):
         self.helpDict = {'normal': self.data.peasantCommands,
                          'leader': self.data.leaderCommands}
 
-        self.games = games.Games('games/players.json', 'games/fishing/misc.json')
-        #
+        self.games = games.Games('games/players.json', 'games/fishing/misc.json', self)
+
         # self.funcDict.update(self.games.commands)
         # print(self.funcDict)
         self.helpDict.update(self.games.helpDict)
@@ -68,8 +68,12 @@ class extendedClient(discord.Client):
         await self.wait_until_ready()
         while not self.is_closed():
             self.counter += 1
-            await self.games.gameLoop(self)
+            await self.games.gameLoop()
             await asyncio.sleep(1) # task runs every second
+
+
+    def gameDecorators(self, slash, guild_ids):
+        self.games.gameDecorators(slash, guild_ids)
 
 
     def loadBank(self):

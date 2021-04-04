@@ -10,6 +10,42 @@ class LineWidthError(Exception):
 class ExtraIndexError(Exception):
     pass
 
+class GameTemplate:
+    def __init__(self, client):
+        self.loopCommands = {}
+        self.reactCommands = {}
+        self.reactMessages = {}
+        self.commands = {}
+        self.helpDict = {}
+        self.client = client
+
+    async def gameLoop(self, players):
+        keylist = list(players.keys())
+        for key in keylist:
+            await self.execute(key, players)
+
+    async def reactLoop(self, reaction, user, add):
+        id = reaction.message.id
+        if id in self.reactMessages and self.reactMessages[id]['user'] == user.id:
+            target = self.reactMessages[id]['target']
+            target = reaction.message if target is None else target
+            await self.reactCommands[self.reactMessages[id]['comm']](reaction, user, add, id)
+
+    def newReactMessage(self, command, user, source, target=None):
+        self.reactMessages[source.id] = {'comm': command, 'user': user, 'target': target, 'source': source}
+
+    async def removeReactMessage(self, source):
+        # delete all messages associated with interaction
+        if self.reactMessages[source]['target'] is not None:
+            await self.reactMessages[source]['target'].delete()
+        await self.reactMessages[source]['source'].delete()
+        del self.reactMessages[source]
+
+    async def execute(self, playerKey, players):
+        pass
+
+    def decorators(self, slash, guild_ids):
+        pass
 
 ################################################################################
 ########################## general functions ###################################

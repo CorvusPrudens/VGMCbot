@@ -1,6 +1,6 @@
 import json
 from games.fishing import fishing
-# from games.rogue import rogue
+from games.rogue import rogue
 
 # TODO -- fix changing dictionary size while iterating -- can just
 # copy the main dict before any iteration (memory intensive but safe?)
@@ -12,14 +12,14 @@ from games.fishing import fishing
 
 class Games:
 
-    def __init__(self, playerPath, miscPath):
+    def __init__(self, playerPath, miscPath, client):
         self.players = {}
         self.misc = {}
         self.commands = {}
         self.games = {}
         self.helpDict = {}
-        self.games['fishing'] = fishing.GameFishing()
-        # self.games['rogue'] = rogue.GameRogue()
+        self.games['fishing'] = fishing.GameFishing(client)
+        self.games['rogue'] = rogue.GameRogue(client)
         self.playerPath = playerPath
         self.miscPath = miscPath
 
@@ -29,12 +29,25 @@ class Games:
             self.helpDict.update(self.games[game].helpDict)
         self.load()
 
-    async def execComm(self, command, message, client):
-        await self.commands[command](message, client)
+    async def loadAsync(self):
+        if 'rogue' in self.games:
+            await self.games['rogue'].load()
 
-    async def gameLoop(self, client):
+    def gameDecorators(self, slash, guild_ids):
         for game in self.games:
-            await self.games[game].gameLoop(self.players, client)
+            self.games[game].decorators(slash, guild_ids)
+
+
+    async def execComm(self, command, message):
+        await self.commands[command](message)
+
+    async def execCommReact(self, reaction, user, add=True):
+        for game in self.games:
+            await self.games[game].reactLoop(reaction, user, add)
+
+    async def gameLoop(self):
+        for game in self.games:
+            await self.games[game].gameLoop(self.players)
 
     def load(self, misc=True):
         try:
