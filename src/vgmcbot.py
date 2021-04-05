@@ -21,7 +21,7 @@ async def on_ready():
     # client.loadBank()
     client.loadLedger()
     client.loadNameCache()
-    await client.games.loadAsync()
+    # await client.games.loadAsync() # WARNING -- uncomment for production!!
     # loadBank(bank, cachePath)
     # client.addCommands()
 

@@ -51,6 +51,11 @@ class GameTemplate:
 ########################## general functions ###################################
 ################################################################################
 
+
+def od(x, y, width):
+    return int(x + y*width)
+
+
 def remap(x, min1, max1, min2, max2):
     range1 = max1 - min1
     prop = (x - min1) / range1

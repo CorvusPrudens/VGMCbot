@@ -1,3 +1,34 @@
+import random as rand
+import copy
+
+class Thing:
+    def __init__(self, initdict={'type': 'thing', 'name': 'object'}):
+        self.dict = copy.deepcopy(initdict)
+
+    def save(self):
+        return self.dict
+
+    def apply(self, payload):
+        try:
+            for effect in payload['delta']:
+                self.dict[effect] += payload['delta'][effect]
+        except KeyError:
+            name = self.dict['name']
+            print('Error on {}; {} not present!'.format(name, effect))
+
+
+class Enemy(Thing):
+
+    def animate(self, player):
+        pass
+
+    def action(self, player):
+        item = rand.choice(self.dict['inventory'])
+        while item['type'] != 'active':
+            item = rand.choice(self.dict['inventory'])
+        act = rand.choice(item['moveset'])
+        payload = act['method'](self, [player])
+
 
 def longestKey(dic, indent=0):
     longest = 0
@@ -95,4 +126,5 @@ sentry = {
 }
 
 if __name__ == '__main__':
-    print(formatDict(enemyTemplate['stats']))
+    pass
+    # print(formatDict(enemyTemplate['stats']))

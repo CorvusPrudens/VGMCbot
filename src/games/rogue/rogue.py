@@ -13,6 +13,7 @@ from discord_slash.utils.manage_commands import create_option, create_choice
 import utils
 from games.rogue.enemies import *
 from games.rogue import rooms
+from games.rogue import rl
 
 # TODO LIST :
 # - room generation
@@ -72,6 +73,12 @@ textBox = {
     'dr': '╝',
 }
 
+def mono(string):
+    return '```\n' + string + '\n```'
+
+def monosyn(string):
+    return '```css\n' + string + '\n```'
+
 def drawText(string, center=False):
     lines = string.split('\n')
     longestLine = 0
@@ -93,81 +100,6 @@ def drawText(string, center=False):
         output += formatter.format(textBox['lr'], line, textBox['lr'])
     return output + textBox['dl'] + textBox['ud']*(longestLine + 2) + textBox['dr'] + '\n'
 
-tiles = {
-    'unlit': ' ',
-    'lit': '•',
-    'opaque': '█',
-    'opaque_up': '▀',
-    'opaque_down': '▄',
-    'water': '~'
-    # 'corpse': '×', this would be a dynamic element, not a baked room element
-}
-
-# flatgen = {}
-# keys = list(tiles.keys())
-#
-# for i in range(len(keys)):
-#     for j in range(len(keys)):
-
-
-
-flat = {
-    (0, 0): 'unlit',
-    (2, 1): 'opaque_up',
-    (1, 2): 'opaque_down',
-    (1, 1): 'lit',
-
-    (2, 0): 'opaque_up',
-    (0, 2): 'opaque_down',
-    (2, 2): 'opaque',
-}
-
-# NOTE for map data --
-# 0 = unlit tile
-# 1 = lit
-# 2 = opaque
-
-doorTemplate = {
-    'type': 'normal',
-    'position': (0, 0),
-    'state': 'open',
-}
-
-def newDoor(type, pos, state):
-    return {'type': type, 'pos': pos, 'state': state}
-
-roomTemplate = {
-    'type': 'room',
-    'name': 'room',
-    'width' : -1,
-    'height': -1,
-    'playerw': 3,
-    'playerh': 3,
-    'draww': -1,
-    'drawh': -1,
-    'ptog': {},
-    'flav': {},
-    'map': [],
-    'things': [],
-    'doors': [],
-}
-
-sqRoom = {
-    'type': 'room',
-    'name': 'square',
-    'width': 5,
-    'height': 5,
-    'playerw': 3,
-    'playerh': 3,
-    'map': [
-        2, 2, 2, 2, 2,
-        2, 0, 0, 0, 2,
-        2, 0, 0, 0, 2,
-        2, 0, 0, 0, 2,
-        2, 2, 2, 2, 2,
-    ],
-    'things': [],
-}
 
 def langList(items):
     string = []
@@ -183,8 +115,6 @@ def langList(items):
                 string.append('and ' + item)
     return ''.join(string)
 
-def od(x, y, width):
-    return int(x + y*width)
 
 def regexFromDict(dic, command=False, bound=False):
     if bound:
@@ -198,273 +128,6 @@ def regexFromDict(dic, command=False, bound=False):
             string += '({})|'.format(key)
     return re.compile(string[:-1] + ')\\b')
 
-def formatRoom(roomdict):
-    w = roomdict['draww']
-    h = roomdict['drawh']
-    # for final discord use:
-    # output = '```'
-    output = ''
-    mapp = roomdict['map']
-    # print(math.ceil(h/2))
-    for y in range(math.ceil(h/2)):
-        for x in range(w):
-            pos1 = od(x, y*2, w)
-            pos2 = od(x, y*2 + 1, w)
-            # print(pos1, pos2)
-            try:
-                output += tiles[flat[(mapp[pos1], mapp[pos2])]]
-            except IndexError:
-                # print(flat[(mapp[pos1]), mapp[pos1]])
-                output += tiles[flat[(mapp[pos1], 0)]]
-            except KeyError:
-                print('Error: room {} is poorly formatted!'.format(roomdict['name']))
-                exit(1)
-        output += '\n'
-    # for final discord use:
-    # output += '```'
-    return output
-
-
-doorList = [
-    'up',
-    'down',
-    'left',
-    'right'
-]
-
-doorTrans = {
-    (0, 1): 'left',
-    (2, 1): 'right',
-    (1, 0): 'up',
-    (1, 2): 'down'
-}
-
-
-def genRect(dict, tempmap, width, height, fill, location, doors):
-    # smallest size for a rect is 5x5
-    for y in range(height):
-        for x in range(width):
-            if y == 0:
-                tempmap[od(x, y, width)] = wallTile
-            elif y == height - 1:
-                tempmap[od(x, y, width)] = wallTile
-            if x == 0:
-                tempmap[od(x, y, width)] = wallTile
-            elif x == width - 1:
-                tempmap[od(x, y, width)] = wallTile
-
-            if fill:
-                if x > 1 and x < width - 2 and y > 1 and y < height - 2:
-                    if (x + 1) % 3 == 0:
-                        tempmap[od(x, y, width)] = litTile
-    # if width
-    # dict['playerw']
-    # TODO -- this should be in terms of playerw and playerh
-    for y in range(3):
-        for x in range(3):
-            dict['ptog'][(x, y)] = (x*((dict['width'] - 1)//2),
-                                   y*((dict['height'] - 1)//2))
-            dict['flav'][(x, y)] = rooms.flavorText.flavor(location, (x, y))
-
-            if (x, y) in doorTrans and doorTrans[(x, y)] in doors:
-                dict['doors'].append(newDoor('normal', (x, y), 'open'))
-
-    # doors (hardcoded 2 pixels)
-    unlit = 0
-    if height % 2 == 0:
-        if 'left' in doors:
-            tempmap[od(0, height/2 - 1, width)] = unlit
-            tempmap[od(0, height/2, width)] = unlit
-
-        if 'right' in doors:
-            tempmap[od(width - 1, height/2 - 1, width)] = unlit
-            tempmap[od(width - 1, height/2, width)] = unlit
-    else:
-        if 'left' in doors:
-            tempmap[od(0, math.floor(height/2), width)] = unlit
-        if 'right' in doors:
-            tempmap[od(width - 1, math.floor(height/2), width)] = unlit
-
-    if width % 2 == 0:
-        if 'up' in doors:
-            tempmap[od(width/2 - 1, 0, width)] = unlit
-            tempmap[od(width/2, 0, width)] = unlit
-
-        if 'down' in doors:
-            tempmap[od(width/2 - 1, height - 1, width)] = unlit
-            tempmap[od(width/2, height - 1, width)] = unlit
-    else:
-        if 'up' in doors:
-            tempmap[od(width/2, 0, width)] = unlit
-        if 'down' in doors:
-            tempmap[od(width/2, height - 1, width)] = unlit
-
-
-def genCircle(tempmap, width, height, fill, location):
-    # smallest size for a rect is 5x5
-    for y in range(height):
-        for x in range(width):
-            if y == 0:
-                tempmap[od(x, y, width)] = wallTile
-            elif y == height - 1:
-                tempmap[od(x, y, width)] = wallTile
-            if x == 0:
-                tempmap[od(x, y, width)] = wallTile
-            elif x == width - 1:
-                tempmap[od(x, y, width)] = wallTile
-
-            if fill:
-                if x > 1 and x < width - 2 and y > 1 and y < height - 2:
-                    if (x + 1) % 3 == 0:
-                        tempmap[od(x, y, width)] = litTile
-    # if width
-    # dict['playerw']
-    # TODO -- this should be in terms of playerw and playerh
-    for y in range(3):
-        for x in range(3):
-            dict['ptog'][(x, y)] = (x*((dict['width'] - 1)//2),
-                                   y*((dict['height'] - 1)//2))
-            dict['flav'][(x, y)] = rooms.flavorText.flavor(location, (x, y))
-
-    # doors (hardcoded 2 pixels)
-    unlit = 0
-    if height % 2 == 0:
-        tempmap[od(0, height/2 - 1, width)] = unlit
-        tempmap[od(0, height/2, width)] = unlit
-        tempmap[od(width - 1, height/2 - 1, width)] = unlit
-        tempmap[od(width - 1, height/2, width)] = unlit
-    else:
-        tempmap[od(0, math.floor(height/2), width)] = unlit
-        tempmap[od(width - 1, math.floor(height/2), width)] = unlit
-
-    if width % 2 == 0:
-        tempmap[od(width/2 - 1, 0, width)] = unlit
-        tempmap[od(width/2, 0, width)] = unlit
-        tempmap[od(width/2 - 1, height - 1, width)] = unlit
-        tempmap[od(width/2, height - 1, width)] = unlit
-    else:
-        tempmap[od(width/2, 0, width)] = unlit
-        tempmap[od(width/2, height - 1, width)] = unlit
-
-
-def genRoom(name, width, height, shape, doors=doorList, fill=True, location='rim'):
-    dict = copy.deepcopy(roomTemplate)
-    dict['name'] = name
-    dict['width'] = width
-    dict['height'] = height
-    width = width*3 + 2
-    height = height*2 + 4
-    dict['draww'] = width
-    dict['drawh'] = height
-    tempmap = np.zeros((width*height,), dtype='u1')
-
-    # note -- this will cause errors if the height is less than four
-    wallTile = 2
-    litTile = 1
-    if shape == 'rect':
-        genRect(dict, tempmap, width, height, fill, location, doors)
-    elif shape == 'circle':
-        genCircle(tempmap, width, height, fill, location)
-
-    dict['map'] = tempmap
-    return dict
-
-# bigg = genRoom('sq', 18, 9, 'rect')
-
-def printRoom(roomdict):
-    for y in range(roomdict['drawh']):
-        string = ''
-        for x in range(roomdict['draww']):
-            string += str(roomdict['map'][od(x, y, roomdict['draww'])])
-        print(string)
-
-def mono(string):
-    return '```\n' + string + '\n```'
-
-def monosyn(string):
-    return '```css\n' + string + '\n```'
-
-# printRoom(bigg)
-
-rectTemplate = genRoom('chamber', 7, 5, 'rect')
-
-class Room:
-    def __init__(self, initdict=rectTemplate, name=None, width=None, height=None, shape=None):
-        self.dict = copy.deepcopy(initdict)
-
-        self.dict['name'] = name if name is not None else self.dict['name']
-        self.dict['width'] = width if width is not None else self.dict['width']
-        self.dict['height'] = height if height is not None else self.dict['height']
-        self.dict['shape'] = shape if shape is not None else self.dict['shape']
-
-    def draw(self, player):
-        tempbuff = formatRoom(self.dict)
-        for thing in self.dict['things']:
-            tempbuff = self.add(tempbuff, thing)
-        tempbuff = self.addPlayer(tempbuff, player)
-        return tempbuff
-
-    def add(self, buff, thing):
-        pos = self.buff2coord(thing.dict['x'], thing.dict['y'])
-        offset = len(thing.dict['char'])//2
-        return buff[:pos - offset] + thing.dict['char'] + buff[pos + 1 + offset:]
-
-    def addPlayer(self, buff, player):
-        temppos = self.getPlayerPos(player)
-        pos = self.buff2coord(temppos[0], temppos[1])
-        offset = len(player.dict['char'])//2
-        # print(playerpos, temppos, pos)
-        return buff[:pos - offset] + player.dict['char'] + buff[pos + 1 + offset:]
-
-    def buff2coord(self, x, y):
-        # + 1 because of newline
-        return (x*3 + 2) + (y + 1)*(self.dict['draww'] + 1)
-
-    def getPlayerPos(self, player):
-        playerpos = (player.dict['x'], player.dict['y'])
-        return self.dict['ptog'][playerpos]
-
-    def insert(self, thing):
-        self.dict['things'].append(thing)
-
-    def save(self):
-        for i in range(len(self.dict['things'])):
-            self.dict['things'][i] = self.dict['things'][i].save()
-        return self.dict
-
-    def animate(self, player):
-        for thing in self.dict['things']:
-            thing.animate(player)
-
-levelTemplate = {
-    'type': 'level',
-    'name': 'Emitter Precipice',
-    'width': 5,
-    'height': 5,
-    'rooms': [Room()],
-}
-
-class Level:
-    def __init__(self, initdict=levelTemplate):
-        self.dict = copy.deepcopy(initdict)
-        self.dict['rooms'][0].insert(Enemy(initdict=sentry))
-
-    def addRoom(self, room):
-        self.dict['rooms'].append(room)
-
-    def generateLevel(self, area='Emitter Precipice'):
-         if area == 'Emitter Precipice':
-             # todo -- levels should have random start, random end,
-             # and use and moderate-length path between them
-             w = self.width
-
-             size = lambda mu, sig : utils.clamp(int(random.gauss(mu, sig)), 2, 5) * 2 + 1
-             rm = lambda w, h, d : genRoom('rect', w, h, 'rect', doors=d)
-             rs = lambda d : rm(size(3.5, 1), size(3.5, 1), d)
-             listdoors = [copy.deepcopy(doorList) for x in range(numRooms)]
-             doors = [x.pop(random.randrange(len(x))) for x in listdoors]
-             temprooms = [Room(initdict=rs(x)) for x in doors]
-
 
     def save(self):
         # the only time this will be called is when
@@ -475,36 +138,6 @@ class Level:
         return self.dict
 
 
-class Thing:
-    def __init__(self, initdict={'type': 'thing', 'name': 'object'}):
-        self.dict = copy.deepcopy(initdict)
-
-    def save(self):
-        return self.dict
-
-    def apply(self, payload):
-        try:
-            for effect in payload['delta']:
-                self.dict[effect] += payload['delta'][effect]
-        except KeyError:
-            name = self.dict['name']
-            print('Error on {}; {} not present!'.format(name, effect))
-
-
-class Enemy(Thing):
-
-    def animate(self, player):
-        pass
-
-    def action(self, player):
-        item = rand.choice(self.dict['inventory'])
-        while item['type'] != 'active':
-            item = rand.choice(self.dict['inventory'])
-        act = rand.choice(item['moveset'])
-        payload = act['method'](self, [player])
-
-
-
 playerTemplate = {
     'id': '-1',
     'lastChannel': None,
@@ -513,7 +146,7 @@ playerTemplate = {
     'x': 0,
     'y': 0,
     'char': '.C ',
-    'levels': [Level()], # need to make home level
+    'levels': [], # need to make home level
     'state': {
         'level': 0,
         'room': 0,
@@ -537,6 +170,8 @@ class Player:
         self.dict['name'] = name if name is not None else self.dict['name']
         self.dict['char'] = char if char is not None else self.dict['char']
         self.dict['id'] = id if id is not None else self.dict['id']
+
+        self.dict['levels'] = [rl.Level(self)]
 
     def save(self):
         out = copy.deepcopy(self.dict)
@@ -676,6 +311,19 @@ Rogue Commands:
                 await outmess.add_reaction('👍')
                 await outmess.add_reaction('👎')
                 self.newReactMessage('rNewSess', ctx.author_id, outmess)
+
+        @slash.slash(
+            name="del", guild_ids=guild_ids,
+            description="Delete character.",
+        )
+        async def _del(ctx):
+            if ctx.author_id in self.players:
+                del self.players[ctx.author_id]
+                await ctx.send(mono('Deleted character.'), delete_after=5)
+            else:
+                await ctx.send(mono('You do not have a saved character.'), delete_after=5)
+
+
 
         @slash.slash(
             name="close", guild_ids=guild_ids,
@@ -827,6 +475,7 @@ Rogue Commands:
         await movemess.add_reaction('➡️')
         await movemess.add_reaction('⬆️')
         await movemess.add_reaction('⬇️')
+        await movemess.add_reaction('🇲')
         return movemess
 
 
@@ -851,8 +500,8 @@ Rogue Commands:
     async def rMove(self, reaction, user, add, messID):
         target = self.reactMessages[messID]['target']
         direction = str(reaction)
+        id = user.id
         if direction in self.moveAlias:
-            id = user.id
             room = self.players[id].getRoom()
             playergrid = (room.dict['playerw'], room.dict['playerh'])
             # now for the actual moving
@@ -871,6 +520,17 @@ Rogue Commands:
             string = self.players[id].draw()
             self.save(self.players[id])
             await target.edit(content=monosyn(string) + '\n' + mono(mess))
+        else:
+            if direction == '🇲':
+                if add:
+                    currentLevel = self.players[id].dict['state']['level']
+                    level = self.players[id].dict['levels'][currentLevel]
+                    string = level.genMap(self.players[id])
+                    mess = '...'
+                    await target.edit(content=monosyn(string) + '\n' + mono(mess))
+                else:
+                    # need way to redraw level
+                    pass
 
 
     async def fMove(self, message):
@@ -919,8 +579,6 @@ Rogue Commands:
             mess = 'you moved somewhere (should be in dict or smth)'
             await message.channel.send(mono(mess))
 
-
-    # async def
 
     async def fHello(self, message):
         id = message.author.id
