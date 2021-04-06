@@ -497,6 +497,21 @@ Rogue Commands:
         return movemess.id
 
 
+    def moveRooms(self, player, dir):
+        lev = player.dict['levels'][player.dict['state']['level']]
+        pos = player.dict['state']['room']
+        if dir == 'up':
+            player.dict['state']['room'] -= lev.dict['width']
+        elif dir == 'down':
+            player.dict['state']['room'] += lev.dict['width']
+        elif dir == 'right':
+            player.dict['state']['room'] += 1
+        elif dir == 'left':
+            player.dict['state']['room'] -= 1
+        
+            
+
+
     async def rMove(self, reaction, user, add, messID):
         target = self.reactMessages[messID]['target']
         direction = str(reaction)
@@ -509,6 +524,11 @@ Rogue Commands:
             matrix = self.moveDict[self.moveAlias[direction]]
             newpos = (prevpos[0] + matrix[0], prevpos[1] + matrix[1])
             if newpos[0] < 0 or newpos[1] < 0 or newpos[0] >= playergrid[0] or newpos[1] >= playergrid[1]:
+                for door in room.dict['doors']:
+                    if door['pos'] == prevpos:
+                        tempdir = door['postr']
+                        self.moveRooms(self.players[id], tempdir)
+                            
                 mess = 'you cannot proceed'
                 # await message.channel.send(mono(mess))
             else:
