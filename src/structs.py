@@ -118,7 +118,7 @@ class extendedClient(discord.Client):
         try:
             await self.funcDict[command](message)
         except KeyError:
-            await self.games.execComm(command, message, self)
+            await self.games.execComm(command, message)
 
     # async def getHour(self):
     #     response = {'datetime': ''}
@@ -278,60 +278,6 @@ class extendedClient(discord.Client):
             await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
             return
         await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
-        tempstr = '```\n'
-        templist = []
-        longest = 0
-        longestValue = 0
-        sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
-        sortedLedger = dict(sortedLedger)
-        maxNameLen = 16
-        for key in sortedLedger:
-            try:
-                fetched = self.data.nameCache[key]
-            except KeyError:
-                user = await self.fetch_user(key)
-                fetched = user.name
-                self.data.nameCache[key] = fetched
-            if len(fetched) > longest:
-                longest = len(fetched)
-            valstr = '{:,.2f}'.format(sortedLedger[key])
-            if len(valstr) > longestValue:
-                longestValue = len(valstr)
-
-        if len('VGMCoins') > longestValue:
-            longestValue = len('VGMCoins')
-
-        longest = maxNameLen if longest > maxNameLen else longest
-
-        header = '✿ Connoisseur' + ' '*(longest - 10) + '| VGMCoins' + ' '*(longestValue - 8) + ' ;\n'
-        headfoot = '✿ ' + '='*(longest + 1) + '+' + '='*(longestValue + 1) + ' ;\n'
-
-        tempstr += header
-        tempstr += headfoot
-
-        for key in sortedLedger:
-            if sortedLedger[key] == 0:
-                continue
-            fetched = self.data.nameCache[key]
-            if len(fetched) > longest:
-                fetched = fetched[:longest - 3] + '...'
-            nameSpace = ' '*(longest - len(fetched))
-            valstr = '{:,.2f}'.format(sortedLedger[key])
-            valueSpace = ' '*(longestValue - len(valstr))
-            tempstr += '✿ {}{} | {}{} ;\n'.format(fetched, nameSpace, valstr, valueSpace)
-
-            templist.append([fetched, sortedLedger[key]])
-
-        tempstr += headfoot + '```'
-        self.storeNameCache()
-        # await message.channel.send(tempstr)
-        await utils.sendBigMess(message, tempstr)
-
-    async def fList(self, message):
-        if self.data.ledger is None or len(self.data.ledger) == 0:
-            await message.channel.send("Looks like there's no connoisseurs, here... {}".format(rand.choice(self.data.sad)))
-            return
-        await message.channel.send(self.data.responses['list'].format(rand.choice(self.data.cute)))
 
         sortedLedger = sorted(self.data.ledger.items(), key=lambda item: item[1], reverse=True)
         sortedLedger = dict(sortedLedger)
@@ -448,26 +394,60 @@ class extendedClient(discord.Client):
     def roll(self, numChoices):
         return rand.randrange(1, numChoices + 1)
 
+    def extractModifier(self, match):
+        if match.group(1) == '+':
+            return int(match.group(2))
+        else:
+            return -int(match.group(2))
+
+    def sign(self, num):
+        if num < 0:
+            return '-'
+        else:
+            return '+'
+
     async def fRoll(self, message):
         match = self.data.rollRegex.search(message.content)
         if match is not None:
+            modifier = self.data.modifierRegex.search(message.content, pos=match.end())
+
             num1 = int(match.group(1))
             num2 = int(match.group(3))
+
+            if num1 > 20:
+                mess = f'sorry, the limit is 20 rolls at a time {rand.choice(self.data.sad)}'
+                await message.channel.send(mess)
+                return
+            if len(match.group(3)) > 10:
+                mess = f'sorry, the die can only go to 10 digits {rand.choice(self.data.sad)}'
+                await message.channel.send(mess)
+                return
+
             if num2 == 1:
-                out = [1]
+                out = [1 for x in range(num1)]
             else:
                 out = [self.roll(num2) for x in range(num1)]
+
             form = 'Roll {}: {}\n'
-            string = [form.format(x + 1, y) for x, y in enumerate(out)]
-            if len(string) > 1:
-                string.append(f'\nTotal : {sum(out)}')
-            else:
+            string = ['[{}]\n'.format(match.group(0))] + [form.format(x + 1, y) for x, y in enumerate(out)]
+
+            formatTotal = 'Total : {} '
+            addit = 0
+            if modifier is not None:
+                addit = self.extractModifier(modifier)
+                formatTotal += '({} {} {})'.format(sum(out), self.sign(addit), abs(addit))
+                string[0] = string[0][:-2] + '{}]\n'.format(modifier.group(0))
+            total = sum(out) + addit if sum(out) + addit > 1 else 1
+            string.append(formatTotal.format(total))
+
+            if num1 == 1:
                 if num2 == 20:
                     if out[0] == 1:
                         string.append(f'\noof... {rand.choice(self.data.sad)}')
                     elif out[0] == 20:
                         string.append(f'\nwow natty!! {rand.choice(self.data.cute)}')
-            await message.channel.send('```css\n' + ''.join(string) + '\n```')
+            await utils.sendBigMess(message, '```css\n' + ''.join(string) + '\n```')
+            # await message.channel.send('```css\n' + ''.join(string) + '\n```')
         else:
             mess = f'sorry, looks like your roll isn\'t quite formatted right {rand.choice(self.data.sad)}'
             await message.channel.send(mess)

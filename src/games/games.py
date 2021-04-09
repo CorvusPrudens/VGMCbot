@@ -19,7 +19,7 @@ class Games:
         self.games = {}
         self.helpDict = {}
         self.games['fishing'] = fishing.GameFishing(client)
-        self.games['rogue'] = rogue.GameRogue(client)
+        # self.games['rogue'] = rogue.GameRogue(client)
         self.playerPath = playerPath
         self.miscPath = miscPath
 

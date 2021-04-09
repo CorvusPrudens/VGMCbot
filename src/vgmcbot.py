@@ -11,9 +11,9 @@ intents.reactions = True
 intents.members = True
 client = structs.extendedClient(intents=intents)
 
-slash = SlashCommand(client, sync_commands=True) # Declares slash commands through the client.
-guild_ids = [566052452114366482] # for quick debug (final needs to be global)
-client.gameDecorators(slash, guild_ids)
+# slash = SlashCommand(client, sync_commands=True) # Declares slash commands through the client.
+# guild_ids = [566052452114366482] # for quick debug (final needs to be global)
+# client.gameDecorators(slash, guild_ids)
 
 @client.event
 async def on_ready():
