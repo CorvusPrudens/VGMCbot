@@ -394,11 +394,31 @@ class extendedClient(discord.Client):
     def roll(self, numChoices):
         return rand.randrange(1, numChoices + 1)
 
-    def extractModifier(self, match):
-        if match.group(1) == '+':
-            return int(match.group(2))
+    def parseModifier(self, initmatch, string):
+        if self.data.modifierRegex.search(string, pos=initmatch.end()) is None:
+            return None
         else:
-            return -int(match.group(2))
+            end = initmatch.end()
+            match = self.data.modifierRegex.search(string, pos=end)
+            matches = []
+            while match is not None:
+                matches.append(match)
+                end = match.end()
+                match = self.data.modifierRegex.search(string, pos=end)
+            return matches
+
+    def extractModifier(self, matches):
+        tot = []
+        for match in matches:
+            if match.group(1) == '+':
+                tot.append(int(match.group(2)))
+            else:
+                tot.append(-int(match.group(2)))
+        return sum(tot)
+
+    def combineModifier(self, matches):
+        return ''.join([x.group(0) for x in matches])
+
 
     def sign(self, num):
         if num < 0:
@@ -409,7 +429,7 @@ class extendedClient(discord.Client):
     async def fRoll(self, message):
         match = self.data.rollRegex.search(message.content)
         if match is not None:
-            modifier = self.data.modifierRegex.search(message.content, pos=match.end())
+            modifier = self.parseModifier(match, message.content)
 
             num1 = int(match.group(1))
             num2 = int(match.group(3))
@@ -436,7 +456,7 @@ class extendedClient(discord.Client):
             if modifier is not None:
                 addit = self.extractModifier(modifier)
                 formatTotal += '({} {} {})'.format(sum(out), self.sign(addit), abs(addit))
-                string[0] = string[0][:-2] + '{}]\n'.format(modifier.group(0))
+                string[0] = string[0][:-2] + '{}]\n'.format(self.combineModifier(modifier))
             total = sum(out) + addit if sum(out) + addit > 1 else 1
             string.append(formatTotal.format(total))
 
