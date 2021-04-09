@@ -7,9 +7,9 @@
   },
   "Silver Perch": {
     "name": "Silver Perch",
-    "size": 232.8,
+    "size": 240.9,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 447700240133390347
   },
   "Acadian Redfish": {
     "name": "Acadian Redfish",
@@ -25,9 +25,9 @@
   },
   "Rainbow Smelt": {
     "name": "Rainbow Smelt",
-    "size": 273.8,
+    "size": 400.2,
     "location": "lagoon",
-    "fisher": 565730762079338510
+    "fisher": 434499163644755978
   },
   "Round Scad": {
     "name": "Round Scad",
@@ -43,15 +43,15 @@
   },
   "Spot": {
     "name": "Spot",
-    "size": 251.2,
+    "size": 296.7,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 434499163644755978
   },
   "Scup": {
     "name": "Scup",
-    "size": 346.7,
+    "size": 483.6,
     "location": "lagoon",
-    "fisher": 565730762079338510
+    "fisher": 434499163644755978
   },
   "Scaled Sardine": {
     "name": "Scaled Sardine",
@@ -67,9 +67,9 @@
   },
   "Northern Kingfish": {
     "name": "Northern Kingfish",
-    "size": 352.6,
+    "size": 553.5,
     "location": "lagoon",
-    "fisher": 282316841731227649
+    "fisher": 164224139316428800
   },
   "Spanish Sardine": {
     "name": "Spanish Sardine",
@@ -97,45 +97,45 @@
   },
   "Blue Runner": {
     "name": "Blue Runner",
-    "size": 360.2,
-    "location": "lagoon",
-    "fisher": 282316841731227649
+    "size": 457.7,
+    "location": "cliffside",
+    "fisher": 419355809940504576
   },
   "Atlantic Croaker": {
     "name": "Atlantic Croaker",
-    "size": 395.5,
+    "size": 688.6,
     "location": "cliffside",
-    "fisher": 282316841731227649
+    "fisher": 434499163644755978
   },
   "Hardhead Catfish": {
     "name": "Hardhead Catfish",
-    "size": 477.1,
-    "location": "lagoon",
-    "fisher": 419355809940504576
+    "size": 659.9,
+    "location": "cliffside",
+    "fisher": 434499163644755978
   },
   "Atlantic Herring": {
     "name": "Atlantic Herring",
-    "size": 367.2,
+    "size": 629.8,
     "location": "cliffside",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Sheepshead": {
     "name": "Sheepshead",
-    "size": 485.2,
+    "size": 671.2,
     "location": "lagoon",
-    "fisher": 89511224831660032
+    "fisher": 164224139316428800
   },
   "Silver Seatrout": {
     "name": "Silver Seatrout",
-    "size": 516.6,
-    "location": "lagoon",
-    "fisher": 542782392872730624
+    "size": 847.1,
+    "location": "cliffside",
+    "fisher": 419355809940504576
   },
   "Vermilion Snapper": {
     "name": "Vermilion Snapper",
-    "size": 400.7,
-    "location": "cliffside",
-    "fisher": 630486434360590355
+    "size": 519.4,
+    "location": "lagoon",
+    "fisher": 434499163644755978
   },
   "Bluestriped Grunt": {
     "name": "Bluestriped Grunt",
@@ -151,9 +151,9 @@
   },
   "Southern Kingfish": {
     "name": "Southern Kingfish",
-    "size": 373.1,
+    "size": 625.9,
     "location": "lagoon",
-    "fisher": 89511224831660032
+    "fisher": 419355809940504576
   },
   "Pigfish": {
     "name": "Pigfish",
@@ -163,15 +163,15 @@
   },
   "Largemouth Bass": {
     "name": "Largemouth Bass",
-    "size": 468.4,
+    "size": 841.5,
     "location": "cliffside",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Northern Puffer": {
     "name": "Northern Puffer",
-    "size": 282.0,
+    "size": 296.5,
     "location": "lagoon",
-    "fisher": 565730762079338510
+    "fisher": 447700240133390347
   },
   "Cunner": {
     "name": "Cunner",
@@ -187,15 +187,15 @@
   },
   "Gray Triggerfish": {
     "name": "Gray Triggerfish",
-    "size": 472.9,
+    "size": 967.8,
     "location": "cliffside",
-    "fisher": 282316841731227649
+    "fisher": 419355809940504576
   },
   "Gafftopsail Catfish": {
     "name": "Gafftopsail Catfish",
-    "size": 668.7,
+    "size": 1045.7,
     "location": "cliffside",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Blue Catfish": {
     "name": "Blue Catfish",
@@ -205,39 +205,39 @@
   },
   "Gray Snapper": {
     "name": "Gray Snapper",
-    "size": 500.0,
-    "location": "cliffside",
-    "fisher": 282316841731227649
+    "size": 585.8,
+    "location": "lagoon",
+    "fisher": 434499163644755978
   },
   "Crevalle Jack": {
     "name": "Crevalle Jack",
-    "size": 670.1,
+    "size": 885.3,
     "location": "cliffside",
-    "fisher": 542782392872730624
+    "fisher": 434499163644755978
   },
   "Hogfish": {
     "name": "Hogfish",
-    "size": 545.2,
-    "location": "cliffside",
+    "size": 1212.8,
+    "location": "boat",
     "fisher": 419355809940504576
   },
   "Winter Flounder": {
     "name": "Winter Flounder",
-    "size": 404.2,
-    "location": "lagoon",
-    "fisher": 282316841731227649
+    "size": 821.2,
+    "location": "cliffside",
+    "fisher": 434499163644755978
   },
   "Southern Flounder": {
     "name": "Southern Flounder",
-    "size": 651.9,
-    "location": "cliffside",
-    "fisher": 630486434360590355
+    "size": 1349.7,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Black Drum": {
     "name": "Black Drum",
-    "size": 774.4,
+    "size": 1228.3,
     "location": "cliffside",
-    "fisher": 630486434360590355
+    "fisher": 434499163644755978
   },
   "Sand Seatrout": {
     "name": "Sand Seatrout",
@@ -247,56 +247,56 @@
   },
   "Striped Mullet": {
     "name": "Striped Mullet",
-    "size": 425.8,
+    "size": 645.1,
     "location": "cliffside",
-    "fisher": 630486434360590355
+    "fisher": 434499163644755978
   },
   "Red Drum": {
     "name": "Red Drum",
-    "size": 783.2,
-    "location": "cliffside",
-    "fisher": 542782392872730624
+    "size": 1852.5,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Red Snapper": {
     "name": "Red Snapper",
-    "size": 631.7,
-    "location": "cliffside",
-    "fisher": 630486434360590355
+    "size": 1637.5,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Channel Catfish": {
     "name": "Channel Catfish",
-    "size": 629.1,
+    "size": 1799.8,
     "location": "boat",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Red Hake": {
     "name": "Red Hake",
-    "size": 523.6,
+    "size": 1106.3,
     "location": "boat",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Ladyfish": {
     "name": "Ladyfish",
-    "size": 558.2,
-    "location": "cliffside",
-    "fisher": 542782392872730624
+    "size": 1354.0,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Mutton Snapper": {
     "name": "Mutton Snapper",
-    "size": 680.5,
-    "location": "cliffside",
-    "fisher": 542782392872730624
+    "size": 1652.3,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Yellowtail Snapper": {
     "name": "Yellowtail Snapper",
-    "size": 409.6,
-    "location": "lagoon",
-    "fisher": 282316841731227649
+    "size": 775.6,
+    "location": "cliffside",
+    "fisher": 434499163644755978
   },
   "Spanish Mackerel": {
     "name": "Spanish Mackerel",
-    "size": 549.3,
-    "location": "cliffside",
+    "size": 1602.0,
+    "location": "boat",
     "fisher": 419355809940504576
   },
   "White Perch": {
@@ -313,9 +313,9 @@
   },
   "Almaco Jack": {
     "name": "Almaco Jack",
-    "size": 880.7,
-    "location": "cliffside",
-    "fisher": 630486434360590355
+    "size": 1864.0,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Lane Snapper": {
     "name": "Lane Snapper",
@@ -331,8 +331,8 @@
   },
   "Summer Flounder": {
     "name": "Summer Flounder",
-    "size": 679.0,
-    "location": "cliffside",
+    "size": 1562.6,
+    "location": "boat",
     "fisher": 419355809940504576
   },
   "Gulf Kingfish": {
@@ -343,9 +343,9 @@
   },
   "Atlantic Spadefish": {
     "name": "Atlantic Spadefish",
-    "size": 421.0,
+    "size": 526.8,
     "location": "lagoon",
-    "fisher": 419355809940504576
+    "fisher": 447700240133390347
   },
   "White Grunt": {
     "name": "White Grunt",
@@ -355,75 +355,75 @@
   },
   "Spotted Seatrout": {
     "name": "Spotted Seatrout",
-    "size": 499.9,
+    "size": 1069.2,
     "location": "cliffside",
-    "fisher": 282316841731227649
+    "fisher": 434499163644755978
   },
   "Banded Rudderfish": {
     "name": "Banded Rudderfish",
-    "size": 701.6,
-    "location": "cliffside",
-    "fisher": 282316841731227649
+    "size": 1790.9,
+    "location": "boat",
+    "fisher": 630486434360590355
   },
   "Gulf Flounder": {
     "name": "Gulf Flounder",
-    "size": 532.9,
-    "location": "cliffside",
-    "fisher": 282316841731227649
+    "size": 1284.0,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Red Porgy": {
     "name": "Red Porgy",
-    "size": 342.7,
-    "location": "lagoon",
+    "size": 568.2,
+    "location": "cliffside",
     "fisher": 419355809940504576
   },
   "Tripletail": {
     "name": "Tripletail",
-    "size": 689.2,
-    "location": "cliffside",
+    "size": 2052.3,
+    "location": "boat",
     "fisher": 419355809940504576
   },
   "Pollock": {
     "name": "Pollock",
-    "size": 934.2,
+    "size": 2284.5,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Bluefish": {
     "name": "Bluefish",
-    "size": 745.4,
-    "location": "cliffside",
-    "fisher": 293106803397492747
+    "size": 2196.3,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Weakfish": {
     "name": "Weakfish",
-    "size": 564.7,
-    "location": "cliffside",
-    "fisher": 630486434360590355
+    "size": 1112.9,
+    "location": "boat",
+    "fisher": 419355809940504576
   },
   "Whitebone Porgy": {
     "name": "Whitebone Porgy",
-    "size": 359.0,
+    "size": 685.5,
     "location": "cliffside",
-    "fisher": 293106803397492747
+    "fisher": 434499163644755978
   },
   "Tautog": {
     "name": "Tautog",
-    "size": 569.6,
+    "size": 1097.3,
     "location": "cliffside",
-    "fisher": 282316841731227649
+    "fisher": 434499163644755978
   },
   "Striped Searobin": {
     "name": "Striped Searobin",
-    "size": 404.0,
+    "size": 708.8,
     "location": "cliffside",
-    "fisher": 419355809940504576
+    "fisher": 434499163644755978
   },
   "Florida Pompano": {
     "name": "Florida Pompano",
-    "size": 358.6,
+    "size": 537.0,
     "location": "lagoon",
-    "fisher": 328374934797680641
+    "fisher": 419355809940504576
   },
   "Oyster Toadfish": {
     "name": "Oyster Toadfish",
@@ -433,9 +433,9 @@
   },
   "Scamp": {
     "name": "Scamp",
-    "size": 660.9,
-    "location": "cliffside",
-    "fisher": 419355809940504576
+    "size": 1861.8,
+    "location": "boat",
+    "fisher": 630486434360590355
   },
   "Atlantic Mackerel": {
     "name": "Atlantic Mackerel",
@@ -445,9 +445,9 @@
   },
   "Striped Bass": {
     "name": "Striped Bass",
-    "size": 967.0,
+    "size": 3336.8,
     "location": "boat",
-    "fisher": 419355809940504576
+    "fisher": 630486434360590355
   },
   "Atlantic Bonito": {
     "name": "Atlantic Bonito",
@@ -457,116 +457,146 @@
   },
   "Blacktip Shark": {
     "name": "Blacktip Shark",
-    "size": 626.9,
+    "size": 3435.7,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Spiny Dogfish": {
     "name": "Spiny Dogfish",
-    "size": 955.9,
+    "size": 2849.5,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Greater Amberjack": {
     "name": "Greater Amberjack",
-    "size": 1435.3,
+    "size": 3292.0,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Yellowfin Tuna": {
     "name": "Yellowfin Tuna",
-    "size": 1187.1,
+    "size": 3438.0,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Common Snook": {
     "name": "Common Snook",
-    "size": 971.4,
+    "size": 2400.4,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Great Barracuda": {
     "name": "Great Barracuda",
-    "size": 1190.6,
+    "size": 4130.3,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Gag": {
     "name": "Gag",
-    "size": 832.6,
+    "size": 2491.6,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Cusk": {
     "name": "Cusk",
-    "size": 587.0,
+    "size": 2161.2,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Smooth Dogfish": {
     "name": "Smooth Dogfish",
-    "size": 882.8,
+    "size": 2670.3,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Cobia": {
     "name": "Cobia",
-    "size": 1348.9,
+    "size": 3817.8,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Dolphin": {
     "name": "Dolphin",
-    "size": 786.1,
+    "size": 2956.0,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Black Grouper": {
     "name": "Black Grouper",
-    "size": 707.8,
+    "size": 3273.4,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Atlantic Cod": {
     "name": "Atlantic Cod",
-    "size": 681.9,
+    "size": 2314.0,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Blueline Tilefish": {
     "name": "Blueline Tilefish",
-    "size": 500.2,
+    "size": 1702.0,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Skipjack Tuna": {
     "name": "Skipjack Tuna",
-    "size": 829.5,
+    "size": 2427.2,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Atlantic Sharpnose Shark": {
     "name": "Atlantic Sharpnose Shark",
-    "size": 931.1,
+    "size": 2725.3,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "Bluefin Tuna": {
     "name": "Bluefin Tuna",
-    "size": 2046.5,
+    "size": 5658.9,
     "location": "boat",
     "fisher": 419355809940504576
   },
   "King Mackerel": {
     "name": "King Mackerel",
-    "size": 1175.9,
+    "size": 3321.4,
     "location": "boat",
-    "fisher": 419355809940504576
+    "fisher": 630486434360590355
   },
   "Haddock": {
     "name": "Haddock",
-    "size": 545.6,
+    "size": 1826.4,
     "location": "boat",
+    "fisher": 419355809940504576
+  },
+  "Red Grouper": {
+    "name": "Red Grouper",
+    "size": 1891.3,
+    "location": "boat",
+    "fisher": 419355809940504576
+  },
+  "Oceanic Whitetip Shark": {
+    "name": "Oceanic Whitetip Shark",
+    "size": 4391.9,
+    "location": "oilrig",
+    "fisher": 419355809940504576
+  },
+  "Humboldt Squid": {
+    "name": "Humboldt Squid",
+    "size": 3709.9,
+    "location": "oilrig",
+    "fisher": 419355809940504576
+  },
+  "Manta Ray": {
+    "name": "Manta Ray",
+    "size": 8725.0,
+    "location": "oilrig",
+    "fisher": 419355809940504576
+  },
+  "Giant Squid": {
+    "name": "Giant Squid",
+    "size": 10294.8,
+    "location": "oilrig",
     "fisher": 419355809940504576
   }
 }

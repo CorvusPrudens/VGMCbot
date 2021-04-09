@@ -33,6 +33,7 @@ class extendedClient(discord.Client):
             '.mgmvote': self.fMgmvote,
             '.mgmwin': self.fMgmwin,
             '.gimme': self.fGimme,
+            '.roll': self.fRoll,
         }
 
         self.data = data.Data()
@@ -41,7 +42,7 @@ class extendedClient(discord.Client):
                          'leader': self.data.leaderCommands}
 
         self.games = games.Games('games/players.json', 'games/fishing/misc.json')
-        #
+
         # self.funcDict.update(self.games.commands)
         # print(self.funcDict)
         self.helpDict.update(self.games.helpDict)
@@ -68,8 +69,12 @@ class extendedClient(discord.Client):
         await self.wait_until_ready()
         while not self.is_closed():
             self.counter += 1
-            await self.games.gameLoop(self)
+            await self.games.gameLoop()
             await asyncio.sleep(1) # task runs every second
+
+
+    def gameDecorators(self, slash, guild_ids):
+        self.games.gameDecorators(slash, guild_ids)
 
 
     def loadBank(self):
@@ -439,3 +444,30 @@ class extendedClient(discord.Client):
     async def fGimme(self, message):
         mess = f'sorry... no {rand.choice(self.data.sad)}'
         await message.channel.send(mess)
+
+    def roll(self, numChoices):
+        return rand.randrange(1, numChoices + 1)
+
+    async def fRoll(self, message):
+        match = self.data.rollRegex.search(message.content)
+        if match is not None:
+            num1 = int(match.group(1))
+            num2 = int(match.group(3))
+            if num2 == 1:
+                out = [1]
+            else:
+                out = [self.roll(num2) for x in range(num1)]
+            form = 'Roll {}: {}\n'
+            string = [form.format(x + 1, y) for x, y in enumerate(out)]
+            if len(string) > 1:
+                string.append(f'\nTotal : {sum(out)}')
+            else:
+                if num2 == 20:
+                    if out[0] == 1:
+                        string.append(f'\noof... {rand.choice(self.data.sad)}')
+                    elif out[0] == 20:
+                        string.append(f'\nwow natty!! {rand.choice(self.data.cute)}')
+            await message.channel.send('```css\n' + ''.join(string) + '\n```')
+        else:
+            mess = f'sorry, looks like your roll isn\'t quite formatted right {rand.choice(self.data.sad)}'
+            await message.channel.send(mess)

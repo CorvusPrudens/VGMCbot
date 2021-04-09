@@ -11,7 +11,7 @@ class Data:
         self.ledgerPath = 'ledger.json'
         self.nameCachePath = 'nameCache.json'
         self.prevChoice = 0
-        self.leader = 'Leader'
+        self.leader = 'Leaders'
         self.bank = {}
         self.ledger = {}
         self.nameCache = {}
@@ -49,6 +49,7 @@ Leader commands:
 ✿ .**coins** -- I'll tell you how many you've got!
 ✿ .**hmc** -- "How Many Coins;" legacy command, equivalent to .coins
 ✿ .**list** -- List out all the VGMConnoisseurs!
+✿ .**roll** <option> -- Cast a roll! (option of the form <number of dice>d<numbers on dice>)
 ✿ .**uwu** -- UwU
 ✿ .**morning** -- I'll saw good morning!
 ✿ .**night** -- I'll say goodnight!
@@ -104,6 +105,7 @@ The \"give\" syntax is \"give @<username> <number> coins\" {}""",
         self.hankRegex = re.compile('\\b(hank)\\b')
         self.mentionRegex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
         self.reactRegex = re.compile('(?<=<:)[A-Za-z_0-9]+')
+        self.rollRegex = re.compile(r'\b([0-9])(d|D)([1-9][0-9]*)\b')
 
         self.mgm = []
 
