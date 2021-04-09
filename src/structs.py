@@ -446,19 +446,28 @@ class extendedClient(discord.Client):
         await message.channel.send(mess)
 
     def roll(self, numChoices):
-        return rand.randrange(1, numChoices)
+        return rand.randrange(1, numChoices + 1)
 
     async def fRoll(self, message):
-        match = self.data.rollRegex.search(message)
+        match = self.data.rollRegex.search(message.content)
         if match is not None:
-            num1 = match.group(1)
-            num2 = match.group(3)
-            out = [self.roll(num2) for x in range(num1)]
+            num1 = int(match.group(1))
+            num2 = int(match.group(3))
+            if num2 == 1:
+                out = [1]
+            else:
+                out = [self.roll(num2) for x in range(num1)]
             form = 'Roll {}: {}\n'
             string = [form.format(x + 1, y) for x, y in enumerate(out)]
             if len(string) > 1:
-                string.append(f'Total: {sum(out)}')
-            await message.channel.send(''.join(string))
+                string.append(f'\nTotal : {sum(out)}')
+            else:
+                if num2 == 20:
+                    if out[0] == 1:
+                        string.append(f'\noof... {rand.choice(self.data.sad)}')
+                    elif out[0] == 20:
+                        string.append(f'\nwow natty!! {rand.choice(self.data.cute)}')
+            await message.channel.send('```css\n' + ''.join(string) + '\n```')
         else:
             mess = f'sorry, looks like your roll isn\'t quite formatted right {rand.choice(self.data.sad)}'
             await message.channel.send(mess)
