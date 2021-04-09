@@ -33,6 +33,7 @@ class extendedClient(discord.Client):
             '.mgmvote': self.fMgmvote,
             '.mgmwin': self.fMgmwin,
             '.gimme': self.fGimme,
+            '.roll': self.fRoll,
         }
 
         self.data = data.Data()
@@ -443,3 +444,21 @@ class extendedClient(discord.Client):
     async def fGimme(self, message):
         mess = f'sorry... no {rand.choice(self.data.sad)}'
         await message.channel.send(mess)
+
+    def roll(self, numChoices):
+        return rand.randrange(1, numChoices)
+
+    async def fRoll(self, message):
+        match = self.data.rollRegex.search(message)
+        if match is not None:
+            num1 = match.group(1)
+            num2 = match.group(3)
+            out = [self.roll(num2) for x in range(num1)]
+            form = 'Roll {}: {}\n'
+            string = [form.format(x + 1, y) for x, y in enumerate(out)]
+            if len(string) > 1:
+                string.append(f'Total: {sum(out)}')
+            await message.channel.send(''.join(string))
+        else:
+            mess = f'sorry, looks like your roll isn\'t quite formatted right {rand.choice(self.data.sad)}'
+            await message.channel.send(mess)

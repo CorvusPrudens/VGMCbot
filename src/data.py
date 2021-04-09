@@ -104,6 +104,7 @@ The \"give\" syntax is \"give @<username> <number> coins\" {}""",
         self.hankRegex = re.compile('\\b(hank)\\b')
         self.mentionRegex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
         self.reactRegex = re.compile('(?<=<:)[A-Za-z_0-9]+')
+        self.rollRegex = re.compile(r'\b([0-9])(d|D)([1-9][0-9]*)\b')
 
         self.mgm = []
 

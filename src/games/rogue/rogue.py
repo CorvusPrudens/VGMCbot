@@ -7,12 +7,9 @@ import datetime as time
 import numpy as np
 import random as rand
 
-from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option, create_choice
 
 import utils
-from games.rogue.enemies import *
-from games.rogue import rooms
 from games.rogue import rl
 
 # TODO LIST :
@@ -496,20 +493,34 @@ Rogue Commands:
         self.newReactMessage('rMove', id, movemess, target=outmess)
         return movemess.id
 
-
+    def getDoor(self, room, doorstr):
+        for door in room.dict['doors']:
+            if door['postr'] == doorstr:
+                return door
+        return None
+    # NOTE -- doors should really be linked to each other in a more sophisticated
+    # way
     def moveRooms(self, player, dir):
         lev = player.dict['levels'][player.dict['state']['level']]
         pos = player.dict['state']['room']
+        level = player.dict['levels'][player.dict['state']['level']]
         if dir == 'up':
             player.dict['state']['room'] -= lev.dict['width']
+            roomstr = 'down'
         elif dir == 'down':
             player.dict['state']['room'] += lev.dict['width']
+            roomstr = 'up'
         elif dir == 'right':
             player.dict['state']['room'] += 1
+            roomstr = 'left'
         elif dir == 'left':
             player.dict['state']['room'] -= 1
-        
-            
+            roomstr = 'right'
+
+        newroom = level.dict['rooms'][player.dict['state']['room']]
+        pos = self.getDoor(newroom, roomstr)['pos']
+        player.dict['x'] = pos[0]
+        player.dict['y'] = pos[1]
 
 
     async def rMove(self, reaction, user, add, messID):
@@ -524,12 +535,13 @@ Rogue Commands:
             matrix = self.moveDict[self.moveAlias[direction]]
             newpos = (prevpos[0] + matrix[0], prevpos[1] + matrix[1])
             if newpos[0] < 0 or newpos[1] < 0 or newpos[0] >= playergrid[0] or newpos[1] >= playergrid[1]:
+                mess = 'you cannot proceed'
                 for door in room.dict['doors']:
                     if door['pos'] == prevpos:
                         tempdir = door['postr']
                         self.moveRooms(self.players[id], tempdir)
-                            
-                mess = 'you cannot proceed'
+                        mess = '...'
+
                 # await message.channel.send(mono(mess))
             else:
                 self.players[id].dict['x'] = newpos[0]
@@ -549,8 +561,11 @@ Rogue Commands:
                     mess = '...'
                     await target.edit(content=monosyn(string) + '\n' + mono(mess))
                 else:
-                    # need way to redraw level
-                    pass
+                    string = self.players[id].draw()
+                    room = self.players[id].getRoom()
+                    pos = (self.players[id].dict['x'], self.players[id].dict['y'])
+                    mess = room.dict['flav'][pos]
+                    await target.edit(content=monosyn(string) + '\n' + mono(mess))
 
 
     async def fMove(self, message):
