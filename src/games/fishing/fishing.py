@@ -233,7 +233,7 @@ Fishing Commands:
             'records': {},
             'licenses': [],
             'lastChannel': -1,
-            'stats': [],
+            'stats': {},
         }
         self.client.games.players[playerid]['fishing'] = templateDict
 
