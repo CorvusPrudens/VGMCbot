@@ -49,6 +49,7 @@ Leader commands:
 ✿ .**coins** -- I'll tell you how many you've got!
 ✿ .**hmc** -- "How Many Coins;" legacy command, equivalent to .coins
 ✿ .**list** -- List out all the VGMConnoisseurs!
+✿ .**roll** <option> -- Cast a roll! (option of the form <number of dice>d<numbers on dice>)
 ✿ .**uwu** -- UwU
 ✿ .**morning** -- I'll saw good morning!
 ✿ .**night** -- I'll say goodnight!
