@@ -1,10 +1,10 @@
 import json
-import asyncio
-import math
+# import asyncio
+# import math
 import copy
 import re
 import random as rand
-from collections import namedtuple
+# from collections import namedtuple
 
 import utils
 
@@ -62,27 +62,58 @@ Fishing Commands:
 
         self.lureShop = {
             # 'broken can': newLure()
-            'hook': {'id': 1, 'price': 5, 'stats': self.newLure(name='hook', efficacy=-0.5, durability=5)},
-            'popper': {'id': 2, 'price': 20, 'stats': self.newLure(name='popper', efficacy=-0.2, durability=20)},
-            'spinner': {'id': 3, 'price': 80, 'stats': self.newLure(name='spinner', efficacy=0.1, durability=80)},
-            'diver': {'id': 4, 'price': 240, 'stats': self.newLure(name='diver', efficacy=0.4, durability=240)}
+            'hook': {
+                'id': 1, 'price': 5,
+                'stats': self.newLure(name='hook', efficacy=-0.5, durability=5)
+            },
+            'popper': {
+                'id': 2, 'price': 20,
+                'stats': self.newLure(name='popper', efficacy=-0.2, durability=20)
+            },
+            'spinner': {
+                'id': 3, 'price': 80,
+                'stats': self.newLure(name='spinner', efficacy=0.1, durability=80)
+            },
+            'diver': {
+                'id': 4, 'price': 240,
+                'stats': self.newLure(name='diver', efficacy=0.4, durability=240)
+            }
         }
 
         self.rodShop = {
-            'old pine rod': {'id': 5, 'price': 10, 'stats': self.newRod(name='old pine rod', efficacy=-0.5, durability=10)},
-            'bamboo rod': {'id': 6, 'price': 50, 'stats': self.newRod(name='bamboo rod', efficacy=-0.1, durability=40)},
-            'aluminum rod': {'id': 7, 'price': 200, 'stats': self.newRod(name='aluminum rod', efficacy=0.3, durability=160)},
-            'carbon fiber rod': {'id': 8, 'price': 800, 'stats': self.newRod(name='carbon fiber rod', efficacy=0.7, durability=640)}
+            'old pine rod': {
+                'id': 5, 'price': 10,
+                'stats': self.newRod(name='old pine rod', efficacy=-0.5, durability=10)
+            },
+            'bamboo rod': {
+                'id': 6, 'price': 50,
+                'stats': self.newRod(name='bamboo rod', efficacy=-0.1, durability=40)
+            },
+            'aluminum rod': {
+                'id': 7, 'price': 200,
+                'stats': self.newRod(name='aluminum rod', efficacy=0.3, durability=160)
+            },
+            'carbon fiber rod': {
+                'id': 8, 'price': 800,
+                'stats': self.newRod(name='carbon fiber rod', efficacy=0.7, durability=640)
+            }
         }
 
         self.licenseShop = {
             'cliffside license': {'id': 9, 'price': 20, 'stats': self.newLicense()},
-            'boat license': {'id': 10, 'price': 300, 'stats': self.newLicense(name='boat license', location='boat')},
-            'sail boat': {'id': 11, 'price': 1200, 'stats': self.newLicense(name='sail boat', location='oilrig')},
+            'boat license': {
+                'id': 10, 'price': 300,
+                'stats': self.newLicense(name='boat license', location='boat')
+            },
+            'sail boat': {
+                'id': 11, 'price': 1200,
+                'stats': self.newLicense(name='sail boat', location='oilrig')
+            },
         }
 
         self.minEff = self.newLure()['efficacy'] + self.newRod()['efficacy']
-        self.maxEff = list(self.lureShop.items())[-1][1]['stats']['efficacy'] + list(self.rodShop.items())[-1][1]['stats']['efficacy']
+        self.maxEff = list(self.lureShop.items())[-1][1]['stats']['efficacy']
+        self.maxEff += list(self.rodShop.items())[-1][1]['stats']['efficacy']
 
         self.fish = {}
         # since this will be run from src
@@ -93,8 +124,12 @@ Fishing Commands:
         with open('games/fishing/locations.json') as file:
             self.locations = json.load(file)
 
-        self.maxSize = self.locations[max(self.locations, key = lambda x : self.locations[x]['mu'])]['mu']
-        self.minSize = self.locations[min(self.locations, key = lambda x : self.locations[x]['min'])]['min']
+        self.maxSize = self.locations[
+            max(self.locations, key = lambda x : self.locations[x]['mu'])
+        ]['mu']
+        self.minSize = self.locations[
+            min(self.locations, key = lambda x : self.locations[x]['min'])
+        ]['min']
 
 
     async def execute(self, playerKey, players):
@@ -103,6 +138,7 @@ Fishing Commands:
         # so we don't need to check
         state = players[playerKey]['fishing']['state']['state']
         await self.loopCommands[state](playerKey, players)
+
 
     def detectAn(self, string):
         anChars = ['a', 'e', 'i', 'o', 'u']
@@ -119,7 +155,7 @@ Fishing Commands:
         small = '\nThat\'s a pretty small one though... {}'
         big = '\nWow! That\'s impressive for a{} {} {}'
 
-        rare = '\nYou don\'t see those every day around here {}'
+        # rare = '\nYou don\'t see those every day around here {}'
 
         loc = fishcatch['location']
         loc_mu = self.locations[loc]['mu']
@@ -128,7 +164,9 @@ Fishing Commands:
         fish_mu = self.fish[fishcatch['name']]['mu'] * scale
         fish_sigma = self.fish[fishcatch['name']]['sigma'] * scale
 
-        output = catch.format(self.detectAn(fishcatch['name']), fishcatch['name'], fishcatch['size']/10, 'UwU')
+        output = catch.format(
+            self.detectAn(fishcatch['name']), fishcatch['name'], fishcatch['size']/10, 'UwU'
+        )
         if fishcatch['size'] <= fish_mu + fish_sigma*-threshold:
             output += small.format(':c')
         if fishcatch['size'] >= fish_mu + fish_sigma*threshold:
@@ -198,10 +236,16 @@ Fishing Commands:
     # TODO you should be able to forage for a branch instead of using vgmcoins
     # and it should take a few minutes to find
     def newRod(self, name='branch', efficacy=-0.8, durability=5, damage=0):
-        return {'name': name, 'efficacy': efficacy, 'durability': durability, 'damage': damage, 'type': 'rods', 'multi': True}
+        return {
+            'name': name, 'efficacy': efficacy, 'durability': durability,
+            'damage': damage, 'type': 'rods', 'multi': True
+        }
 
     def newLure(self, name='broken can', efficacy=-0.8, durability=5, damage=0):
-        return {'name': name, 'efficacy': efficacy, 'durability': durability, 'damage': damage, 'type': 'lures', 'multi': True}
+        return {
+            'name': name, 'efficacy': efficacy, 'durability': durability,
+            'damage': damage, 'type': 'lures', 'multi': True
+        }
 
     def newRecord(self, name='trout', size='20', location='lagoon'):
         return {'name': name, 'size': size, 'location': location}
@@ -237,7 +281,9 @@ Fishing Commands:
         }
         self.client.games.players[playerid]['fishing'] = templateDict
 
-        string1 = 'Hello {}, and welcome to the VGMSea! {}\n'.format(message.author.name, rand.choice(self.client.data.cute))
+        string1 = 'Hello {}, and welcome to the VGMSea! {}\n'.format(
+            message.author.name, rand.choice(self.client.data.cute)
+        )
         string2 = 'Pick up a rod, get yourself a hook, and set out to catch some record breaking fish!\n'
         string3 = 'If you need help with the commands, just type .help fishing'
 
@@ -338,7 +384,9 @@ Fishing Commands:
 
 
     async def fShop(self, message):
-        string = 'Hey {}, here\'s what we\'ve got! {}\n\n'.format(message.author.mention, rand.choice(self.client.data.cute))
+        string = 'Hey {}, here\'s what we\'ve got! {}\n\n'.format(
+            message.author.mention, rand.choice(self.client.data.cute)
+        )
 
         header = [['Item', 'Durability', 'Efficacy', 'Price']]
 
@@ -349,7 +397,10 @@ Fishing Commands:
         string += '\nIf you\'d like to buy something, type .buy <left number>'
         await self.lastChannel(message)
 
-        data =  header + [['[Lures]'], ['-']] + lures + [[' '], ['[Rods]'], ['-']] + rods + [[' '], ['[Special]'], ['-']] + licenses
+        data =  (
+            header + [['[Lures]'], ['-']] + lures + [[' '], ['[Rods]'], ['-']] +
+            rods + [[' '], ['[Special]'], ['-']] + licenses
+        )
 
         string = utils.tablegen(data, header=True)
         string += '\nIf you\'d like to buy something, type .buy <left number>'
@@ -375,7 +426,9 @@ Fishing Commands:
                     if targ == '':
                         targ = '<nowhere>'
                     if targ not in list(self.locations.keys()):
-                        mess = 'I\'m sorry, I\'m not sure how to take you to {} {}\n'.format(targ, rand.choice(self.client.data.sad))
+                        mess = 'I\'m sorry, I\'m not sure how to take you to {} {}\n'.format(
+                            targ, rand.choice(self.client.data.sad)
+                        )
                         mess += 'If you\'re not sure where I can take you, just type .locations!'
                         await message.channel.send(mess)
                     else:
@@ -387,12 +440,16 @@ Fishing Commands:
                                     allowed = True
                                     break
                         if allowed:
-                            mess = 'Ok! Off we go to the {}! {}\n'.format(targ, rand.choice(self.client.data.cute))
+                            mess = 'Ok! Off we go to the {}! {}\n'.format(
+                                targ, rand.choice(self.client.data.cute)
+                            )
                             await message.channel.send(mess)
                             self.client.games.players[str(message.author.id)]['fishing']['state']['location'] = targ
                         else:
                             mess = self.locations[targ]['rejection']
-                            mess = mess.format(message.author.name, rand.choice(self.client.data.sad))
+                            mess = mess.format(
+                                message.author.name, rand.choice(self.client.data.sad)
+                            )
                             await message.channel.send(mess)
                     await self.lastChannel(message)
                     break
@@ -408,7 +465,7 @@ Fishing Commands:
             currentLocation = 'lagoon'
             await self.initFishing(message)
 
-        locs = [key for key in self.locations]
+        # locs = [key for key in self.locations]
         flowers = ['**->**' if x == currentLocation else '✿' for x in self.locations]
 
         string = "Hey {}, here's the locations you can go to right now:\n\n".format(message.author.name)
@@ -420,7 +477,9 @@ Fishing Commands:
         descriptions = ''.join(descriptions)
 
         string += descriptions
-        string += "If you'd like to visit one, just type .goto <location> {}".format(rand.choice(self.client.data.cute))
+        string += "If you'd like to visit one, just type .goto <location> {}".format(
+            rand.choice(self.client.data.cute)
+        )
 
         await self.lastChannel(message)
         await utils.sendBigMess(message, string)
@@ -434,7 +493,7 @@ Fishing Commands:
     async def fInv(self, message):
         currentPlayer = str(message.author.id)
         try:
-            isFishing = self.client.games.players[currentPlayer]['fishing']
+            self.client.games.players[currentPlayer]['fishing']
         except KeyError:
             await self.initFishing(message)
 
@@ -458,7 +517,9 @@ Fishing Commands:
         rods = utils.tablegen(rodHead + rods, header=True, numbered=True, extra=extra1, width=14)
         lures = utils.tablegen(lureHead + lures, header=True, numbered=True, extra=extra2, width=14)
         licenses = utils.tablegen(liceHead + licenses, header=True)
-        greet = 'hey {}, here\'s what you\'ve got {}\n'.format(message.author.name, rand.choice(self.client.data.cute))
+        greet = 'hey {}, here\'s what you\'ve got {}\n'.format(
+            message.author.name, rand.choice(self.client.data.cute)
+        )
 
         await self.lastChannel(message)
 
@@ -541,7 +602,9 @@ Fishing Commands:
                             break
                     itemname = tempitem['stats']['name']
                     if not taken:
-                        self.client.games.players[currentPlayer]['fishing'][type].insert(0, copy.deepcopy(tempitem['stats']))
+                        self.client.games.players[currentPlayer]['fishing'][type].insert(
+                            0, copy.deepcopy(tempitem['stats'])
+                        )
                         mess = 'ok {}, a{} **{}** has been added to your inventory {}'
 
                         try:
@@ -608,7 +671,6 @@ Fishing Commands:
             mess = 'you don\'t have any rods {}'.format(rand.choice(self.client.data.sad))
             await message.channel.send(mess)
         else:
-            invalid = False
             tokens = message.content.split(' ')
             for i in range(len(tokens)):
                 if tokens[i] == '.setrod':
@@ -633,7 +695,7 @@ Fishing Commands:
                                    rand.choice(self.client.data.cute))
                 self.client.games.save()
                 await message.channel.send(mess)
-            except (TypeError, IndexError) as error:
+            except (TypeError, IndexError):
                 mess = 'I\'m sorry, I don\'t see anything like that in your inventory {}'
                 mess = mess.format(rand.choice(self.client.data.sad))
                 await message.channel.send(mess)
@@ -650,7 +712,6 @@ Fishing Commands:
             mess = 'you don\'t have any lures {}'.format(rand.choice(self.client.data.sad))
             await message.channel.send(mess)
         else:
-            invalid = False
             tokens = message.content.split(' ')
             for i in range(len(tokens)):
                 if tokens[i] == '.setlure':
@@ -675,7 +736,7 @@ Fishing Commands:
                                    rand.choice(self.client.data.cute))
                 self.client.games.save()
                 await message.channel.send(mess)
-            except (TypeError, IndexError) as error:
+            except (TypeError, IndexError):
                 mess = 'I\'m sorry, I don\'t see anything like that in your inventory {}'
                 mess = mess.format(rand.choice(self.client.data.sad))
                 await message.channel.send(mess)
@@ -789,7 +850,9 @@ Fishing Commands:
             await self.initFishing(message)
             currentState = self.client.games.players[currentPlayer]['fishing']['state']['state']
         if currentState != 'idle':
-            mess = 'whoa wait let\'s chill until you\'re done with that {} {} o.o'.format(currentState, message.author.name)
+            mess = 'whoa wait let\'s chill until you\'re done with that {} {} o.o'.format(
+                currentState, message.author.name
+            )
             await message.channel.send(mess)
 
         if len(self.client.games.players[currentPlayer]['fishing']['rods']) > 0:
@@ -837,7 +900,9 @@ Fishing Commands:
         # sizeRaw = min(utils.expBias(sizeRaw, 0.19, steep=0.5), 2)
         # return round(sizeRaw*maxCoins, 2)
 
-        sizeRaw = utils.clamp(utils.remap(size, self.minSize, self.maxSize, 0.01, 1), 0.01, 2)
+        sizeRaw = utils.clamp(
+            utils.remap(size, self.minSize, self.maxSize, 0.01, 1), 0.01, 2
+        )
         return sizeRaw*maxCoins
 
 
@@ -865,9 +930,13 @@ Fishing Commands:
         # lastChannel = await client.fetch_channel(players[playerKey]['fishing']['lastChannel'])
         tempstr = ''
 
-        if players[playerKey]['fishing']['rods'][0]['damage'] >= players[playerKey]['fishing']['rods'][0]['durability']:
+        idmg = players[playerKey]['fishing']['rods'][0]['damage']
+        idur = players[playerKey]['fishing']['rods'][0]['durability']
+        if idmg >= idur:
             name = players[playerKey]['fishing']['rods'][0]['name']
-            mess = '\noh no! your **{}** broke, {} {}'.format(name, playerName.name, rand.choice(self.client.data.sad))
+            mess = '\noh no! your **{}** broke, {} {}'.format(
+                name, playerName.name, rand.choice(self.client.data.sad)
+            )
             players[playerKey]['fishing']['rods'].pop(0)
             # await lastChannel.send(mess)
             tempstr += mess
@@ -880,9 +949,13 @@ Fishing Commands:
             # await lastChannel.send(mess)
             tempstr += mess
 
-        if players[playerKey]['fishing']['lures'][0]['damage'] >= players[playerKey]['fishing']['lures'][0]['durability']:
+        idmg = players[playerKey]['fishing']['lures'][0]['damage']
+        idur = players[playerKey]['fishing']['lures'][0]['durability']
+        if idmg >= idur:
             name = players[playerKey]['fishing']['lures'][0]['name']
-            mess = '\noh no! your **{}** broke, {} {}'.format(name, playerName.name, rand.choice(self.client.data.sad))
+            mess = '\noh no! your **{}** broke, {} {}'.format(
+                name, playerName.name, rand.choice(self.client.data.sad)
+            )
             players[playerKey]['fishing']['lures'].pop(0)
             # await lastChannel.send(mess)
             tempstr += mess
@@ -911,14 +984,17 @@ Fishing Commands:
         # await lastChannel.send(mess)
 
     async def checkRecord(self, playerkey, players, catch):
-        record = False
         try:
             if catch['size'] > self.client.games.misc[catch['name']]['size']:
                 # prevname = await self.client.fetch_user(self.client.games.misc[catch['name']]['fisher'])
                 try:
-                    prevname = self.client.data.nameCache[str(self.client.games.misc[catch['name']]['fisher'])]
+                    prevname = self.client.data.nameCache[
+                        str(self.client.games.misc[catch['name']]['fisher'])
+                    ]
                 except KeyError:
-                    prevname = await self.client.fetch_user(int(self.client.games.misc[catch['name']]['fisher']))
+                    prevname = await self.client.fetch_user(
+                        int(self.client.games.misc[catch['name']]['fisher'])
+                    )
                     prevname = prevname.name
                 prev = self.client.games.misc[catch['name']]
                 self.client.games.misc[catch['name']] = catch
@@ -941,9 +1017,10 @@ Fishing Commands:
     async def lCast(self, playerKey, players):
         players[playerKey]['fishing']['state']['timeCast'] -= 1
         if players[playerKey]['fishing']['state']['timeCast'] <= 0:
-            lastChannel = await self.client.fetch_channel(players[playerKey]['fishing']['lastChannel'])
+            lastChannel = await self.client.fetch_channel(
+                players[playerKey]['fishing']['lastChannel']
+            )
             playerName = await self.client.fetch_user(int(playerKey))
-            # 50 50 chance of catching
             # probability of catch related to efficacy
             totalEff = players[playerKey]['fishing']['rods'][0]['efficacy']
             totalEff += players[playerKey]['fishing']['lures'][0]['efficacy']
@@ -962,10 +1039,14 @@ Fishing Commands:
 
             if hooked:
                 #caught
-                catch, valid = self.retrieveFish(players[playerKey]['fishing']['state']['location'], bias=totalEff)
+                catch, valid = self.retrieveFish(
+                    players[playerKey]['fishing']['state']['location'], bias=totalEff
+                )
 
                 if not valid:
-                    tempstring = 'shoot! it got away... i think the fish here are too big for your gear {}'.format(rand.choice(self.client.data.sad))
+                    tempstring = 'shoot! it got away... i think the fish here are too big for your gear {}'.format(
+                        rand.choice(self.client.data.sad)
+                    )
                     tempstring += self.applyDamage(playerKey, players, catch['size'], playerName)
                     players[playerKey]['fishing']['state']['state'] = 'idle'
                     await lastChannel.send(tempstring)
@@ -989,7 +1070,9 @@ Fishing Commands:
                     if players[playerKey]['fishing']['records'][catch['name']]['size'] < catch['size']:
                         prev = players[playerKey]['fishing']['records'][catch['name']]['size']
                         players[playerKey]['fishing']['records'][catch['name']] = catch
-                        mess = '\n✿✿ hey that\'s a new personal best! {} **+1 coin** '.format(rand.choice(self.client.data.cute))
+                        mess = '\n✿✿ hey that\'s a new personal best! {} **+1 coin** '.format(
+                            rand.choice(self.client.data.cute)
+                        )
                         mess += 'your previous best was {:,.2f} cm! ✿✿'.format(prev/10)
                         tempmess = await self.checkRecord(playerKey, players, catch)
                         mess += tempmess
@@ -1000,7 +1083,9 @@ Fishing Commands:
                         tempstring += mess
                         # add coins here
                 except KeyError:
-                    mess = '\n✿✿ oh that\'s your first {} {} **+0.5 coins** ✿✿'.format(catch['name'], rand.choice(self.client.data.cute))
+                    mess = '\n✿✿ oh that\'s your first {} {} **+0.5 coins** ✿✿'.format(
+                        catch['name'], rand.choice(self.client.data.cute)
+                    )
                     players[playerKey]['fishing']['records'][catch['name']] = catch
                     tempmess = await self.checkRecord(playerKey, players, catch)
                     mess += tempmess
@@ -1034,7 +1119,9 @@ Fishing Commands:
                 await lastChannel.send(tempstring)
                 self.client.storeLedger()
             else:
-                mess = 'you got a nibble! but it got away {}'.format(rand.choice(self.client.data.sad))
+                mess = 'you got a nibble! but it got away {}'.format(
+                    rand.choice(self.client.data.sad)
+                )
                 # await lastChannel.send(mess)
                 mess +=  self.applyDamage(playerKey, players, 10, playerName)
                 await lastChannel.send(mess)
@@ -1057,7 +1144,9 @@ Fishing Commands:
     async def lForage(self, playerKey, players):
         players[playerKey]['fishing']['state']['timeCast'] -= 1
         if players[playerKey]['fishing']['state']['timeCast'] <= 0:
-            lastChannel = await self.client.fetch_channel(players[playerKey]['fishing']['lastChannel'])
+            lastChannel = await self.client.fetch_channel(
+                players[playerKey]['fishing']['lastChannel']
+            )
             playerName = await self.client.fetch_user(int(playerKey))
             if rand.random() > 0.5:
                 #caught
@@ -1078,7 +1167,9 @@ Fishing Commands:
                 self.client.games.save()
 
             else:
-                mess = 'shoot {}, looks like you didn\'t find anything {}'.format(playerName.name, rand.choice(self.client.data.sad))
+                mess = 'shoot {}, looks like you didn\'t find anything {}'.format(
+                    playerName.name, rand.choice(self.client.data.sad)
+                )
                 await lastChannel.send(mess)
                 players[playerKey]['fishing']['state']['state'] = 'idle'
 

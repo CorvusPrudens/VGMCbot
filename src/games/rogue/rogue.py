@@ -1,13 +1,13 @@
 import pickle
-import math
+# import math
 import copy
 import re
 import os
 import datetime as time
-import numpy as np
-import random as rand
+# import numpy as np
+# import random as rand
 
-from discord_slash.utils.manage_commands import create_option, create_choice
+from discord_slash.utils.manage_commands import create_option #, create_choice
 
 import utils
 from games.rogue import rl
@@ -48,6 +48,13 @@ from games.rogue import rl
 # like in a normal shop, but the keeper just can't explain it in your language
 
 # IDEA -- maybe the level map requires an item just like the room view
+
+# IDEA -- The map / room view should have HP and Manna bars to the right
+
+# IDEA -- some locks should be soft -- ie they can be solved multiple ways or have
+# partial / inideal solutions
+# -> in order to get the key, you have to either fight the enemy before the chest
+# _or_ find the hidden item that allows you to stealth around the enemy
 
 concept1 = '''█▀▀▀▒▒▀▀▀█
 █        █
@@ -223,9 +230,10 @@ class GameRogue(utils.GameTemplate):
 
         commandString = """
 Rogue Commands:
-‣ .**map** -- Debug: Display current room.
-‣ .**hello** -- Say hello.
-‣ .**move** -- Move in the room.
+‣ /**begin** -- Begun new Rogue session.
+‣ /**close** -- Close current Rogue session. Progress is saved.
+‣ /**prefs** -- Manage Rogue preferences.
+‣ /**del** -- (Debug) Delete current character.
 """
 
         self.reactCommands = {
@@ -371,6 +379,7 @@ Rogue Commands:
         async def _prefs(ctx, **kwargs):
             await self.managePrefs(ctx, kwargs)
 
+
     async def managePrefs(self, ctx, kwargs):
         pdict = {
             'controls': self.prefControls,
@@ -396,6 +405,7 @@ Rogue Commands:
             self.save(self.players[id])
         await ctx.send(content=mono(string), delete_after=5)
 
+
     async def rNewSess(self, reaction, user, add, messID):
         options = ['👍', '👎']
         if str(reaction) in options:
@@ -413,12 +423,14 @@ Rogue Commands:
             return True
         return False
 
+
     def prefCharacter(self, id, charPref):
         charPref = charPref.strip(' ')
         if len(charPref) == 1 and charPref.isalpha():
             self.players[id].dict['char'] = '.{} '.format(charPref)
             return True
         return False
+
 
     def save(self, player):
         tempchan = player.dict['lastChannel']
@@ -427,25 +439,31 @@ Rogue Commands:
             pickle.dump(player, file, -1)
         player.dict['lastChannel'] = tempchan
 
+
     async def load(self):
         files = os.listdir(self.savepath)
         for file in files:
             id = int(file.replace('.pkl', ''))
             with open(self.savepath + file, 'rb') as input:
                 self.players[id] = pickle.load(input)
-                self.players[id].dict['lastChannel'] = await self.client.fetch_channel(self.players[id].dict['lastChannel'])
+                self.players[id].dict['lastChannel'] = await self.client.fetch_channel(
+                    self.players[id].dict['lastChannel']
+                )
+
 
     def playerDeats(self, name, id, channel):
         char = name[0] if name[0].isalpha() else 'P'
         self.players[id] = Player(name=name, id=id, char='.{} '.format(char))
         self.players[id].setLastChannel(channel)
-        mess = drawText('Welcome to rogue, {}'.format(name))
+        return drawText('Welcome to rogue, {}'.format(name))
+
 
     async def addPlayer(self, message):
         name = message.author.name
         id = message.author.id
         mess = self.playerDeats(name, id, message.channel)
         await message.channel.send(mono(mess), delete_after=5)
+
 
     async def addPlayerSlash(self, id, ctx):
         name = ctx.author.name
@@ -457,9 +475,11 @@ Rogue Commands:
         string = 'You have {} coins\n'.format(self.coins)
         await message.channel.send(string)
 
+
     async def verifyPlayer(self, key, message):
         if key not in self.players:
             await self.addPlayer(message)
+
 
     async def verifyPlayerSlash(self, id, ctx):
         if id not in self.players:
@@ -492,6 +512,7 @@ Rogue Commands:
             movemess = await self.printControls(channel)
         self.newReactMessage('rMove', id, movemess, target=outmess)
         return movemess.id
+
 
     def getDoor(self, room, doorstr):
         for door in room.dict['doors']:

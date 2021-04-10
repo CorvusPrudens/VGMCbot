@@ -1,8 +1,8 @@
-import aiohttp
 import math
 import json
+import re
 from copy import deepcopy
-from data import *
+# from data import *
 
 
 class LineWidthError(Exception):
@@ -33,7 +33,9 @@ class GameTemplate:
             await self.reactCommands[self.reactMessages[id]['comm']](reaction, user, add, id)
 
     def newReactMessage(self, command, user, source, target=None):
-        self.reactMessages[source.id] = {'comm': command, 'user': user, 'target': target, 'source': source}
+        self.reactMessages[source.id] = {
+            'comm': command, 'user': user, 'target': target, 'source': source
+        }
 
     async def removeReactMessage(self, source):
         # delete all messages associated with interaction
@@ -71,6 +73,7 @@ def expBias(x, bias, steep=1):
     k = bias
     return (x*k) / (x*k*steep - x + 1)
 
+
 def clamp(x, minval, maxval):
     return min(max(x, minval), maxval)
 
@@ -80,6 +83,7 @@ def getUserFromMention(mention, regex):
         return int(regex.search(mention).group(0))
     except AttributeError:
         return None
+
 
 def extractValue(tokens, keyword):
     for i in range(len(tokens)):
@@ -93,11 +97,13 @@ def extractValue(tokens, keyword):
                 return None
     return None
 
+
 def hasPermission(user, role):
     for ro in user.roles:
         if ro.name == role:
             return True
     return False
+
 
 def manageStyling(strings, styling):
     active = False
@@ -187,11 +193,13 @@ def breakMessage(string, maxlen=1399, minlen=500, buffer=100, styling='css'):
 
     return outstrings
 
+
 # ~~this is truly horrible~~
 # fixed! now it's lovely <3
 async def sendBigMess(message, string):
     for fragment in breakMessage(string):
         await message.channel.send(fragment)
+
 
 def rowGen(colWidth, dot, row=None, sep='='):
     # optional feature, may remove later
@@ -209,6 +217,7 @@ def rowGen(colWidth, dot, row=None, sep='='):
         string[-1] = string[-1][:-2] + '  '
     string[-1] = string[-1][:-1] + ';\n'
     return dot + ''.join(string)
+
 
 def splitStrings(strings, maxlen):
     breaks = ('\n', ' ')
@@ -236,11 +245,13 @@ def splitStrings(strings, maxlen):
                 outstrings.append(tempstr)
     return outstrings
 
+
 # cell format
 def cf(cell, width):
     regex_special = re.compile(r'\[.*\]')
     ell = '..]' if regex_special.search(cell) is not None else '...'
     return cell if len(cell) <= width else cell[:width - 3] + ell
+
 
 def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='', width=32, lineWidth=60):
     # all tables are formatted with css highlighting
@@ -297,29 +308,17 @@ def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='',
     return '```css\n' + ''.join(string) + '```'
 
 
-
-# def loadBank(dict, path):
-#     try:
-#         with open(path, 'r') as file:
-#             for line in file:
-#                 tokens = line.replace('\n', '').split(',')
-#                 if len(line.replace('\n', '')) > 0:
-#                     dict[int(tokens[0])] = float(tokens[1])
-#     except FileNotFoundError:
-#         pass
-#
-# def storeBank(dict, path):
-#     with open(path, 'w') as file:
-#         for key in dict:
-#             file.write(f'{key},{dict[key]}\n')
-
-def loadj(dict, path):
+def loadj(path):
+    dict = None
     with open(path, 'r') as file:
-        dict = json.load(path)
+        dict = json.load(file)
+    return dict
+
 
 def storej(dict, path):
     with open(path, 'w') as file:
-        json.dump(dict, path)
+        json.dump(dict, file)
+
 
 def getReactionName(reactStr, regex):
     match = regex.search(reactStr)
@@ -327,6 +326,7 @@ def getReactionName(reactStr, regex):
         return match.group(0)
     else:
         return None
+
 
 def sanitizedTokens(string):
     sanitized = string.replace('<', ' <').replace('>', '> ')

@@ -1,4 +1,4 @@
-import utils
+# import utils
 import numpy as np
 import random
 # this could be sped up by making a callable c module if necessary (seems like a lot of work, though)

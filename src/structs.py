@@ -1,4 +1,3 @@
-import aiohttp
 import discord
 import asyncio
 import json
@@ -159,11 +158,11 @@ class extendedClient(discord.Client):
 
         if name != None and name == 'VGMCoin':
             try:
-                giver = self.data.ledger[str(user.id)]
+                self.data.ledger[str(user.id)]
             except KeyError:
                 self.data.ledger[str(user.id)] = 0
             try:
-                receiver = self.data.ledger[str(reaction.message.author.id)]
+                self.data.ledger[str(reaction.message.author.id)]
             except KeyError:
                 self.data.ledger[str(reaction.message.author.id)] = 0
 
@@ -190,11 +189,11 @@ class extendedClient(discord.Client):
 
         if name != None and name == 'VGMCoin':
             try:
-                taker = self.data.ledger[str(user.id)]
+                self.data.ledger[str(user.id)]
             except KeyError:
                 self.data.ledger[str(user.id)] = 0
             try:
-                victim = self.data.ledger[str(reaction.message.author.id)]
+                self.data.ledger[str(reaction.message.author.id)]
             except KeyError:
                 self.data.ledger[str(reaction.message.author.id)] = 0
 

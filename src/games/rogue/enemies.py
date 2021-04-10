@@ -5,8 +5,6 @@ class Thing:
     def __init__(self, initdict={'type': 'thing', 'name': 'object'}):
         self.dict = copy.deepcopy(initdict)
 
-    def save(self):
-        return self.dict
 
     def apply(self, payload):
         try:
@@ -17,10 +15,25 @@ class Thing:
             print('Error on {}; {} not present!'.format(name, effect))
 
 
-class Enemy(Thing):
+    def onTouch(self, player):
+        pass
+
 
     def animate(self, player):
         pass
+
+
+class Enemy(Thing):
+
+    def animate(self, player):
+        # simple movement script for now
+        self.dict['x'] += 
+        pass
+
+
+    def onTouch(self, player):
+        player.beginCombat(self)
+
 
     def action(self, player):
         item = rand.choice(self.dict['inventory'])
@@ -28,6 +41,7 @@ class Enemy(Thing):
             item = rand.choice(self.dict['inventory'])
         act = rand.choice(item['moveset'])
         payload = act['method'](self, [player])
+        return payload
 
 
 def longestKey(dic, indent=0):
@@ -37,7 +51,7 @@ def longestKey(dic, indent=0):
             temp = longestKey(dic[key], indent=indent+2)
             if temp > longest:
                 longest = temp
-        except (AttributeError, TypeError) as error:
+        except (AttributeError, TypeError):
             temp = len(' '*indent + key)
             if temp > longest:
                 longest = temp
@@ -52,7 +66,7 @@ def formatDict(dic, indent=0, longest=None):
             temp = formatDict(dic[key], indent=indent+2, longest=longest)
             string += '{}:\n'.format(key)
             string += temp
-        except (AttributeError, TypeError) as error:
+        except (AttributeError, TypeError):
             spaces = longest - len(' '*indent + key)
             string += ' '*indent + '{}:{} {}\n'.format(key, spaces*' ', dic[key])
     return string
@@ -115,7 +129,7 @@ sentry = {
     'stats': { #base stats
         'strength': 0,
         'tech': 5,
-        'speed': 0.5, # units / sec
+        'speed': 2, # units / player move
         'resistance': {
             'heat': 5,
             'physical': 2,

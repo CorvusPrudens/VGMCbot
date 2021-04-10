@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 from games.rogue import rooms
-from games.rogue import enemies
+# from games.rogue import enemies
 from games.rogue import maze
 import utils
 
@@ -443,7 +443,7 @@ class Level:
              starts = []
              ends = []
 
-             for i in range(4):
+             for i in range(10):
                  while True:
                      try:
                          w = self.dict['width']
@@ -494,7 +494,7 @@ class Level:
                  else:
                      smscore = 0
 
-                 score = dead * 5 + smscore
+                 score = dead * 7.5 + smscore
                  print(score)
                  scores.append(score)
                  genned.append(drs)
