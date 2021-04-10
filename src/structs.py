@@ -1,16 +1,16 @@
-import discord
 import asyncio
 import json
 import re
-import time
 import random as rand
+
+import discord
 
 from games import games
 import data
 import utils
 
 
-class extendedClient(discord.Client):
+class ExtendedClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -72,8 +72,8 @@ class extendedClient(discord.Client):
             await asyncio.sleep(1) # task runs every second
 
 
-    def gameDecorators(self, slash, guild_ids):
-        self.games.gameDecorators(slash, guild_ids)
+    def gameDecorators(self, slash, guilds):
+        self.games.gameDecorators(slash, guilds)
 
 
     def loadBank(self):
@@ -113,33 +113,19 @@ class extendedClient(discord.Client):
         with open(self.data.nameCachePath, 'w') as file:
             json.dump(self.data.nameCache, file, indent=2)
 
+
     async def execComm(self, command, message):
         try:
             await self.funcDict[command](message)
         except KeyError:
             await self.games.execComm(command, message)
 
-    # async def getHour(self):
-    #     response = {'datetime': ''}
-    #     async with aiohttp.ClientSession() as session:
-    #         async with session.get(self.data.timeUrl) as r:
-    #             if r.status == 200:
-    #                 response = await r.json()
-    #     hour = self.data.timeRegex.search(response['datetime'])
-    #     if hour == None:
-    #         return None
-    #     else:
-    #         return int(hour.group(0))
-
-    def getHour(self):
-        boston_time = 19 # equivalent to -5
-        return (time.gmtime().tm_hour + boston_time) % 24
 
     def mentioned(self, message):
         men = False
         if self.user.mentioned_in(message):
             men = True
-        elif self.nameRegex.search(message.content) != None:
+        elif self.nameRegex.search(message.content) is not None:
             men = True
         return men
 
@@ -156,7 +142,7 @@ class extendedClient(discord.Client):
     async def reactionAdd(self, reaction, user):
         name = utils.getReactionName(str(reaction), self.data.reactRegex)
 
-        if name != None and name == 'VGMCoin':
+        if name is not None and name == 'VGMCoin':
             try:
                 self.data.ledger[str(user.id)]
             except KeyError:
@@ -187,7 +173,7 @@ class extendedClient(discord.Client):
     async def reactionRemove(self, reaction, user):
         name = utils.getReactionName(str(reaction), self.data.reactRegex)
 
-        if name != None and name == 'VGMCoin':
+        if name is not None and name == 'VGMCoin':
             try:
                 self.data.ledger[str(user.id)]
             except KeyError:
@@ -209,14 +195,14 @@ class extendedClient(discord.Client):
     ################################################################################
 
     async def preMention(self, message):
-        if self.data.honkRegex.search(message.content.lower()) != None:
+        if self.data.honkRegex.search(message.content.lower()) is not None:
             currentChoice = rand.randrange(5)
             while currentChoice == self.data.prevChoice:
                 currentChoice = rand.randrange(5)
             self.data.prevChoice = currentChoice
             url = self.data.imgur + self.data.honks[currentChoice] + self.data.end
             await message.channel.send(url)
-        elif self.data.hankRegex.search(message.content.lower()) != None:
+        elif self.data.hankRegex.search(message.content.lower()) is not None:
             await message.channel.send(self.data.hankUrl1 + self.data.hankUrl2 + self.data.hankUrl3)
 
     async def fGive(self, message):
@@ -227,7 +213,7 @@ class extendedClient(discord.Client):
             tokens = sanitized.split(' ')
             data = utils.extractValue(tokens, '.give')
             user = utils.getUserFromMention(data['name'], self.data.mentionRegex)
-            if data['value'] == None or user == None:
+            if data['value'] is None or user is None:
                 mess = self.data.responses['giveErr'].format(message.author.mention, rand.choice(self.data.sad))
                 await message.channel.send(mess)
             else:
@@ -304,18 +290,18 @@ class extendedClient(discord.Client):
 
     async def fTime(self, message):
         time = self.data.timePartRegex.search(message.content.lower())
-        if time != None:
+        if time is not None:
             period = time.group(0)
-            hour = self.getHour()
+            hour = utils.get_hour()
             if period == 'morning':
-                if  hour == None or (hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]):
+                if  hour is None or (hour>self.data.timeBound['morning'][0] and hour < self.data.timeBound['morning'][1]):
                     mess = self.data.responses['time'].format('morning', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
                     mess = self.data.responses['nottime'].format('morning', rand.choice(self.data.sad))
                     await message.channel.send(mess)
             elif period == 'night':
-                if hour == None or (hour > self.data.timeBound['night'][0] or hour < self.data.timeBound['night'][1]):
+                if hour is None or (hour > self.data.timeBound['night'][0] or hour < self.data.timeBound['night'][1]):
                     mess = self.data.responses['time'].format('night', rand.choice(self.data.cute))
                     await message.channel.send(mess)
                 else:
@@ -396,15 +382,15 @@ class extendedClient(discord.Client):
     def parseModifier(self, initmatch, string):
         if self.data.modifierRegex.search(string, pos=initmatch.end()) is None:
             return None
-        else:
-            end = initmatch.end()
+
+        end = initmatch.end()
+        match = self.data.modifierRegex.search(string, pos=end)
+        matches = []
+        while match is not None:
+            matches.append(match)
+            end = match.end()
             match = self.data.modifierRegex.search(string, pos=end)
-            matches = []
-            while match is not None:
-                matches.append(match)
-                end = match.end()
-                match = self.data.modifierRegex.search(string, pos=end)
-            return matches
+        return matches
 
     def extractModifier(self, matches):
         tot = []

@@ -33,9 +33,9 @@ class Games:
         if 'rogue' in self.games:
             await self.games['rogue'].load()
 
-    def gameDecorators(self, slash, guild_ids):
+    def gameDecorators(self, slash, guilds):
         for game in self.games:
-            self.games[game].decorators(slash, guild_ids)
+            self.games[game].decorators(slash, guilds)
 
 
     async def execComm(self, command, message):
@@ -55,7 +55,7 @@ class Games:
                 self.players = json.load(file)
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print("NOT FOUND", e)
-            pass
+            
         if misc:
             try:
                 with open(self.miscPath, 'r') as file:

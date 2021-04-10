@@ -142,7 +142,12 @@ disable=print-statement,
         C0111,
         R0903,
         C0200,
-        W0123
+        W0123,
+        C0301,
+        C0303,
+        R0902,
+        R0904,
+        R1705
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -191,14 +196,14 @@ never-returning-functions=sys.exit
 [BASIC]
 
 # Naming style matching correct argument names.
-argument-naming-style=snake_case
+argument-naming-style=camelCase
 
 # Regular expression matching correct argument names. Overrides argument-
 # naming-style.
 #argument-rgx=
 
 # Naming style matching correct attribute names.
-attr-naming-style=snake_case
+attr-naming-style=camelCase
 
 # Regular expression matching correct attribute names. Overrides attr-naming-
 # style.
@@ -299,7 +304,7 @@ no-docstring-rgx=^_
 property-classes=abc.abstractproperty
 
 # Naming style matching correct variable names.
-variable-naming-style=snake_case
+variable-naming-style=camelCase
 
 # Regular expression matching correct variable names. Overrides variable-
 # naming-style.
@@ -413,7 +418,7 @@ indent-string='    '
 max-line-length=88
 
 # Maximum number of lines in a module.
-max-module-lines=1000
+max-module-lines=1500
 
 # Allow the body of a class to be on the same line as the declaration if body
 # contains single statement.

@@ -1,5 +1,6 @@
 import math
 import json
+import time
 import re
 from copy import deepcopy
 # from data import *
@@ -47,12 +48,54 @@ class GameTemplate:
     async def execute(self, playerKey, players):
         pass
 
-    def decorators(self, slash, guild_ids):
+    def decorators(self, slash, guilds):
         pass
 
 ################################################################################
 ########################## general functions ###################################
 ################################################################################
+
+def get_hour():
+    bostonTime = 19 # equivalent to -5
+    return (time.gmtime().tm_hour + bostonTime) % 24
+
+
+def extract_value(tokens, keyword):
+    for i in range(len(tokens)):
+        if keyword in tokens[i]:
+            if i > len(tokens) - 2:
+                return None
+            try:
+                value = int(tokens[i + 1])
+                return value
+            except ValueError:
+                return None
+    return None
+
+
+def prog_bar(value, minval, maxval, step=20):
+    valrange = maxval - minval
+    adjval = value - minval
+    if adjval < 0:
+        adjval = 0
+    pos = adjval/valrange
+    if pos > 1:
+        pos = 1
+    stepSize = 1/step
+    string = ''
+    for i in range(1, step + 1):
+        if pos >= i*stepSize:
+            string += '▰'
+        else:
+            string += '▱'
+    return string
+
+
+def detect_an(string):
+    anChars = ['a', 'e', 'i', 'o', 'u']
+    if string.lower()[0] in anChars:
+        return 'n'
+    return ''
 
 
 def od(x, y, width):
@@ -269,7 +312,7 @@ def tablegen(data, header=False, dot='✿', numbered=False, extra=None, name='',
         num = 1
         offset = 2 if header else 0
         for idx, item in enumerate(data[offset:]):
-            if item[0] != '' and re.search('^[=\-*~#]$', item[0]) is None:
+            if item[0] != '' and re.search(r'^[=\-*~#]$', item[0]) is None:
                 nstr = str(num)
                 data[idx + offset][0] = fmt.format(nstr, ' '*(spc - len(nstr)), item[0])
                 num += 1

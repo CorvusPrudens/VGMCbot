@@ -10,16 +10,9 @@ import utils
 
 user_regex = re.compile('((?<=(<@)[!&])|(?<=<@))[0-9]+(?=>)')
 
-def getUserFromMention(mention):
-    try:
-        return int(user_regex.search(mention).group(0))
-    except AttributeError:
-        return None
-
-
 class GameFishing(utils.GameTemplate):
     def __init__(self, client):
-        super(GameFishing, self).__init__(client)
+        super().__init__(client)
 
         self.loopCommands = {
             'cast': self.lCast,
@@ -140,14 +133,6 @@ Fishing Commands:
         await self.loopCommands[state](playerKey, players)
 
 
-    def detectAn(self, string):
-        anChars = ['a', 'e', 'i', 'o', 'u']
-        if string.lower()[0] in anChars:
-            return 'n'
-        else:
-            return ''
-
-    # TODO record code ought to execute here too
     # TODO consider adding image urls to fish list
     def fishLine(self, fishcatch, threshold=2.5):
         catch = '✿ You caught a{} **{}**! ({:,.2f} cm) {} ✿'
@@ -165,12 +150,12 @@ Fishing Commands:
         fish_sigma = self.fish[fishcatch['name']]['sigma'] * scale
 
         output = catch.format(
-            self.detectAn(fishcatch['name']), fishcatch['name'], fishcatch['size']/10, 'UwU'
+            utils.detect_an(fishcatch['name']), fishcatch['name'], fishcatch['size']/10, 'UwU'
         )
         if fishcatch['size'] <= fish_mu + fish_sigma*-threshold:
             output += small.format(':c')
         if fishcatch['size'] >= fish_mu + fish_sigma*threshold:
-            output += big.format(self.detectAn(fishcatch['name']), fishcatch['name'], 'UwU')
+            output += big.format(utils.detect_an(fishcatch['name']), fishcatch['name'], 'UwU')
 
         return output
 
@@ -241,14 +226,17 @@ Fishing Commands:
             'damage': damage, 'type': 'rods', 'multi': True
         }
 
+
     def newLure(self, name='broken can', efficacy=-0.8, durability=5, damage=0):
         return {
             'name': name, 'efficacy': efficacy, 'durability': durability,
             'damage': damage, 'type': 'lures', 'multi': True
         }
 
+
     def newRecord(self, name='trout', size='20', location='lagoon'):
         return {'name': name, 'size': size, 'location': location}
+
 
     def newLicense(self, name='cliff license', location='cliffside'):
         return {'name': name, 'type': 'licenses', 'multi': False, 'location': location}
@@ -490,6 +478,7 @@ Fishing Commands:
         dur = '{:,.2f}/{}'.format(item['durability'] - item['damage'], item['durability'])
         return [name, dur, str(item['efficacy'])]
 
+
     async def fInv(self, message):
         currentPlayer = str(message.author.id)
         try:
@@ -525,17 +514,6 @@ Fishing Commands:
 
         await utils.sendBigMess(message, greet + rods + lures + licenses)
 
-    def extractValue(self, tokens, keyword):
-        for i in range(len(tokens)):
-            if keyword in tokens[i]:
-                if i > len(tokens) - 2:
-                    return None
-                try:
-                    value = int(tokens[i + 1])
-                    return value
-                except ValueError:
-                    return None
-        return None
 
     async def fBuy(self, message):
         sanitized = message.content.lower().replace('<', ' <').replace('>', '> ')
@@ -543,11 +521,11 @@ Fishing Commands:
         tokens = sanitized.split(' ')
         currentPlayer = str(message.author.id)
 
-        val = self.extractValue(tokens, '.buy')
+        val = utils.extract_value(tokens, '.buy')
         tempitem = {}
         type = ''
 
-        if val != None:
+        if val is not None:
             found = False
             for key in self.lureShop:
                 if self.lureShop[key]['id'] == val:
@@ -584,7 +562,7 @@ Fishing Commands:
                     mess = 'sorry {}, you don\'t have enough coins to get a{} **{}** {}'
                     itemname = tempitem['stats']['name']
                     mess = mess.format(message.author.name,
-                                       self.detectAn(itemname),
+                                       utils.detect_an(itemname),
                                        itemname,
                                        rand.choice(self.client.data.sad))
                     await message.channel.send(mess)
@@ -616,7 +594,7 @@ Fishing Commands:
                         money = self.client.data.ledger[currentPlayer]
                         mess2 = '\n(you now have {:,.2f} VGMCoins)'.format(money)
                         mess = mess.format(message.author.name,
-                                           self.detectAn(itemname),
+                                           utils.detect_an(itemname),
                                            itemname,
                                            rand.choice(self.client.data.cute))
                         await message.channel.send(mess + mess2)
@@ -690,7 +668,7 @@ Fishing Commands:
                 rods.insert(0, selection)
                 self.client.games.players[currentPlayer]['fishing']['rods'] = rods
                 mess = 'Ok! A{} {} is now your primary rod {}'
-                mess = mess.format(self.detectAn(selection['name']),
+                mess = mess.format(utils.detect_an(selection['name']),
                                    selection['name'],
                                    rand.choice(self.client.data.cute))
                 self.client.games.save()
@@ -731,7 +709,7 @@ Fishing Commands:
                 lures.insert(0, selection)
                 self.client.games.players[currentPlayer]['fishing']['lures'] = lures
                 mess = 'Ok! A{} {} is now your primary lure {}'
-                mess = mess.format(self.detectAn(selection['name']),
+                mess = mess.format(utils.detect_an(selection['name']),
                                    selection['name'],
                                    rand.choice(self.client.data.cute))
                 self.client.games.save()
@@ -819,7 +797,7 @@ Fishing Commands:
             tempstr = await self.fishTable(sortedFish, total=tempmax, userid=message.author.id)
         elif user_regex.search(arg1) is not None:
             tempmax = 15
-            userid = getUserFromMention(arg1)
+            userid = utils.getUserFromMention(arg1, user_regex)
             try:
                 mefish = self.client.games.players[str(userid)]['fishing']['records']
             except KeyError:
@@ -877,7 +855,7 @@ Fishing Commands:
             mess = mess.format(message.author.name, rand.choice(self.client.data.sad))
 
         await message.channel.send(mess)
-        pass
+
 
     async def lIdle(self, playerKey, players):
         pass
@@ -905,23 +883,6 @@ Fishing Commands:
         )
         return sizeRaw*maxCoins
 
-
-    def progBar(self, value, min, max, step=20):
-        valrange = max - min
-        adjval = value - min
-        if adjval < 0:
-            adjval = 0
-        pos = adjval/valrange
-        if pos > 1:
-            pos = 1
-        stepSize = 1/step
-        string = ''
-        for i in range(1, step + 1):
-            if pos >= i*stepSize:
-                string += '▰'
-            else:
-                string += '▱'
-        return string
 
     def applyDamage(self, playerKey, players, size, playerName):
         damage = self.calcDamage(size)
@@ -1057,7 +1018,7 @@ Fishing Commands:
                     self.client.storeLedger()
                     self.client.games.save()
                     return
-                else:
+                if valid:
                     try:
                         players[playerKey]['fishing']['stats']['hooked'] += 1
                     except KeyError:
@@ -1156,7 +1117,7 @@ Fishing Commands:
                     item = self.newLure(damage=rand.random()*4)
 
                 mess = 'you found a{} **{}**, {} {}\nI\'ve added it to your inventory'
-                mess = mess.format(self.detectAn(item['name']),
+                mess = mess.format(utils.detect_an(item['name']),
                                    item['name'],
                                    playerName.name,
                                    rand.choice(self.client.data.cute))

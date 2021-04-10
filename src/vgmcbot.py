@@ -9,7 +9,7 @@ import structs
 intents = discord.Intents.default()
 intents.reactions = True
 intents.members = True
-client = structs.extendedClient(intents=intents)
+client = structs.ExtendedClient(intents=intents)
 
 slash = SlashCommand(client, sync_commands=True) # Declares slash commands through the client.
 guild_ids = [566052452114366482] # for quick debug (final needs to be global)
