@@ -10,7 +10,7 @@ import datetime as time
 from discord_slash.utils.manage_commands import create_option #, create_choice
 
 import utils
-from games.rogue import rl
+from games.rogue import player
 
 # TODO LIST :
 # - room generation
@@ -133,88 +133,13 @@ def regexFromDict(dic, command=False, bound=False):
     return re.compile(string[:-1] + ')\\b')
 
 
-    def save(self):
-        # the only time this will be called is when
-        # everything is deepcopied, so 'destroying' things
-        # is no biggie
-        for i in range(len(self.dict['rooms'])):
-            self.dict['rooms'][i] = self.dict['rooms'][i].save()
-        return self.dict
-
-
-playerTemplate = {
-    'id': '-1',
-    'lastChannel': None,
-    'type': 'player',
-    'name': 'Player',
-    'x': 0,
-    'y': 0,
-    'char': '.C ',
-    'levels': [], # need to make home level
-    'state': {
-        'level': 0,
-        'room': 0,
-        'state': 'exploration',
-    },
-    'prefs': {
-        'movement': 'above'
-    },
-    'session': None,
-}
-
-controlOptions = [
-    'above',
-    'below'
-]
-
-class Player:
-    def __init__(self, initdict=playerTemplate, name=None, char=None, id=None):
-        self.dict = copy.deepcopy(initdict)
-
-        self.dict['name'] = name if name is not None else self.dict['name']
-        self.dict['char'] = char if char is not None else self.dict['char']
-        self.dict['id'] = id if id is not None else self.dict['id']
-
-        self.dict['levels'] = [rl.Level(self)]
-
-    def save(self):
-        out = copy.deepcopy(self.dict)
-        for i in range(len(out['levels'])):
-            out['levels'][i] = out['levels'][i].save()
-        return out
-
-    def setLastChannel(self, channel):
-        self.dict['lastChannel'] = channel
-
-    def draw(self):
-        return self.getRoom().draw(self)
-
-    def getRoom(self):
-        level = self.dict['state']['level']
-        room = self.dict['state']['room']
-        return self.dict['levels'][level].dict['rooms'][room]
-
-    def apply(self, payload):
-        try:
-            for effect in payload['delta']:
-                self.dict[effect] += payload['delta'][effect]
-        except KeyError:
-            name = self.dict['name']
-            print('Error on {}; {} not present!'.format(name, effect))
-
-    async def encounter(self):
-        # for now, if the player is close to an enemy, combat will start
-        room = self.getRoom()
-        pos = room.getPlayerPos(self)
-        for thing in room.dict['things']:
-            dist = (pos[0] - thing.dict['x'])**2 + (pos[1] - thing.dict['y'])**2
-            if dist <= 2:
-                self.dict['state']['state'] = 'combat'
-                mess = 'you have entered combat'
-                await self.dict['lastChannel'].send(mess)
-
-    def combat(self):
-        pass
+    # def save(self):
+    #     # the only time this will be called is when
+    #     # everything is deepcopied, so 'destroying' things
+    #     # is no biggie
+    #     for i in range(len(self.dict['rooms'])):
+    #         self.dict['rooms'][i] = self.dict['rooms'][i].save()
+    #     return self.dict
 
 
 class GameRogue(utils.GameTemplate):
@@ -418,7 +343,7 @@ Rogue Commands:
 
 
     def prefControls(self, id, controlPref):
-        if controlPref in controlOptions:
+        if controlPref in player.controlOptions:
             self.players[id].dict['prefs']['movement'] = controlPref
             return True
         return False
@@ -453,7 +378,7 @@ Rogue Commands:
 
     def playerDeats(self, name, id, channel):
         char = name[0] if name[0].isalpha() else 'P'
-        self.players[id] = Player(name=name, id=id, char='.{} '.format(char))
+        self.players[id] = player.Player(name=name, id=id, char='.{} '.format(char))
         self.players[id].setLastChannel(channel)
         return drawText('Welcome to rogue, {}'.format(name))
 
@@ -544,6 +469,7 @@ Rogue Commands:
         player.dict['y'] = pos[1]
 
 
+    # needs to be renamed to 'interaction', since it's really just handling interactions
     async def rMove(self, reaction, user, add, messID):
         target = self.reactMessages[messID]['target']
         direction = str(reaction)
@@ -569,6 +495,10 @@ Rogue Commands:
                 self.players[id].dict['y'] = newpos[1]
                 mess = room.dict['flav'][newpos]
                 # await message.channel.send(mono(mess))
+            room.animate(self.players[id])
+
+            if self.players[id].dict['state']['state'] == 'combat':
+                mess = 'You encountered a {}!'.format(self.players[id].dict['state']['initiator'])
 
             string = self.players[id].draw()
             self.save(self.players[id])

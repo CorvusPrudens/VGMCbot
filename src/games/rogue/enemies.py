@@ -1,5 +1,8 @@
-import random as rand
+import math
 import copy
+import random as rand
+
+import utils
 
 class Thing:
     def __init__(self, initdict={'type': 'thing', 'name': 'object'}):
@@ -22,13 +25,127 @@ class Thing:
     def animate(self, player):
         pass
 
+optKeys = [
+    (0, -1),
+    (0, 1),
+    (-1, 0),
+    (1, 0),
+
+    (-1, -1),
+    (1, -1),
+    (-1, 1),
+    (1, 1),
+]
 
 class Enemy(Thing):
 
+    def applyState(self):
+        # may need adjusting if multiple enemies have same name
+        if self.dict['state'] == 'idle':
+            self.dict['char'] = '({})'.format(self.dict['name'][0])
+        elif self.dict['state'] == 'alert':
+            self.dict['char'] = '{{{}}}'.format(self.dict['name'][0])
+        elif self.dict['state'] == 'chase':
+            self.dict['char'] = '[{}]'.format(self.dict['name'][0])
+
+
     def animate(self, player):
         # simple movement script for now
-        self.dict['x'] += 
-        pass
+        room = player.getRoom()
+        playerPos = room.getPlayerPos(player)
+
+        if self.dict['state'] == 'chase':
+            self.dict['prevpos'] = (self.dict['x'], self.dict['y'])
+            # TODO -- vertical upwards movement is slow for some reason
+            vector = utils.direction((self.dict['x'], self.dict['y']), playerPos)
+            self.dict['x'] += round(vector[0] * self.dict['stats']['speed'])
+            self.dict['y'] += round(vector[1] * self.dict['stats']['speed'])
+
+            if self.dict['x'] < 0:
+                self.dict['x'] = 0
+            elif self.dict['x'] > room.dict['width'] - 1:
+                self.dict['x'] = room.dict['width'] - 1
+
+            if self.dict['y'] < 0:
+                self.dict['y'] = 0
+            elif self.dict['y'] > room.dict['height'] - 1:
+                self.dict['y'] = room.dict['height'] - 1
+        elif self.dict['state'] == 'idle':
+            if utils.distance(playerPos, (self.dict['x'], self.dict['y'])) <= self.dict['stats']['sensory-radius']:
+                self.dict['state'] = 'chase'
+
+        self.applyState()
+
+
+    def generateCollisionOptions(self, player):
+        currentPos = (self.dict['x'], self.dict['y'])
+        room = player.getRoom()
+        getRel = lambda x, y : (x.dict['x'] - y.dict['x'], x.dict['y'] - y.dict['y'])
+        relpos = [getRel(x, self) for x in player.getRoom().dict['things']]
+        ppos = room.getPlayerPos(player)
+        relpos.append((ppos[0] - self.dict['x'], ppos[1] - self.dict['y']))
+        opts = {k:True for k in optKeys}
+
+        for pos in relpos:
+            if pos in opts:
+                opts[pos] = False
+
+        for pos in opts:
+            if not room.validPosition(utils.add_vector(currentPos, pos)):
+                opts[pos] = False
+
+        return opts
+
+
+    def checkOptions(self, player, otherPos, rotSeq):
+        currentPos = (self.dict['x'], self.dict['y'])
+        if otherPos == currentPos:
+            options = self.generateCollisionOptions(player)
+            bestDirection = utils.direction((self.dict['x'], self.dict['y']), self.dict['prevpos'])
+            bdpos = utils.round_vector(bestDirection)
+            if utils.magnitude(bdpos) == 0:
+                bdpos = rand.choice(optKeys)
+            if options[bdpos] and player.getRoom().validPosition(utils.add_vector(currentPos, bdpos)):
+                self.dict['x'] += bdpos[0]
+                self.dict['y'] += bdpos[1]
+                return True
+            else:
+                for rot in rotSeq:
+                    testvec = utils.rotate(bdpos, rot)
+                    testvec = utils.round_vector(testvec)
+                    if options[testvec]:
+                        self.dict['x'] += testvec[0]
+                        self.dict['y'] += testvec[1]
+                        return True
+                # if nothing worked -- this could be expanded to do proper step-by-step
+                # checking until invalid
+                self.dict['x'] = self.dict['prevpos'][0]
+                self.dict['y'] = self.dict['prevpos'][1]
+                return True
+        return False
+
+
+    # this only partially works -- needs a bugfix
+    def resolveCollision(self, player):
+        rotSeq = [
+            math.pi * 0.25,
+            -math.pi * 0.25,
+            math.pi * 0.5,
+            -math.pi * 0.5,
+            math.pi * 0.75,
+            -math.pi * 0.75,
+            math.pi
+        ]
+        thinglist = []
+        for thing in player.getRoom().dict['things']:
+            if thing is not self:
+                thinglist.append(thing)
+        poslist = [(x.dict['x'], x.dict['y']) for x in thinglist]
+        poslist += [player.getRoom().getPlayerPos(player)]
+        for pos in poslist:
+            if self.checkOptions(player, pos, rotSeq):
+                break
+            # collision resolution can fail if there are no options
 
 
     def onTouch(self, player):
@@ -115,21 +232,31 @@ stun = {
     'stat bonus': {}
 }
 
+# TODO -- moveset is generated from inventory (should be same for player)
+# TODO -- each item move will have access to the current status (and player status)
+# TODO -- moves are chosen randomly from a weighted list of options. Weights are a combination
+# of item attributes and player/self status
 sentry = {
     'name': 'sentry bot',
     'type': 'enemy',
-    'char': '[s]',
+    'char': '(s)',
+    'state': 'idle',
     'x': 2,
-    'y':0,
-    'hp': 10.0,
+    'y': 0,
+    'prevpos': (2, 0),
+    'status': {
+        'hp': 10.0,
+    },
     'inventory': [
-        lens,
-        stun,
+        copy.deepcopy(lens),
+        copy.deepcopy(stun),
     ],
     'stats': { #base stats
+        'hp': 10.0,
+        'sensory-radius': 3,
         'strength': 0,
         'tech': 5,
-        'speed': 2, # units / player move
+        'speed': 2, # units / player move NOTE -- really should be units per player distance travelled
         'resistance': {
             'heat': 5,
             'physical': 2,

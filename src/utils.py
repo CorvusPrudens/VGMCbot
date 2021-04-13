@@ -2,6 +2,7 @@ import math
 import json
 import time
 import re
+from itertools import islice
 from copy import deepcopy
 # from data import *
 
@@ -54,6 +55,59 @@ class GameTemplate:
 ################################################################################
 ########################## general functions ###################################
 ################################################################################
+
+def mergeStrings(primary, addition, xoff, yoff):
+    plist = primary.split('\n')
+    alist = addition.split('\n')
+    longest = max(len(plist), len(alist) + yoff)
+    alist = [' '*len(alist[0]) for x in range(yoff)] + alist
+    plist += [' '*len(plist[0]) for x in range(longest - len(plist))]
+
+    for idx, (str1, str2) in enumerate(islice(zip(plist, alist), yoff, None), yoff):
+        plist[idx] = str1 + ' '*xoff + str2
+
+    return '\n'.join(plist)
+
+
+def magnitude(pos):
+    return math.sqrt(pos[0]**2 + pos[1]**2)
+
+def distance(pos1, pos2):
+    return math.sqrt(
+        math.pow(pos1[0] - pos2[0], 2) +
+        math.pow(pos1[1] - pos2[1], 2)
+    )
+
+
+def direction(pos1, pos2):
+    dist = distance(pos1, pos2)
+    if dist == 0:
+        dist = 1
+    return (
+        (pos2[0] - pos1[0]) / dist,
+        (pos2[1] - pos1[1]) / dist
+    )
+
+
+def get_angle(dir):
+    return math.atan2(dir[1], dir[0])
+
+
+def rotate(dir, angle):
+    ang = angle
+    cs = math.cos(ang)
+    sn = math.sin(ang)
+
+    return (dir[0]*cs - dir[1]*sn, dir[0]*sn + dir[1]*cs)
+
+
+def round_vector(vector):
+    return (round(vector[0]), round(vector[1]))
+
+
+def add_vector(vector1, vector2):
+    return (vector1[0] + vector2[0], vector1[1] + vector2[1])
+
 
 def get_hour():
     bostonTime = 19 # equivalent to -5

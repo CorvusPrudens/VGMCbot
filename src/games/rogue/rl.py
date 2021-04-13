@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 from games.rogue import rooms
-# from games.rogue import enemies
+from games.rogue import enemies
 from games.rogue import maze
 import utils
 
@@ -273,6 +273,68 @@ def printRoom(roomdict):
 
 # printRoom(bigg)
 
+arenaStr = '\n'.join([
+'   ░░░░░░░░░░░░░░░░░░░░░░░░   ',
+'   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒   ',
+'   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ',
+'  /...............{6}.{3}..\\  ',
+' /••{0}••••••••••••{4}•{1}••\\ ',
+'/●●●●●●●●●●●●●●●●●●●{5}●{2}●●\\'
+])
+
+replacement = [
+    '•••',
+    '●●●',
+    '...',
+    '•••',
+    '●●●',
+    '...'
+]
+
+barStr = '\n'.join([
+' {} ',
+'│{}│',
+'│{}│',
+'│{}│',
+'│{}│',
+'│{}│',
+])
+
+barFill = [
+    ' ',
+    '▁',
+    '▂',
+    '▃',
+    '▄',
+    '▅',
+    '▆',
+    '▇',
+    '█',
+]
+
+def drawBar(char, total, current):
+    numsegs = 5
+    totalRange = numsegs * 8 # as determined by box characters
+    # this assumes a start of zero
+    barval = utils.clamp(int(utils.remap(current, 0, total, 0, totalRange)), 0, totalRange)
+    numFull = barval // 8
+    partial = barval % 8
+    barlist = [barFill[-1] for x in range(numFull)]
+    if partial != 0:
+        barlist += [barFill[partial]]
+    barlist += [' ' for x in range(numsegs - len(barlist))]
+    return barStr.format(char, *barlist[::-1])
+
+
+def drawArena(player):
+    enemyList = [x.dict['char'] for x in player.dict['enemies']]
+    enemyList += replacement[len(enemyList):]
+    arena = arenaStr.format(player.dict['char'], *enemyList)
+    bar = drawBar('H', player.dict['stats']['hp'], player.dict['status']['hp'])
+    merge1 = utils.mergeStrings(arena, bar, 3, 0)
+    return merge1
+
+
 rectTemplate = genRoom('chamber', 7, 5, 'rect')
 
 class Room:
@@ -285,10 +347,13 @@ class Room:
         self.dict['shape'] = shape if shape is not None else ''
 
     def draw(self, player):
-        tempbuff = formatRoom(self.dict)
-        for thing in self.dict['things']:
-            tempbuff = self.add(tempbuff, thing)
-        tempbuff = self.addPlayer(tempbuff, player)
+        if player.dict['state']['state'] == 'exploration':
+            tempbuff = formatRoom(self.dict)
+            for thing in self.dict['things']:
+                tempbuff = self.add(tempbuff, thing)
+            tempbuff = self.addPlayer(tempbuff, player)
+        elif player.dict['state']['state'] == 'combat':
+            tempbuff = drawArena(player)
         return tempbuff
 
     def add(self, buff, thing):
@@ -322,6 +387,19 @@ class Room:
     def animate(self, player):
         for thing in self.dict['things']:
             thing.animate(player)
+        for thing in self.dict['things']:
+            if thing.dict['type'] == 'enemy':
+                thing.resolveCollision(player)
+        for thing in self.dict['things']:
+            if utils.distance((thing.dict['x'], thing.dict['y']), self.getPlayerPos(player)) < 2:
+                thing.onTouch(player)
+
+    def validPosition(self, pos):
+        if pos[0] < 0 or pos[0] > self.dict['width'] - 1:
+            return False
+        if pos[1] < 0 or pos[1] > self.dict['height'] - 1:
+            return False
+        return True
 
 #
 # ┌───┐
@@ -495,7 +573,7 @@ class Level:
                      smscore = 0
 
                  score = dead * 7.5 + smscore
-                 print(score)
+                 # print(score)
                  scores.append(score)
                  genned.append(drs)
                  starts.append(start)
@@ -519,6 +597,15 @@ class Level:
              special = [maze.macro2sp(x) for x in drs]
              dists = [maze.getDist(x) for x in drs]
              temprooms = [Room(initdict=rs(x, y, z)) for x, y, z in zip(doors, special, dists)]
+
+             for room in temprooms:
+                 room.insert(enemies.Enemy(enemies.sentry))
+                 room.insert(enemies.Enemy(enemies.sentry))
+                 room.insert(enemies.Enemy(enemies.sentry))
+                 room.insert(enemies.Enemy(enemies.sentry))
+                 room.insert(enemies.Enemy(enemies.sentry))
+                 room.insert(enemies.Enemy(enemies.sentry))
+
 
              temprooms[end_flat].dict['special'] = 'E'
 
