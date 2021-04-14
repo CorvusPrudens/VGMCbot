@@ -1,7 +1,7 @@
 import copy
 
 import utils
-from games.rogue import rl
+from games.rogue import levels
 
 playerTemplate = {
     'id': '-1',
@@ -57,7 +57,7 @@ class Player:
         self.dict['char'] = char if char is not None else self.dict['char']
         self.dict['id'] = id if id is not None else self.dict['id']
 
-        self.dict['levels'] = [rl.Level(self)]
+        self.dict['levels'] = [levels.Level(self)]
 
     def save(self):
         out = copy.deepcopy(self.dict)
