@@ -295,7 +295,7 @@ Fishing Commands:
             currentState = self.client.games.players[currentPlayer]['fishing']['state']['state']
         except KeyError:
             # await self.initFishing(message, self.client)
-            self.initFishing(message)
+            await self.initFishing(message)
             currentState = self.client.games.players[currentPlayer]['fishing']['state']['state']
         if currentState != 'idle':
             mess = 'whoa chill u already {} {} o.o'.format(currentState, message.author.name)

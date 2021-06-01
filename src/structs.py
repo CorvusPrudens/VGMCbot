@@ -289,9 +289,13 @@ class extendedClient(discord.Client):
             try:
                 fetched = self.data.nameCache[key]
             except KeyError:
-                user = await self.fetch_user(key)
-                fetched = user.name
-                self.data.nameCache[key] = fetched
+                try:
+                    user = await self.fetch_user(key)
+                    fetched = user.name
+                    self.data.nameCache[key] = fetched
+                except discord.NotFound:
+                    fetched = '???'
+                    print(key)
             if sortedLedger[key] != 0:
                 valstr = '{:,.2f}'.format(sortedLedger[key])
                 rows.append([fetched, valstr])
