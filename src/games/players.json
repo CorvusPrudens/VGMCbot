@@ -8,14 +8,14 @@
         "location": "oilrig",
         "state": "idle",
         "timeCast": -0.5700000000000003,
-        "prevnibs": 0
+        "prevnibs": 1
       },
       "rods": [
         {
           "name": "aluminum rod",
           "efficacy": 0.3,
           "durability": 160,
-          "damage": 116.69311034482755,
+          "damage": 116.74311034482754,
           "type": "rods",
           "multi": true
         }
@@ -25,7 +25,7 @@
           "name": "diver",
           "efficacy": 0.4,
           "durability": 240,
-          "damage": 116.69311034482755,
+          "damage": 116.74311034482754,
           "type": "lures",
           "multi": true
         },
@@ -549,8 +549,8 @@
       ],
       "lastChannel": 777266814933008406,
       "stats": {
-        "casts": 909,
-        "nibbles": 377,
+        "casts": 910,
+        "nibbles": 378,
         "records": 25,
         "spent": 4495,
         "hooked": 532,
@@ -645,15 +645,15 @@
       "state": {
         "location": "cliffside",
         "state": "idle",
-        "timeCast": -0.4400000000000004,
-        "prevnibs": 1
+        "timeCast": -0.9000000000000004,
+        "prevnibs": 2
       },
       "rods": [
         {
           "name": "carbon fiber composite rod",
           "efficacy": 0.7,
           "durability": 150,
-          "damage": 73.61975517241378,
+          "damage": 73.66975517241377,
           "type": "rods",
           "multi": true
         },
@@ -671,7 +671,7 @@
           "name": "diver",
           "efficacy": 0.4,
           "durability": 80,
-          "damage": 79.81975517241379,
+          "damage": 79.86975517241379,
           "type": "lures",
           "multi": true
         },
@@ -907,7 +907,7 @@
       ],
       "lastChannel": 777266814933008406,
       "stats": {
-        "casts": 34,
+        "casts": 35,
         "hooked": 26,
         "earned": 217.87233896551732,
         "numfish": {
@@ -932,7 +932,7 @@
           "Gafftopsail Catfish": 1
         },
         "records": 7,
-        "nibbles": 8
+        "nibbles": 9
       }
     }
   },
